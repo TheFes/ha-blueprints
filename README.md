@@ -29,6 +29,7 @@ On this repository different blueprints will be placed with the same goal. The w
 |No strict voice commands|❌|
 |Complete freedom in voice commands|❌|
 |Variance in responses for each request|❌|
+|Works without need for translations|❌|
 
 ### Option 2: LLM Enhanced automation
 
@@ -40,6 +41,7 @@ On this repository different blueprints will be placed with the same goal. The w
 |No strict voice commands|✅|
 |Complete freedom in voice commands|❌|
 |Variance in responses for each request|✅|
+|Works without need for translations|❌|
 
 ### Option 3: Full LLM script
 
@@ -51,6 +53,7 @@ On this repository different blueprints will be placed with the same goal. The w
 |No strict voice commands|✅|
 |Complete freedom in voice commands|✅|
 |Variance in responses for each request|✅|
+|Works without need for translations|✅|
 
 ## The Blueprints
 
