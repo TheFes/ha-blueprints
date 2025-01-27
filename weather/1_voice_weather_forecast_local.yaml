@@ -24,6 +24,7 @@ blueprint:
 
     * Change or translate the settings for the response given by Assist
 
+
     These translations are already available:
 
     * [Dutch](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_nl.md)
