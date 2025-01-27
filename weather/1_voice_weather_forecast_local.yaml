@@ -39,6 +39,8 @@ blueprint:
     
     - what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({pharse}|day)]
 
+    #### Trigger sentence syntax
+
     All parts between square brackets are optional, the sentence will be recognized with and without those parts. A pipe `|` means `or`.
     All parts betwee round brackets are mandatory, but also here the pipe means `or`.
 
