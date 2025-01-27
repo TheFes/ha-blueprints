@@ -3,8 +3,10 @@ blueprint:
   name: Voice - Weather Forecast - Local Assist Blueprint
   author: TheFes
   source_url: https://github.com/TheFes/blob/main//ha-blueprints/weather/1_voice_weather_forecast_local.yaml
-  description: "
-    # Request the weather forecast fully locally 
+  description:
+    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+
+    # Request the weather forecast fully locally
 
     ### Blueprint setup
 
@@ -51,8 +53,9 @@ blueprint:
               multiline: false
               multiple: true
           default:
-            - "what['s| is] [this] ({phrase}[']s|the|this) weather [forecast]"
-            - "what['s| is] the weather [forecast] [for] [this|next] ({phrase}|day)"
+            - "what('s| is) [this] ({phrase}[']s|the|this) weather [forecast]"
+            - "what('s| is) the weather [forecast] [for] [this|next] ({phrase}|day)"
+            - "what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({pharse}|day)]"
     daily_forecast_settings:
       name: Settings for the daily forecast.
       icon: mdi:chat
@@ -181,7 +184,7 @@ blueprint:
               multiline: false
               multiple: true
           default:
-            - "morning"
+            - "afternoon"
         evening:
           name: Evening
           description: Phrases to request the forecast for the evening
@@ -197,6 +200,12 @@ blueprint:
       description: "Change or translate the response"
       collapsed: true
       input:
+        enable_llm_fallback:
+          name: LLM Fallback
+          description: Enable to send the request to an LLM in case the prhase could not be recognized
+          selector:
+            boolean:
+          default: false
         clear:
           name: Clear
           selector:
@@ -378,12 +387,28 @@ blueprint:
               min: 0
               max: 3
           default: 0
+        response_invalid_phrase:
+          name: Response when the requested prhase could not be recognized
+          description: The response which will be given by Assist.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: "Unable to get forecasts for {{ phrase }}"
+        response_no_data:
+          name: Response when there is a no data for the requested period
+          description: The response which will be given by Assist.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: "No forecast data available for the requested period"
         response_forecast:
           name: Response when there is a forecast found
           description: The response which will be given by Assist.
           selector:
             text:
-              multiline: false
+              multiline: true
               multiple: false
           default:
             "It will be {{ temperature }} degrees {{ condition_translated }}.
@@ -403,48 +428,70 @@ blueprint:
 triggers:
   - trigger: conversation
     command: !input trigger
+variables:
+  daily_mapping:
+    - phrases: !input today
+      delta: 0
+    - phrases: !input tomorrow
+      delta: 1
+    - phrases: !input day_after_tomorrow
+      delta: 2
+    - phrases: !input monday
+      delta: "{{ 0 - now().weekday() + (7 if 0 <= now().weekday() else 0) }}"
+    - phrases: !input tuesday
+      delta: "{{ 1 - now().weekday() + (7 if 1 <= now().weekday() else 0) }}"
+    - phrases: !input wednesday
+      delta: "{{ 2 - now().weekday() + (7 if 2 <= now().weekday() else 0) }}"
+    - phrases: !input thursday
+      delta: "{{ 3 - now().weekday() + (7 if 3 <= now().weekday() else 0) }}"
+    - phrases: !input friday
+      delta: "{{ 4 - now().weekday() + (7 if 4 <= now().weekday() else 0) }}"
+    - phrases: !input saturday
+      delta: "{{ 5 - now().weekday() + (7 if 5 <= now().weekday() else 0) }}"
+    - phrases: !input sunday
+      delta: "{{ 6 - now().weekday() + (7 if 6 <= now().weekday() else 0) }}"
+  day_part_mapping:
+    - phrases: !input night
+      start: "00:00:00"
+      end: "06:00:00"
+    - phrases: !input morning
+      start: "06:00:00"
+      end: "12:00:00"
+    - phrases: !input afternoon
+      start: "12:00:00"
+      end: "18:00:00"
+    - phrases: !input evening
+      start: "18:00:00"
+      end: "23:59:59"
+  phrase: "{{ trigger.get('slots', {}).phrase | lower if trigger.get('slots', {}).get('phrase') else none }}"
+  daily_phrases: "{{ daily_mapping | map(attribute='phrases') | sum(start=[]) }}"
+  day_part_phrases: "{{ day_part_mapping | map(attribute='phrases') | sum(start=[]) }}"
+  daily: "{{ phrase is none or daily_phrases | select('contains', phrase) | list | count > 0 }}"
+  part_day: "{{ false if phrase is none else day_part_phrases | select('contains', phrase) | list | count > 0 }}"
+  weather_entity: !input weather_entity
+  translations:
+    clear: !input clear
+    clear-night: !input clear-night
+    cloudy: !input cloudy
+    fog: !input fog
+    hail: !input hail
+    lightning: !input lightning
+    lighting-rainy: !input lightning-rainy
+    partlycloudy: !input partlycloudy
+    pouring: !input pouring
+    rainy: !input rainy
+    snowy: !input snowy
+    snowy-rainy: !input snowy-rainy
+    sunny: !input sunny
+    windy: !input windy
+    windy-variant: !input windy-variant
+    exceptional: !input exceptional
+  wind_phrases: !input wind_phrases
+conditions:
+  - condition: template
+    value_template: "{{ daily or part_day }}"
+    enabled: !input enable_llm_fallback
 actions:
-  - variables:
-      daily_mapping:
-        - phrases: !input today
-          delta: 0
-        - phrases: !input tomorrow
-          delta: 1
-        - phrases: !input day_after_tomorrow
-          delta: 2
-        - phrases: !input monday
-          delta: "{{ 0 - now().weekday() + (7 if 0 <= now().weekday() else 0) }}"
-        - phrases: !input tuesday
-          delta: "{{ 1 - now().weekday() + (7 if 1 <= now().weekday() else 0) }}"
-        - phrases: !input wednesday
-          delta: "{{ 2 - now().weekday() + (7 if 2 <= now().weekday() else 0) }}"
-        - phrases: !input thursday
-          delta: "{{ 3 - now().weekday() + (7 if 3 <= now().weekday() else 0) }}"
-        - phrases: !input friday
-          delta: "{{ 4 - now().weekday() + (7 if 4 <= now().weekday() else 0) }}"
-        - phrases: !input saturday
-          delta: "{{ 5 - now().weekday() + (7 if 5 <= now().weekday() else 0) }}"
-        - phrases: !input sunday
-          delta: "{{ 6 - now().weekday() + (7 if 6 <= now().weekday() else 0) }}"
-      day_part_mapping:
-        - phrases: !input night
-          start: "00:00:00"
-          end: "06:00:00"
-        - phrases: !input morning
-          start: "06:00:00"
-          end: "12:00:00"
-        - phrases: !input afternoon
-          start: "12:00:00"
-          end: "18:00:00"
-        - phrases: !input evening
-          start: "18:00:00"
-          end: "23:59:59"
-      phrase: "{{ trigger.get('slots', {}).phrase | lower if trigger.get('slots', {}).get('phrase') else none }}"
-      daily_phrases: "{{ daily_mapping | map(attribute='phrases') | sum(start=[]) }}"
-      day_part_phrases: "{{ day_part_mapping | map(attribute='phrases') | sum(start=[]) }}"
-      daily: "{{ phrase is none or daily_phrases | select('contains', phrase) | list | count > 0 }}"
-      part_day: "{{ false if phrase is none else day_part_phrases | select('contains', phrase) | list | count > 1 }}"
-      weather_entity: !input weather_entity
   - choose:
       - conditions: "{{ daily }}"
         sequence:
@@ -455,41 +502,109 @@ actions:
             data:
               type: daily
             response_variable: weather
+            continue_on_error: true
           - alias: Define variables to determine which part to use
             variables:
               delta: "{{ daily_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='delta') | list | first | default(0) }}"
-              day_forecast: "{{ weather[weather_entity].forecast[delta] }}"
-          - alias: Create translation mapping
+              start: "{{ today_at() + timedelta(days=delta) }}"
+              end: "{{ start | as_datetime + timedelta(days=1) }}"
+              day_forecast: >
+                {% set ns = namespace(forecast=[]) %}
+                {% set forecast = weather[weather_entity].forecast if weather is defined else [] %}
+                {% for item in forecast %}
+                  {% if start | as_datetime <= item.datetime | as_datetime < end | as_datetime %}
+                    {% set ns.forecast = ns.forecast + [item] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.forecast | first | default({}) }}
+          - if:
+              - condition: template
+                value_template: "{{ iif(day_forecast) }}"
+            then:
+              - alias: Create variables for response
+                variables:
+                  value_round: !input value_round
+                  condition: "{{ day_forecast.get('condition') }}"
+                  cloud_coverage: "{{ day_forecast.get('cloud_coverage', 0) | round(value_round) }}"
+                  temperature: "{{ day_forecast.get('temperature', 0) | round(value_round) }}"
+                  dew_point: "{{ day_forecast.get('dew_point', 0) | round(value_round) }}"
+                  pressure: "{{ day_forecast.get('pressure', 0) | round(value_round) }}"
+                  humidity: "{{ day_forecast.get('humidity', 0) | round(value_round) }}"
+                  templow: "{{ day_forecast.get('temp_low', 0) | round(value_round) }}"
+                  wind_gust_speed: "{{ day_forecast.get('wind_gust_speed', 0) | round(value_round) }}"
+                  apparent_temperature: "{{ day_forecast.get('apparent_temperatue', temperature) | round(value_round) }}"
+                  uv_index: "{{ day_forecast.get('uv_index', 0) | round(value_round) }}"
+                  precipitation: "{{ day_forecast.get('precipitation', 0) | round(value_round) }}"
+                  precipitation_probability: "{{ day_forecast.get('precipitation_probability', 0) | round(value_round) }}"
+                  wind_speed: "{{ day_forecast.get('wind_speed', 0) | round(value_round) }}"
+                  condition_translated: "{{ translations.get(condition) }}"
+                  rain_warning_threshold: !input rain_warning_threshold
+                  wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', wind_speed) | map(attribute='0') | list | last | default }}"
+                  wind_threshold: !input wind_threshold
+                  wind_joke_threshold: !input wind_joke_threshold
+                  wind_warning_threshold: !input wind_warning_threshold
+                  response_forecast: !input response_forecast
+              - alias: Send back the response
+                set_conversation_response: !input response_forecast
+      - conditions: "{{ part_day }}"
+        sequence:
+          - alias: "Get the forecast data"
+            action: weather.get_forecasts
+            target:
+              entity_id: !input weather_entity
+            data:
+              type: hourly
+            response_variable: weather
+            continue_on_error: true
+          - alias: Define variables to determine which part to use
             variables:
-              translations:
-                clear: !input clear
-                clear-night: !input clear-night
-                cloudy: !input cloudy
-                rainy: !input rainy
-              wind_phrases: !input wind_phrases
-          - alias: Create variables for response
-            variables:
-              value_round: !input value_round
-              condition: "{{ day_forecast.get('condition') }}"
-              cloud_coverage: "{{ day_forecast.get('cloud_coverage', 0) | round(value_round) }}"
-              temperature: "{{ day_forecast.get('temperature') | round(value_round) }}"
-              dew_point: "{{ day_forecast.get('dew_point') | round(value_round) }}"
-              pressure: "{{ day_forecast.get('pressure') | round(value_round) }}"
-              humidity: "{{ day_forecast.get('humidity') | round(value_round) }}"
-              templow: "{{ day_forecast.get('temp_low') | round(value_round) }}"
-              wind_gust_speed: "{{ day_forecast.get('wind_gust_speed') | round(value_round) }}"
-              apparent_temperature: "{{ day_forecast.get('apparent_temperatue', temperature) | round(value_round) }}"
-              uv_index: "{{ day_forecast.get('uv_index', 0) | round(value_round) }}"
-              precipitation: "{{ day_forecast.get('precipitation', 0) | round(value_round) }}"
-              precipitation_probability: "{{ day_forecast.get('precipitation_probability', 0) | round(value_round) }}"
-              wind_speed: "{{ day_forecast.get('wind_speed', 0) | round(value_round) }}"
-              condition_translated: "{{ translations.get(condition) }}"
-              rain_warning_threshold: !input rain_warning_threshold
-              wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<', wind_speed) | map(attribute='0') | list | last | default }}"
-              wind_threshold: !input wind_threshold
-              wind_joke_threshold: !input wind_joke_threshold
-              wind_warning_threshold: !input wind_warning_threshold
-              response_forecast: !input response_forecast
-          - alias: Send back the response
-            set_conversation_response: !input response_forecast
+              tomorrow: !input tomorrow
+              next_day: "{{ phrase is search(tomorrow | join('|')) }}"
+              delta: "{{ 1 if next_day else 0}}"
+              start_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='start') | list | first }}"
+              end_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='end') | list | first }}"
+              start: "{{ today_at() + timedelta(days=delta) + as_timedelta(start_time) }}"
+              end: "{{ today_at() + timedelta(days=delta) + as_timedelta(end_time) }}"
+              day_part_forecast: >
+                {% set ns = namespace(forecast=[]) %}
+                {% set forecast = weather[weather_entity].forecast if weather is defined else [] %}
+                {% for item in forecast %}
+                  {% if start | as_datetime <= item.datetime | as_datetime < end | as_datetime %}
+                    {% set ns.forecast = ns.forecast + [item] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.forecast | default([]) }}
+          - if:
+              - condition: template
+                value_template: "{{ iif(day_part_forecast) }}"
+            then:
+              - alias: Create variables for response
+                variables:
+                  value_round: !input value_round
+                  condition: "{{ day_part_forecast | map(attribute='condition') | list | statistical_mode }}"
+                  cloud_coverage: "{{ day_part_forecast | map(attribute='cloud_coverage') | list | average | default(0) | round(value_round) }}"
+                  temperature: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  dew_point: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  pressure: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  humidity: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  apparent_temperature: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(temperature) | round(value_round) }}"
+                  uv_index: "{{ day_part_forecast | map(attribute='uv_index') | list | max | default(0) | round(value_round) }}"
+                  precipitation: "{{ day_part_forecast | map(attribute='precipitation') | list | sum | default(0) | round(value_round) }}"
+                  precipitation_probability: "{{ day_part_forecast | map(attribute='precipitation_probability') | list | max | default(0) | round(value_round) }}"
+                  wind_speed: "{{ day_part_forecast | map(attribute='wind_speed') | list | max | default(0) | round(value_round) }}"
+                  condition_translated: "{{ translations.get(condition) }}"
+                  rain_warning_threshold: !input rain_warning_threshold
+                  wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', wind_speed) | map(attribute='0') | list | last | default }}"
+                  wind_threshold: !input wind_threshold
+                  wind_joke_threshold: !input wind_joke_threshold
+                  wind_warning_threshold: !input wind_warning_threshold
+                  response_forecast: !input response_forecast
+              - alias: Send back the response
+                set_conversation_response: !input response_forecast
+            else:
+              - alias: Send back the response
+                set_conversation_response: !input response_no_data
+    default:
+      - alias: Send back the response
+        set_conversation_response: !input response_invalid_phrase
 mode: single
