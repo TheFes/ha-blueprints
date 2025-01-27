@@ -200,12 +200,6 @@ blueprint:
       description: "Change or translate the response"
       collapsed: true
       input:
-        enable_llm_fallback:
-          name: LLM Fallback
-          description: Enable to send the request to an LLM in case the prhase could not be recognized
-          selector:
-            boolean:
-          default: false
         clear:
           name: Clear
           selector:
@@ -487,10 +481,6 @@ variables:
     windy-variant: !input windy-variant
     exceptional: !input exceptional
   wind_phrases: !input wind_phrases
-conditions:
-  - condition: template
-    value_template: "{{ daily or part_day }}"
-    enabled: !input enable_llm_fallback
 actions:
   - choose:
       - conditions: "{{ daily }}"
