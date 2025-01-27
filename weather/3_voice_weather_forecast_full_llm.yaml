@@ -185,7 +185,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 2.3
+      version: 20250127
       weather_entity: !input weather_entity
       start_date: "{{ start_date | as_datetime(default='') }}"
       start_time:
