@@ -6,7 +6,7 @@ blueprint:
   description:
     "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
 
-    For more detailed instructions, see the _documentation to be added_
+    More detailed information can be found [here](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/1_voice_weather_forecast_local.md)
 
     # Request the weather forecast fully locally
 
