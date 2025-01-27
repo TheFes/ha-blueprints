@@ -1,3 +1,7 @@
+![Version](https://img.shields.io/github/v/release/TheFes/ha-blueprints)
+[![Buy me a coffe](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/TheFes)
+[![Paypal](https://img.shields.io/badge/PayPal-00457C?&color=00457c&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/thefes)
+
 # Home Assistant Voice Blueprints
 ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
 
@@ -57,10 +61,21 @@ On this repository different blueprints will be placed with the same goal. The w
 
 ## The Blueprints
 
-## Weather Forecasts
+### Weather Forecasts
 
 |Option|Import Button|Explanation|
 |---|---|---|
 |1: Local|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F1_voice_weather_forecast_local.yaml)|To be created|
 |2: LLM Enhanced|To be created|To be created|
 |3: Full LLM|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F3_voice_weather_forecast_full_llm.yaml)|To be created|
+
+## ☕ Coffee
+
+If you think I deserve a coffe, please feel free to buy me one (I might spend it on another beverage though).
+In case you decide to do so, thanks a lot!
+
+<a href="https://www.buymeacoffee.com/thefes" target="_blank">![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)</a>
+
+Or you can do a small donation using PayPal.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/thefes)
