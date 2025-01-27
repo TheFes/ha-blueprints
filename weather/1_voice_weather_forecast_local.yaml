@@ -182,7 +182,7 @@ blueprint:
               multiple: true
           default:
             - "morning"
-        morning:
+        evening:
           name: Evening
           description: Phrases to request the forecast for the evening
           selector:
