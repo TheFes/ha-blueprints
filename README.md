@@ -26,41 +26,20 @@ On this repository different blueprints will be placed with the same goal. The w
 
 ## Blueprint options
 
-### Option 1: Local
+There are 3 options for the blueprints
+* Option 1: Local automation
+* Option 2: LLM Enhanced automation
+* Option 3: Full LLM script
 
-|Description|Pro/Con|
+|Description|Option 1|Option 2|Option 3|
 |---|---|
-|Supported voice configurations|1, 2, 4|
-|Fully local, no LLM required|✅|
-|No home control for LLM required|✅|
-|No strict voice commands|❌|
-|Complete freedom in voice commands|❌|
-|Variance in responses for each request|❌|
-|Works without need for translations|❌|
-
-### Option 2: LLM Enhanced automation
-
-|Description|Pro/Con|
-|---|---|
-|Supported voice configurations|1, 3, 5|
-|Fully local, no LLM required|❌|
-|No home control for LLM required|✅|
-|No strict voice commands|✅|
-|Complete freedom in voice commands|❌|
-|Variance in responses for each request|✅|
-|Works without need for translations|❌|
-
-### Option 3: Full LLM script
-
-|Description|Pro/Con|
-|---|---|
-|Supported voice configurations|3, 4, 5|
-|Fully local, no LLM required|❌|
-|No home control for LLM required|❌|
-|No strict voice commands|✅|
-|Complete freedom in voice commands|✅|
-|Variance in responses for each request|✅|
-|Works without need for translations|✅|
+|Supported voice configurations|1, 2, 4|1, 3, 5|3, 4, 5|
+|Fully local, no LLM required|✅|❌|❌|
+|No home control for LLM required|✅|✅|❌|
+|No strict voice commands|❌|✅|✅|
+|Complete freedom in voice commands|❌|❌|✅|
+|Variance in responses for each request|❌|✅|✅|
+|Works without need for translations|❌|❌|✅|
 
 ## The Blueprints
 
