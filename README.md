@@ -15,6 +15,7 @@ On this respository I will put my blueprints which are created to help issuing a
 There are basically 5 ways to configure a voice pipeline in Home Assistant:
 
 |#|LLM|Home Control (Assist) enabled|Local preference enabled|Description|
+|---|---|---|---|---|
 |1|❌|NA|NA|Local only|
 |2|✅|❌|❌|LLM as voice agent, no home control, no local preference|
 |3|✅|❌|✅|LLM as voice agent, no home control, with local preference|
