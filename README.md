@@ -7,7 +7,7 @@
 
 ## Under construction
 
-![Image](/images/Under_construction_graphic.gif?raw=true)
+This Repository is still under contstruction. The contents in general, but also the blueprints might change quite frequently. I'll try not to introduce any backwards incompatible changes.
 
 ## About this repository
 
