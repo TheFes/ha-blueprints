@@ -15,19 +15,41 @@ blueprint:
 
     #### Optional
 
-    * Adjust the prompt
+    * Adjust the prompts for each field used in the script. The descriptions guide the LLM to provide the correct input
 
+    #### Note:
+    
+    * Give the script a clear description. This will be used by the LLM to understand it should use this script for weather forecasts.
+
+    * **Make sure to expose the script to Assist after the script has been saved**
+
+    #### Example for script description:
+
+    `Fetches the weather forecast for either a part of a day, or one or more full days. In case the weather for the weekend is requested, this means Saturday and Sunday`
 
     ### Usage
 
-    To add
+    You can request for the forecast in any way yuou can think of, using any language. Unless set otherwise in the LLM
+    configuration, the response will be in the same language as the command.
+
+    You can refer to a single day, multiple days (e.g. next weekend) a part of the day (e.g. next morning) or one or more hours
+    (e.g. from 5 to 9).
+
+    You can even ask for specific weather conditions, for example, will it rain tomorrow. Or should I take an umbrella if I 
+    go out this evening.
 
 
     #### Examples
 
     ```
 
-    To add
+    Give me the weather forecast for this evening
+
+    Do I need to apply sunscreen if I go out tomorrow morning
+
+    Will it rain at 9 this evening
+
+    What's the weather for this weekend
 
     ```"
   domain: script

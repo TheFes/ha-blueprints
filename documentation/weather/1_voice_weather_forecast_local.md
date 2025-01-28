@@ -61,26 +61,26 @@ First part of this section set how the state of the weather entity will be used 
 
 #### Variables
 
-These variables can be used in the response
+These variables can be used in the response. For all numeric values the `Value round` setting in the blueprint is used (defaults to 0 digits).
 
 variable|type|description
 ---|---|---
-condition|text|The (most frequent occuring) weather condition
-cloud_coverage|number|The (highest) percentage of cloud coverage
-temperature|number|The (highest) temperature
-dew_point|number|The (highest) dew point
-pressure|number|The (highest) pressure
-humidity|number|The (highest) humidity
-templow|number|The low temperature for the day forecast (not provided in day part forecast)
-wind_gust_speed|number|The wind gust speed (not provided in day part forecast)
 apparent_temperature|number|The (highest) apparant temperature
-uv_index|number|The (hightest) uv index
+condition|text|The (most frequent occuring) weather condition
+condition_translated|text|The translated condition using the blueprint settings
+cloud_coverage|number|The (highest) percentage of cloud coverage
+dew_point|number|The (highest) dew point
+humidity|number|The (highest) humidity
+pressure|number|The (highest) pressure
+temperature|number|The (highest) temperature
+templow|number|The low temperature for the day forecast (not provided in day part forecast)
 precipitation|number|The (total) precipitation
 precipitation_probability|number|The (highest) probability for rain
-wind_speed|number|The (highest) wind speed
-condition_translated|text|The translated condition using the blueprint settings
 rain_warning_threshold|number|Set in the blueprint settings, can be used to not respond about rain when the probability is low
+wind_speed|number|The (highest) wind speed
 wind_phrase|text|Term to describe the wind as set in the blueprint settings
+wind_gust_speed|number|The wind gust speed (not provided in day part forecast)
 wind_threshold|number|Set in the blueprint settings, can be used to not respond about wind when the speed is low
 wind_joke_threshold|number|Set in de blueprint, it is used in the default response template to issue a small joke about the wind
 wind_warning_threshold|number|Set in the blueprint, can be used to issue a warning about the wind
+uv_index|number|The (hightest) uv index
