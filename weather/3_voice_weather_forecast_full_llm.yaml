@@ -207,7 +207,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 20250127
+      version: 20250128
       weather_entity: !input weather_entity
       start_date: "{{ start_date | as_datetime(default='') }}"
       start_time:
@@ -232,7 +232,7 @@ sequence:
   - alias: Check if variables were set correctly
     if:
       - condition: template
-        value_template: "{{ start == 'NA' or end | as_datetime > now() }}"
+        value_template: "{{ start == 'NA' or end | as_datetime < now() }}"
     then:
       - alias: Set variable for eror message
         variables:
