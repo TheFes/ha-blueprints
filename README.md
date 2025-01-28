@@ -32,7 +32,7 @@ There are 3 options for the blueprints
 * Option 3: Full LLM script
 
 |Description|Option 1|Option 2|Option 3|
-|---|---|
+|---|---|---|---|
 |Supported voice configurations|1, 2, 4|1, 3, 5|3, 4, 5|
 |Fully local, no LLM required|✅|❌|❌|
 |No home control for LLM required|✅|✅|❌|
