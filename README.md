@@ -13,11 +13,13 @@
 
 On this respository I will put my blueprints which are created to help issuing advanced (voice) commands using Assist. 
 There are basically 5 ways to configure a voice pipeline in Home Assistant:
-1. Local only
-2. Using an LLM (like OpenAI, or Ollama) and with home control disabled for that LLM
-3. As 2. but with local preference enabled.
-4. Using an LLM with home control disabled.
-5. As 4. but with local preference enabled.
+
+|#|LLM|Home Control (Assist) enabled|Local preference enabled|Description|
+|1|❌|NA|NA|Local only|
+|2|✅|❌|❌|LLM as voice agent, no home control, no local preference|
+|3|✅|❌|✅|LLM as voice agent, no home control, with local preference|
+|4|✅|✅|❌|LLM as voice agent, with home control, no local preference|
+|5|✅|✅|✅|LLM as voice agent, with home control, with local preference|
 
 On this repository different blueprints will be placed with the same goal. The will differ in which op the above mentioned configurations are supported. Based on that, also other aspects will differ.
 
@@ -39,7 +41,7 @@ On this repository different blueprints will be placed with the same goal. The w
 
 |Description|Pro/Con|
 |---|---|
-|Supported voice configurations|3, 5|
+|Supported voice configurations|1, 3, 5|
 |Fully local, no LLM required|❌|
 |No home control for LLM required|✅|
 |No strict voice commands|✅|
