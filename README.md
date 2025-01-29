@@ -91,7 +91,7 @@ In case you have a question, you found a bug, or have a feature request open an 
 
 In case something isn't working or you found a bug, a trace of the script will be needed in most cases to determine the cause. The trace can be downloaded as a json file. To do this follow the steps below:
 
-1. Depending on the blueprint type go to `Configuration > Automations & Scenes > Scripts` (or use [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/scripts.svg)](https://my.home-assistant.io/redirect/scripts/)) or `Configuration > Automations & Scenes` (or use [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/automations.svg)](https://my.home-assistant.io/redirect/automations/))
+1. Depending on the blueprint type go to [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/scripts.svg)](https://my.home-assistant.io/redirect/scripts/) or [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/automations.svg)](https://my.home-assistant.io/redirect/automations/)
 2. Find the relevant script or automation in the list.
 3. Click on 3 dot menu icon left of the script and then select `Traces`
 4. Make sure to select the right trace which contains the error
