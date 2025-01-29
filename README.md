@@ -55,6 +55,16 @@ Using these blueprints you can ask for the weather forecast from a weather entit
 |2: LLM Enhanced|To be created|
 |[3: Full LLM](/documentation/weather/3_voice_weather_forecast_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F3_voice_weather_forecast_full_llm.yaml)|
 
+### Calendar
+
+Using these blueprints you can ask for the calendar entries from one or more calendar entities in your system.
+
+|Option|Import Button|
+|---|---|
+|1: Local|To be created|
+|2: LLM Enhanced|To be created|
+|[3: Full LLM](/documentation/calendar/3_voice_calendar_entries_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_calendar_entries_full_llm.yaml)|
+
 ### Music Assistant
 
 For completeness I also mention these blueprints here. They are located on the Music Assistant Voice support [repository](<https://github.com/music-assistant/voice-support>).
