@@ -6,7 +6,7 @@ blueprint:
   description:
     "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
 
-    More detailed information can be found [here](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/1_voice_calendar_entries_local.md)
+    More detailed information can be found [here](https://github.com/TheFes/ha-blueprints/blob/main/documentation/calendar/1_voice_calendar_entries_local.md)
 
     # Request calendar entries fully local
 
