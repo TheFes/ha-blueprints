@@ -41,15 +41,32 @@ There are 3 options for the blueprints
 |Variance in responses for each request|❌|✅|✅|
 |Works without need for translations|❌|❌|✅|
 
+The groundwork for option 2 was done by [JLo](<https://github.com/jlpouffier>) in his [blog post](<https://blog.jlpouffier.fr/chatgpt-powered-music-search-engine-on-a-local-voice-assistant/>) on GPT-powered music search. This blog post was a big inspiration for the LLM enhanced automation, and also enabled the full LLM script. So big thanks to JLo!
+
 ## The Blueprints
 
 ### Weather Forecasts
+
+Using these blueprints you can ask for the weather forecast from a weather entity in your system.
 
 |Option|Import Button|
 |---|---|
 |[1: Local](/documentation/weather/1_voice_weather_forecast_local.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F1_voice_weather_forecast_local.yaml)|
 |2: LLM Enhanced|To be created|
 |[3: Full LLM](/documentation/weather/3_voice_weather_forecast_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F3_voice_weather_forecast_full_llm.yaml)|
+
+### Music Assistant
+
+For completeness I also mention these blueprints here. They are located on the Music Assistant Voice support [repository](<https://github.com/music-assistant/voice-support>).
+I'm also a maintainer of that repository and did a lot of work on those blueprints together with some other guys.
+
+Using these bleuprints you can issue voice commands to play media on your Music Assistant media players.
+
+|Option|Import Button|
+|---|---|
+|[1: Local](https://github.com/music-assistant/voice-support#option-1-local-assistant-blueprint)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmusic-assistant%2Fvoice-support%2Fblob%2Fmain%2Flocal-assist-blueprint%2Fmass_assist_blueprint_en.yaml)|
+|[2: LLM Enhanced](https://github.com/music-assistant/voice-support#option-2-local-assist-enhanced-by-an-llm-integration-like-open-ai-conversation-chatgpt-or-google-generative-ai-gemini)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmusic-assistant%2Fvoice-support%2Fblob%2Fmain%2Fllm-enhanced-local-assist-blueprint%2Fmass_llm_enhanced_assist_blueprint_en.yaml)|
+|[3: Full LLM](https://github.com/music-assistant/voice-support#option-3-script-which-can-be-used-as-a-tool-by-an-llm-integration-like-open-ai-conversation-chatgpt-or-google-generative-ai-gemini)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmusic-assistant%2Fvoice-support%2Fblob%2Fmain%2Fllm-script-blueprint%2Fllm_voice_script.yaml)|
 
 ## ☕ Coffee
 
