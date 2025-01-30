@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_calendar_entries_local](/calendar/1_voice_calendar_entries_local.yaml)
 Translation by: @TheFes
-Last update: 2025-30-01
+Last update: 2025-29-01
 
 # How to use this translation
 
