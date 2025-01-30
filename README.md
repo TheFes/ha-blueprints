@@ -45,7 +45,7 @@ The groundwork for option 2 was done by [JLo](<https://github.com/jlpouffier>) i
 
 ## The Blueprints
 
-### Weather Forecasts
+### :sun_behind_rain_cloud: Weather Forecasts
 
 Using these blueprints you can ask for the weather forecast from a weather entity in your system.
 
@@ -55,7 +55,7 @@ Using these blueprints you can ask for the weather forecast from a weather entit
 |2: LLM Enhanced|To be created|
 |[3: Full LLM](/documentation/weather/3_voice_weather_forecast_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fweather%2F3_voice_weather_forecast_full_llm.yaml)|
 
-### Calendar
+### 📅 Calendar
 
 Using these blueprints you can ask for the calendar entries from one or more calendar entities in your system.
 
@@ -68,7 +68,7 @@ Using these blueprints you can ask for the calendar entries from one or more cal
 
 [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F1_voice_get_todo_entries_local.yaml)
 
-### ToDo
+### ✅ ToDo
 
 Using these blueprints you can ask for the todo list items from the todo entities in your system.
 
@@ -79,7 +79,7 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 |3: Full LLM|To be created|
 
 
-### Music Assistant
+### 🎶 Music Assistant
 
 For completeness I also mention these blueprints here. They are located on the Music Assistant Voice support [repository](<https://github.com/music-assistant/voice-support>).
 I'm also a maintainer of that repository and did a lot of work on those blueprints together with some other guys.
