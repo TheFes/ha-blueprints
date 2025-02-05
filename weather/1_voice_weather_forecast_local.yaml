@@ -541,7 +541,7 @@ actions:
                 {% set ns = namespace(forecast=[]) %}
                 {% set forecast = weather[weather_entity].forecast if weather is defined else [] %}
                 {% for item in forecast %}
-                  {% if start | as_datetime <= item.datetime | as_datetime < end | as_datetime %}
+                  {% if start | as_datetime <= item.datetime | as_datetime | as_local < end | as_datetime %}
                     {% set ns.forecast = ns.forecast + [item] %}
                   {% endif %}
                 {% endfor %}
