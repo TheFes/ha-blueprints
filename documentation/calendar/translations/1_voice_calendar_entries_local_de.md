@@ -55,6 +55,7 @@ Last update: 2025-18-02
     evening:
       - Abend
     part_day_event: Von {start} bis {end} steht {event_summary} im Kalender.
+    combine_word: und
     response_translations:
       Monday: Montag
       Tuesday: Dienstag
