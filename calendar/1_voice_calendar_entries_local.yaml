@@ -278,6 +278,14 @@ blueprint:
               multiline: false
               multiple: false
           default: events
+        combine_word:
+          name: Combine word
+          description: Word used to combine multipe events.For example "Breakfast, Lunch and Dinner"
+          selector:
+            text:
+              multiline: false
+              multiple: false
+          default: and
         no_events:
           name: No events for selected period
           description: Response by Assist in case there are no events
@@ -443,7 +451,7 @@ actions:
               {{ event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural) }}
               {%- set text = namespace(message='') %}
                 {%- for e in full_day %}
-                  {% set text.message = text.message + ((' and ' if loop.last and not loop.first) ~ e.summary ~ (', ' if not loop.last) ) %}
+                  {% set text.message = text.message + (((' ' ~ combine_word ~ ' ') if loop.last and not loop.first) ~ e.summary ~ (', ' if not loop.last) ) %}
                 {%- endfor %}
                 {% if full_day %}{{ day_event.format(event_list=text.message) }}{% endif %}
                 {%- for e in day_events | reject('in', full_day) %}
