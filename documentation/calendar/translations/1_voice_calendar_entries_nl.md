@@ -76,6 +76,7 @@ Last update: 2025-29-01
         December: december
       event_singular: afspraak
       event_plural: afspraken
+      combine_word: en
       no_events: Er zijn geen afspraken voor deze periode
       event_count: Op {date} heb je {event_count} {events}.
       day_event: Voor de hele dag staat er {event_list}.
