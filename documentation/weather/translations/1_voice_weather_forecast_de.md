@@ -1,7 +1,7 @@
 # Description
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
-Translation by: @TheFes
+Translation by: @danielrheinbay
 Last update: 2025-27-01
 
 # How to use this translation
