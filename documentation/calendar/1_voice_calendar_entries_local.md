@@ -17,7 +17,7 @@ Using this blueprint you can create an automation to request the calendar entrie
 
 1. Import the blueprint using the button above
 2. Create an automation using the blueprint
-3. Provide a weather entity which will be used for the calendar entries
+3. Provide a calendar entity which will be used for the calendar entries
 4. (optionally) change or add the triggers provided in the blueprint settings
 5. (optionally) change the phrases used to refer to the days and day parts
 6. (optionally) change the response given by Assist
