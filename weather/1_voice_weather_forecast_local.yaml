@@ -371,7 +371,7 @@ blueprint:
             calm: 0
             a light air: 1
             a light breeze: 6
-            a gentrle breeze: 12
+            a gentle breeze: 12
             a moderate breeze: 20
             a fresh breeze: 29
             a strong breeze: 39
