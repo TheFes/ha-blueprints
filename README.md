@@ -91,6 +91,14 @@ Using these bleuprints you can issue voice commands to play media on your Music 
 |[2: LLM Enhanced](https://github.com/music-assistant/voice-support#option-2-local-assist-enhanced-by-an-llm-integration-like-open-ai-conversation-chatgpt-or-google-generative-ai-gemini)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmusic-assistant%2Fvoice-support%2Fblob%2Fmain%2Fllm-enhanced-local-assist-blueprint%2Fmass_llm_enhanced_assist_blueprint_en.yaml)|
 |[3: Full LLM](https://github.com/music-assistant/voice-support#option-3-script-which-can-be-used-as-a-tool-by-an-llm-integration-like-open-ai-conversation-chatgpt-or-google-generative-ai-gemini)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmusic-assistant%2Fvoice-support%2Fblob%2Fmain%2Fllm-script-blueprint%2Fllm_voice_script.yaml)|
 
+### :loudspeaker: Announce
+Using these blueprints you can ask to announce a message to one or multiple speakers.
+|Option|Import Button|
+|---|---|
+|1: Local|To be created|
+|2: LLM Enhanced|To be created|
+|[3: Full LLM](/documentation/announce/3_voice_announce_full_llm.yaml
+
 ## Planned
 
 1. Add missing options for weather and calendar

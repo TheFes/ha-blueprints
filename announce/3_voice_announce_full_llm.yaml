@@ -1,0 +1,193 @@
+blueprint:
+  name: Voice - Make Announcements - Full LLM script
+  author: swever
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/speaker/3_voice_get_todo_entries_full_llm.yaml
+  description: >
+    ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+
+    # Make an announcement in one or multiple speakers by use of an LLM
+
+    ### Blueprint setup
+
+    #### Optional
+
+    * Adjust the prompts for each field used in the script. The descriptions guide
+    the LLM to provide the correct input
+
+    #### Note:
+
+    * Give the script a clear description. This will be used by the LLM to understand
+    it should use this script for the todo list items.
+
+    * **Make sure to expose the script to Assist after the script has been saved**
+
+    #### Example for script description:
+
+    `Announce a message to one speaker or multiple speakers indicated by the user. The speakers can be indicated by name, by the area or by the floor they are located in.`
+
+    ### Usage
+
+    You can request an announcement in any way you can think of, using any
+    language. Unless set otherwise in the LLM configuration, the response will be
+    in the same language as the command.
+
+    #### Examples
+
+    ```
+
+    Announce in the living room speaker that dinner is ready.
+
+    Tell my wife in the bedroom to get me my medicine when she comes back to the living room.
+
+    Make an announcement to my kids that the school bus will be here soon.
+    
+    Ask my roomate with the kitchen speaker, if he has seen my phone?
+    
+    Announce that it's bedtime.
+
+    ```
+  domain: script
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    tts_settings:
+      name: TTS Settings
+      icon: mdi:speaker-message
+      description: Here you need to select the TTS entity you want to use.
+      input:
+        tts_entity:
+          name: TTS entity
+          description: Select the TTS entity to use for the announcement.
+          selector:
+            entity:
+              multiple: false
+              filter:
+                domain: tts
+    default_speakers_settings:
+      name: Default Speakers Settings
+      icon: mdi:speaker-multiple
+      description: Here you need to select the speaker entities that will be selected by default if no speaker or area are indicated in the prompt.
+      input:
+        default_speakers_entities:
+          name: Default Speakers
+          description: Select the default speakers.
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain: media_player
+    prompt_settings:
+      name: Prompt settings for the LLM
+      icon: mdi:robot
+      description: >
+        You can use these settings to finetune the prompts for your specific
+        LLM (model). In most cases the defaults should be fine.
+      collapsed: true
+      input:
+        message_prompt:
+          name: Message Prompt
+          description: The prompt which will be used to the LLM can select the message to announce.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: >
+            This argument is mandatory and must always be provided no matter
+            what!
+
+            Based on the request by the user, announce the selected message. 
+
+            Interpret the message so it's a concise and clear announcement.
+        speakers_prompt:
+          name: Speakers Prompt
+          description: The prompt which will be used to the LLM can select the correct speakers.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: >
+            This argument is optional and might not be provided.
+
+            Based on the request by the user, select one or more speakers to which the announcement will sound.
+
+            Make sure to use the entity_id of the speaker, not the name.
+        areas_prompt:
+          name: Areas Prompt
+          description: The prompt which will be used to the LLM can select the areas that contains the correct speakers.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: >
+            This argument is optional and might not be provided.
+
+            Based on the request by the user, select one or more areas that have the speakers where the announcement will sound.
+
+            Make sure to use the area_id of the area, not the name.
+        floors_prompt:
+          name: Floors Prompt
+          description: The prompt which will be used to the LLM can select the floors that contains the correct speakers.
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default: >
+            This argument is optional and might not be provided.
+
+            Based on the request by the user, select one or more floors that have the speakers where the announcement will sound.
+
+            Make sure to use the floor_id of the floor, not the name.
+mode: parallel
+max_exceeded: silent
+description: Gets the TTS entity for the voice that will make the announcement.
+fields:
+  message_text:
+    name: Message
+    description: !input message_prompt
+    selector:
+      text:
+        multiline: false
+        multiple: false
+    required: true
+  media_player_entities:
+    selector:
+      entity:
+        multiple: true
+        filter:
+          domain: media_player
+    name: Speakers
+    description: !input speakers_prompt
+  areas_with_entities:
+    selector:
+      area:
+        multiple: true
+        entity:
+          domain: media_player
+    name: Areas
+    description: !input areas_prompt
+  floors_with_entities:
+    selector:
+      floor:
+        multiple: true
+        entity:
+          domain: media_player
+    name: Floors
+    description: !input floors_prompt
+sequence:
+  - variables:
+      version: 20250310
+      tts_entity: !input tts_entity
+      default_speakers_entities: !input default_speakers_entities
+      speakers: >
+        {% set by_entity = states.media_player | selectattr('entity_id', 'in', media_player_entities) | map(attribute='entity_id') | list %}
+        {% set by_name = states.media_player | selectattr('name', 'in', media_player_entities) | map(attribute='entity_id') | list %}
+        {% set floor_areas = floors_with_entities | map('floor_areas') | sum(start=[]) | list %}
+        {% set by_area = (areas_with_entities | default([]) + floor_areas | default([])) | map('area_entities') | sum(start=[]) | select('match', "^media_player\.") | list %}
+        {{ (by_entity + by_name + by_area) | unique | list }}
+  - action: tts.speak
+    data:
+      media_player_entity_id: "{{ speakers if speakers | length > 0 else default_speakers_entities }}"
+      message: "{{ message_text }}"
+      cache: false
+    target:
+      entity_id: "{{ tts_entity }}"
