@@ -97,7 +97,7 @@ Using these blueprints you can ask to announce a message to one or multiple spea
 |---|---|
 |1: Local|To be created|
 |2: LLM Enhanced|To be created|
-|[3: Full LLM](/documentation/announce/3_voice_announce_full_llm.yaml
+|[3: Full LLM](/documentation/announce/3_voice_announce_full_llm.yaml)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fannounce%2F3_voice_announce_full_llm.yaml)|
 
 ## Planned
 
