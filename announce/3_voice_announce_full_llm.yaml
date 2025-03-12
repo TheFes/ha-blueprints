@@ -86,7 +86,7 @@ blueprint:
       input:
         message_prompt:
           name: Message Prompt
-          description: The prompt which will be used to the LLM can select the message to announce.
+          description: The prompt that will be used so the LLM can select the message to announce.
           selector:
             text:
               multiline: true
@@ -100,7 +100,7 @@ blueprint:
             Interpret the message so it's a concise and clear announcement.
         speakers_prompt:
           name: Speakers Prompt
-          description: The prompt which will be used to the LLM can select the correct speakers.
+          description: The prompt that will be used so the LLM can select the correct speakers.
           selector:
             text:
               multiline: true
@@ -113,7 +113,7 @@ blueprint:
             Make sure to use the entity_id of the speaker, not the name.
         areas_prompt:
           name: Areas Prompt
-          description: The prompt which will be used to the LLM can select the areas that contains the correct speakers.
+          description: The prompt that will be used so the LLM can select the areas that contains the correct speakers.
           selector:
             text:
               multiline: true
@@ -126,7 +126,7 @@ blueprint:
             Make sure to use the area_id of the area, not the name.
         floors_prompt:
           name: Floors Prompt
-          description: The prompt which will be used to the LLM can select the floors that contains the correct speakers.
+          description: The prompt that will be used so the LLM can select the floors that contains the correct speakers.
           selector:
             text:
               multiline: true
@@ -139,7 +139,7 @@ blueprint:
             Make sure to use the floor_id of the floor, not the name.
 mode: parallel
 max_exceeded: silent
-description: Gets the TTS entity for the voice that will make the announcement.
+icon: mdi:bullhorn
 fields:
   message_text:
     name: Message
@@ -175,7 +175,6 @@ fields:
     description: !input floors_prompt
 sequence:
   - variables:
-      version: 20250310
       tts_entity: !input tts_entity
       default_speakers_entities: !input default_speakers_entities
       speakers: >
