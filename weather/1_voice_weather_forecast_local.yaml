@@ -461,7 +461,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20250205
+  version: 20250313
   daily_mapping:
     - phrases: !input today
       delta: 0
@@ -610,17 +610,17 @@ actions:
               - alias: Create variables for response
                 variables:
                   value_round: !input value_round
-                  condition: "{{ day_part_forecast | map(attribute='condition') | list | statistical_mode }}"
-                  cloud_coverage: "{{ day_part_forecast | map(attribute='cloud_coverage') | list | average | default(0) | round(value_round) }}"
-                  temperature: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  dew_point: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  pressure: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  humidity: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  apparent_temperature: "{{ day_part_forecast | map(attribute='temperature') | list | max | default(temperature) | round(value_round) }}"
-                  uv_index: "{{ day_part_forecast | map(attribute='uv_index') | list | max | default(0) | round(value_round) }}"
-                  precipitation: "{{ day_part_forecast | map(attribute='precipitation') | list | sum | default(0) | round(value_round) }}"
-                  precipitation_probability: "{{ day_part_forecast | map(attribute='precipitation_probability') | list | max | default(0) | round(value_round) }}"
-                  wind_speed: "{{ day_part_forecast | map(attribute='wind_speed') | list | max | default(0) | round(value_round) }}"
+                  condition: "{{ day_part_forecast | selectattr('condition', 'defined') | map(attribute='condition') | list | statistical_mode }}"
+                  cloud_coverage: "{{ day_part_forecast | selectattr('cloud_coverage', 'defined') | map(attribute='cloud_coverage') | list | average | default(0) | round(value_round) }}"
+                  temperature: "{{ day_part_forecast | selectattr('temperature', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  dew_point: "{{ day_part_forecast | selectattr('dew_point', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  pressure: "{{ day_part_forecast | selectattr('pressure', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  humidity: "{{ day_part_forecast | selectattr('humidity', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  apparent_temperature: "{{ day_part_forecast | selectattr('apparent_temperature', 'defined') | map(attribute='apparent_temperature') | list | max | default(temperature) | round(value_round) }}"
+                  uv_index: "{{ day_part_forecast | selectattr('uv_index', 'defined') | map(attribute='uv_index') | list | max | default(0) | round(value_round) }}"
+                  precipitation: "{{ day_part_forecast | selectattr('precipitation', 'defined') | map(attribute='precipitation') | list | sum | default(0) | round(value_round) }}"
+                  precipitation_probability: "{{ day_part_forecast | selectattr('precipitation_probability', 'defined') | map(attribute='precipitation_probability') | list | max | default(0) | round(value_round) }}"
+                  wind_speed: "{{ day_part_forecast | selectattr('wind_speed', 'defined') | map(attribute='wind_speed') | list | max | default(0) | round(value_round) }}"
                   condition_translated: "{{ translations.get(condition) }}"
                   rain_warning_threshold: !input rain_warning_threshold
                   wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', wind_speed) | map(attribute='0') | list | last | default }}"
