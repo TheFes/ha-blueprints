@@ -33,27 +33,27 @@ Last update: 2025-18-02
     day_after_tomorrow:
       - übermorgen
     monday:
-      - Montag
+      - montag
     tuesday:
-      - Dienstag
+      - dienstag
     wednesday:
-      - Mittwoch
+      - mittwoch
     thursday:
-      - Donnerstag
+      - donnerstag
     friday:
-      - Freitag
+      - freitag
     saturday:
-      - Samstag
+      - samstag
     sunday:
-      - Sonntag
+      - sonntag
     night:
-      - Nacht
+      - nacht
     morning:
-      - Vormittag
+      - vormittag
     afternoon:
-      - Nachmittag
+      - nachmittag
     evening:
-      - Abend
+      - abend
     part_day_event: Von {start} bis {end} steht {event_summary} im Kalender.
     combine_word: und
     response_translations:
