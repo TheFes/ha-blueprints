@@ -322,7 +322,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20250218
+  version: 20250318
   daily_mapping:
     - phrases: !input today
       delta: 0
@@ -362,6 +362,8 @@ variables:
       end: "23:59:59"
     - phrases: !input sunday
       delta: "{{ 6 - now().weekday() + (7 if 6 <= now().weekday() else 0) }}"
+      start: 00:00:00
+      end: "23:59:59"
   day_part_mapping:
     - phrases: !input night
       start: 00:00:00
