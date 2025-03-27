@@ -77,6 +77,17 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 |[3: Full LLM](/documentation/todo/3_voice_get_todo_entries_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F3_voice_get_todo_entries_full_llm.yaml)|
 
 
+### 📋 Reminder
+
+Using these blueprints you can set reminders.
+
+Note: the seup for these bluprints require you to create a todo entity first to store the reminders in. It also relies on an automation to send the reminders. Make sure to read the documentation
+
+|Option|Import Button|
+|---|---|
+|1: Local|To be created|
+|2: LLM Enhanced|To be created|
+|[3: Full LLM](/documentation/reminder/3_voice_reminder_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F3_voice_reminder_full_llm.yaml)|
 
 ### 🎶 Music Assistant
 
