@@ -79,6 +79,8 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 
 ### 📋 Reminder
 
+#### 🚨 ONLY WORKS ON 2025.4.0 which is in beta now
+
 Using these blueprints you can set reminders.
 
 Note: the setup for these bluprints require you to create a todo entity first to store the reminders in. It also relies on an automation to send the reminders. Make sure to read the documentation
