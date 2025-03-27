@@ -1,5 +1,5 @@
 blueprint:
-  name: Voice - Get ToDo entries - Full LLM script
+  name: Voice - Set Reminders - Full LLM script
   author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/reminder/3_voice_reminder_full_llm.yaml
   description:
