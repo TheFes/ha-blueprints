@@ -74,7 +74,6 @@ blueprint:
           default:
             - name: John
               description: Father of the house
-              person: person.john
               notifiers:
                 - action: notify.mobile_app_john
                   data:
