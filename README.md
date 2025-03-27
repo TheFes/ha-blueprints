@@ -81,7 +81,7 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 
 Using these blueprints you can set reminders.
 
-Note: the seup for these bluprints require you to create a todo entity first to store the reminders in. It also relies on an automation to send the reminders. Make sure to read the documentation
+Note: the setup for these bluprints require you to create a todo entity first to store the reminders in. It also relies on an automation to send the reminders. Make sure to read the documentation
 
 |Option|Import Button|
 |---|---|
@@ -105,7 +105,7 @@ Using these bleuprints you can issue voice commands to play media on your Music 
 ## Planned
 
 1. Add missing options for weather and calendar
-2. Add blueprints to create reminders
+2. ~~Add blueprints to create reminders~~
 3. Add blueprints to add and list todo items, including due dates/times
 4. ...
 
