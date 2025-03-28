@@ -64,8 +64,8 @@ the `message` field in the data. So a persistent notification, tts message, noti
 You can add addtional action data as normal, for example a `title`.
 
 It is also possible to use a jinja template as `condition` to determine if the reminder should be sent, 
-however, even if the condition is `false` the reminder will be removed from the todo list, so always 
-make sure that at least one notifier returns `true`
+however, if all notifiers have a condition, and it returns `false` for all, the reminder will not be removed 
+from the list. Only when at least one action is performed, the item will be removed.
 
 Lastly it is possible to add a `prefix` for the message, so for example you can prefix the a TTS announcement 
 with `This is a reminder for: `
@@ -98,5 +98,7 @@ Here is an example with comments to explain it in more detail. Make sure to adju
 ```
 
 #### Optional
+
+* Adjust the trigger to check for the reminders, by default it will check every minute
 
 * Adjust the prompt used to get the right names

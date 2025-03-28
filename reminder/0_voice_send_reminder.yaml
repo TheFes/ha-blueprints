@@ -23,17 +23,22 @@ blueprint:
     You can add addtional action data as normal, for example a `title`.
 
     It is also possible to use a jinja template as `condition` to determine if the reminder should be sent, 
-    however, even if the condition is `false` the reminder will be removed from the todo list, so always 
-    make sure that at least one notifier returns `true`
+    however, if all notifiers have a condition, and it returns `false` for all, the reminder will not be removed 
+    from the list. Only when at least one action is performed, the item will be removed.
 
     Lastly it is possible to add a `prefix` for the message, so for example you can prefix the a TTS announcement 
     with `This is a reminder for: `
 
-    The default settings for this parameter act as an example, make sure to change it to fit your own system.
+    The default setting in this selector acts as an example, make sure to adjust it to your own system.
+
+
 
     #### Optional
-    
+
+    * Adjust the trigger to check for the reminders, by default it will check every minute
+
     * Adjust the prompt used to get the right names
+
 
 
     ### Usage
@@ -162,6 +167,7 @@ actions:
             item: "{{ repeat.item }}"
             text: "{{ item.summary }}"
             entries: "{{ item.description | default('No entries provided') }}"
+            notifiers_used: 0
         - alias: Get right recipient names
           action: conversation.process
           data:
@@ -188,9 +194,13 @@ actions:
                           action: "{{ repeat.item.action }}"
                           target: "{{ repeat.item.target | default({}, true) }}"
                           data: "{{ combine(repeat.item.data | default({}, true), dict(message=[repeat.item.prefix | default, text] | join(' '))) }}"
-        - alias: remove item from list
-          action: todo.remove_item
-          target:
-            entity_id: !input todo_entity
-          data:
-            item: "{{ text }}"
+                        - variables:
+                            notifiers_used: "{{ notifiers_used + 1 }}"
+        - if: "{{ notifiers_used > 0}}"
+          then:
+            - alias: remove item from list
+              action: todo.remove_item
+              target:
+                entity_id: !input todo_entity
+              data:
+                item: "{{ text }}"
