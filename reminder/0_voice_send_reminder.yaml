@@ -40,8 +40,8 @@ blueprint:
 
     Nothing from your side is needed, the automation will check every minute if there are todo items due, and perform
     the actions if this is the case."
-  # homeassistant:
-  #   min_version: 2024.4.0
+  homeassistant:
+    min_version: 2024.3.999
   input:
     general_settings:
       name: General settings

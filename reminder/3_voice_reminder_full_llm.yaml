@@ -57,8 +57,8 @@ blueprint:
 
     ```'
   domain: script
-  # homeassistant:
-  #   min_version: 2025.4.0
+  homeassistant:
+    min_version: 2024.3.999
   input:
     general_settings:
       name: General settings
