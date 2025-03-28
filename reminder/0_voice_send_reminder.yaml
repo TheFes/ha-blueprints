@@ -89,6 +89,22 @@ blueprint:
                     media_player_entity_id: media_player.office_john
                   prefix: "This is a reminder for:"
                   condition: "{{ is_state('person.john', 'home') }}"
+    trigger_setting:
+      name: Trigger for automation
+      icon: mdi:timer
+      description: Set the trigger for the automation to send the notifications
+      collapsed: true
+      input:
+        triggers:
+          name: Triggers
+          description: Set the triggers when the automation should check for reminders, default trigger checks every minute
+          selector:
+            trigger:
+              multiple: true
+          default:
+            - alias: Trigger to check for Todo items every minute
+              trigger: time_pattern
+              minutes: "/1"
     prompt_setting:
       name: Prompt setting for the LLM
       icon: mdi:robot
@@ -120,10 +136,7 @@ blueprint:
             further processing in actions.
             '
 
-triggers:
-  - alias: Trigger to check for Todo items every minute
-    trigger: time_pattern
-    minutes: "/1"
+triggers: !input triggers
 variables:
   todo_entity: !input todo_entity
   recipients: !input recipients
