@@ -99,8 +99,7 @@ blueprint:
           name: Triggers
           description: Set the triggers when the automation should check for reminders, default trigger checks every minute
           selector:
-            trigger:
-              multiple: true
+            trigger: {}
           default:
             - alias: Trigger to check for Todo items every minute
               trigger: time_pattern
