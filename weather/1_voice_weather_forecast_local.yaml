@@ -588,10 +588,11 @@ actions:
           - alias: Define variables to determine which part to use
             variables:
               tomorrow: !input tomorrow
-              next_day: "{{ phrase is search(tomorrow | join('|')) }}"
-              delta: "{{ 1 if next_day else 0}}"
               start_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='start') | list | first }}"
               end_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='end') | list | first }}"
+              next_day: "{{ phrase is search(tomorrow | join('|')) }}"
+              skip_day: "{{ now() >= today_at(end_time) and not next_day }}"
+              delta: "{{ 1 if (next_day or skip_day) else 0 }}"
               start: "{{ today_at() + timedelta(days=delta) + as_timedelta(start_time) }}"
               end: "{{ today_at() + timedelta(days=delta) + as_timedelta(end_time) }}"
               day_part_forecast: >
