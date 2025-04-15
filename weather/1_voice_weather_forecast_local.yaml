@@ -461,7 +461,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20250414.1
+  version: 20250415
   daily_mapping:
     - phrases: !input today
       delta: 0

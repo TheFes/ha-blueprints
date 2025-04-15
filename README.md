@@ -79,7 +79,7 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 
 ### 📋 Reminder
 
-#### 🚨 ONLY WORKS ON 2025.4.0 which is in beta now
+#### 🚨 Requires at least Home Assistant 2025.4.0
 
 Using these blueprints you can set reminders.
 
