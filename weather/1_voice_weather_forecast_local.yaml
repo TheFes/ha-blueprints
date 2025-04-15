@@ -93,7 +93,7 @@ blueprint:
           default:
             - "what('s| is) [this|next] ({phrase}[']s|the|this) weather [forecast]"
             - "what('s| is) the weather [forecast] [for] [this|next] ({phrase}|day)"
-            - "what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({pharse}|day)]"
+            - "what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({phrase}|day)]"
     daily_forecast_settings:
       name: Settings for the daily forecast.
       icon: mdi:chat
@@ -461,7 +461,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20250313
+  version: 20250414.1
   daily_mapping:
     - phrases: !input today
       delta: 0
@@ -588,10 +588,11 @@ actions:
           - alias: Define variables to determine which part to use
             variables:
               tomorrow: !input tomorrow
-              next_day: "{{ phrase is search(tomorrow | join('|')) }}"
-              delta: "{{ 1 if next_day else 0}}"
               start_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='start') | list | first }}"
               end_time: "{{ day_part_mapping | selectattr('phrases', 'contains', phrase) | map(attribute='end') | list | first }}"
+              next_day: "{{ phrase is search(tomorrow | join('|')) }}"
+              skip_day: "{{ now() >= today_at(end_time) and not next_day }}"
+              delta: "{{ 1 if (next_day or skip_day) else 0 }}"
               start: "{{ today_at() + timedelta(days=delta) + as_timedelta(start_time) }}"
               end: "{{ today_at() + timedelta(days=delta) + as_timedelta(end_time) }}"
               day_part_forecast: >
