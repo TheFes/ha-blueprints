@@ -1,4 +1,4 @@
-blueprint:
+9blueprint:
   domain: automation
   name: Voice - Send Reminder - Automation
   author: TheFes
@@ -142,7 +142,7 @@ blueprint:
 
 triggers: !input triggers
 variables:
-  version: 2025.6.0
+  version: 2025.6.1
   todo_entity: !input todo_entity
   recipients: !input recipients
   recipient_data: >
@@ -177,7 +177,7 @@ actions:
           response_variable: recipient_llm_raw
         - variables:
             recipients_raw: "{{ recipient_llm_raw.response.speech.plain.speech }}"
-            reciptients_llm: >
+            recipients_llm: >
               {% set r = recipients_raw %}
               {% if r is list %}
                 {{ r }}
