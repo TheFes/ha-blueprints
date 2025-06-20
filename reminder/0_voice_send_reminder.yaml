@@ -1,4 +1,4 @@
-9blueprint:
+blueprint:
   domain: automation
   name: Voice - Send Reminder - Automation
   author: TheFes
@@ -142,7 +142,7 @@
 
 triggers: !input triggers
 variables:
-  version: 2025.6.1
+  version: 2025.6.2
   todo_entity: !input todo_entity
   recipients: !input recipients
   recipient_data: >
