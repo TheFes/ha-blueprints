@@ -168,7 +168,7 @@ actions:
     response_variable: todo_data
   - alias: Set new variable
     variables:
-      items: "{{ todo_data[todo_entity]['items'] | selectattr('status', 'eq' 'needs_action') | selectattr('due', '<', (now()+timedelta(seconds=30)).isoformat()) | list }}"
+      items: "{{ todo_data[todo_entity]['items'] | selectattr('status', 'eq', 'needs_action') | selectattr('due', '<', (now()+timedelta(seconds=30)).isoformat()) | list }}"
   - alias: "Repeat sending the notifications for each event"
     repeat:
       for_each: "{{ items }}"
