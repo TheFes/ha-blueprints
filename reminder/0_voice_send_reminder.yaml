@@ -94,6 +94,15 @@ blueprint:
                     media_player_entity_id: media_player.office_john
                   prefix: "This is a reminder for:"
                   condition: "{{ is_state('person.john', 'home') }}"
+        after_notification:
+          name: After notification
+          description: What to do with the to-do entry after the notification is sent
+          selector:
+            select:
+              options:
+                - Delete item
+                - Mark as completed
+          default: Delete item
     trigger_setting:
       name: Trigger for automation
       icon: mdi:timer
@@ -142,7 +151,7 @@ blueprint:
 
 triggers: !input triggers
 variables:
-  version: 2025.6.2
+  version: 2025.6.3
   todo_entity: !input todo_entity
   recipients: !input recipients
   recipient_data: >
@@ -159,8 +168,8 @@ actions:
     response_variable: todo_data
   - alias: Set new variable
     variables:
-      items: "{{ todo_data[todo_entity]['items'] | selectattr('due', '<', (now()+timedelta(seconds=30)).isoformat()) | list }}"
-  - alias: "Repeat sending the notifications for eacht event"
+      items: "{{ todo_data[todo_entity]['items'] | selectattr('status', 'eq' 'needs_action') | selectattr('due', '<', (now()+timedelta(seconds=30)).isoformat()) | list }}"
+  - alias: "Repeat sending the notifications for each event"
     repeat:
       for_each: "{{ items }}"
       sequence:
@@ -208,9 +217,19 @@ actions:
                             notifiers_used: "{{ notifiers_used + 1 }}"
         - if: "{{ notifiers_used > 0}}"
           then:
-            - alias: remove item from list
-              action: todo.remove_item
-              target:
-                entity_id: !input todo_entity
-              data:
-                item: "{{ text }}"
+            - if: "{{ after_notification | default('Delete item', true) == 'Delete item' }}"
+              then:
+                - alias: remove item from list
+                  action: todo.remove_item
+                  target:
+                    entity_id: !input todo_entity
+                  data:
+                    item: "{{ text }}"
+              else:
+                - alias: mark item as completed
+                  action: todo.update_item
+                  target:
+                    entity_id: !input todo_entity
+                  data:
+                    status: completed
+                    item: "{{ text }}"
