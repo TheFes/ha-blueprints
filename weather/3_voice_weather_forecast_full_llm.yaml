@@ -301,10 +301,18 @@ sequence:
 
               {% for item in forecast_keys %}
 
-              {% set combine = weather_data | map(attribute=item) | list %}
+              {% set combine = weather_data | map(attribute=item, default=none) | select('!=', none) | list %}
+
+              {% if combine | length > 0 %}
 
               {% set combine = combine | statistical_mode if combine[0] is string else combine
               | average | round %}
+
+              {% else %}
+
+              {% set combine = none %}
+
+              {% endif %}
 
               {% set ns.combined = dict(ns.combined, **{item: combine}) %}
 
