@@ -207,7 +207,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 20250526
+      version: 20250820
       weather_entity: !input weather_entity
       supported: >
         {% set sf = state_attr(weather_entity, 'supported_features') | default([], true) %}
@@ -301,12 +301,11 @@ sequence:
 
               {% for item in forecast_keys %}
 
-              {% set combine = weather_data | map(attribute=item) | list %}
+              {% set combine = weather_data | selectattr(item, 'defined') | map(attribute=item) | list %}
 
-              {% set combine = combine | statistical_mode if combine[0] is string else combine
-              | average | round %}
+              {% set combine = combine | statistical_mode if combine | count > 0 and combine[0] is string else combine | average(none) | round(default=none) %}
 
-              {% set ns.combined = dict(ns.combined, **{item: combine}) %}
+              {% set ns.combined = (dict(ns.combined, **{item: combine})) if conbine is not none else ns.combined %}
 
               {% endfor %}
 
