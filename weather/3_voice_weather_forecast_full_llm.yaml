@@ -303,7 +303,7 @@ sequence:
 
               {% set combine = weather_data | selectattr(item, 'defined') | map(attribute=item) | list %}
 
-              {% set combine = combine | statistical_mode if combine | count > 0 and combine[0] is string else combine | average(none) | round(default=none) %}
+              {% set combine = combine | statistical_mode if combine | count > 0 and combine[0] is string else combine | average(none) | round(1,default=none) %}
 
               {% set ns.combined = (dict(ns.combined, **{item: combine})) if conbine is not none else ns.combined %}
 
