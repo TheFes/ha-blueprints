@@ -305,7 +305,7 @@ sequence:
 
               {% set combine = combine | statistical_mode if combine | count > 0 and combine[0] is string else combine | average(none) %} 
               
-              {% set combine = combine | round(1 if combine < 1 else 0) if combine is not none else combine %}
+              {% set combine = combine | round(1 if combine < 1 else 0) if combine | is_number else combine %}
 
               {% set ns.combined = (dict(ns.combined, **{item: combine})) if combine is not none else ns.combined %}
 
