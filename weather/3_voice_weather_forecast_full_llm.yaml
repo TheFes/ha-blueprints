@@ -207,7 +207,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 20250820
+      version: 20250926
       weather_entity: !input weather_entity
       supported: >
         {% set sf = state_attr(weather_entity, 'supported_features') | default([], true) %}
