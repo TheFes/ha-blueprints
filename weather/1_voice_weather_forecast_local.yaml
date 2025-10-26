@@ -27,8 +27,12 @@ blueprint:
     #### These translations are already available:
 
     * [Dutch](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_nl.md)
-    * [German](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de.md)
 
+    * German: There are multiple variants available, just mix and match whatever fits your needs
+    
+      * [Variant 1](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_1.md)
+      
+      * [Variant 2](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_2.md)
 
     ### Usage
 
