@@ -1,8 +1,8 @@
 # Description
 
 Translation for: [1_voice_calendar_entries_local](/calendar/1_voice_calendar_entries_local.yaml)
-Translation by: @nilsreiter
-Last update: 2025-18-02
+Translation by: @nilsreiter and @felixschndr
+Last update: 2025-23-10
 
 # How to use this translation
 
@@ -19,16 +19,17 @@ Last update: 2025-18-02
 
 ```yaml
     trigger:
-      - was (steht|ist) [(für|am)] {phrase} (im kalender|auf der agenda)
+      - was (steht|ist|habe ich) [(für|am)] {phrase} (im kalender|auf der agenda|vor)
       - was passiert [am] {phrase}
+      - welche Termine habe ich [am ]{phrase}
     today:
       - heute
     tomorrow:
       - morgen
-    event_singular: Eintrag
-    event_plural: Einträge
-    no_events: Es gibt keine Einträge.
-    event_count: Am {date} gibt es {event_count} {events}.
+    event_singular: Termin
+    event_plural: Termine
+    no_events: In diesem Zeitraum gibt es keine Termine.
+    event_count: "Am {date} gibt es {event_count} {events}:"
     day_event: Ganztägig steht {event_list} im Kalender.
     day_after_tomorrow:
       - übermorgen
@@ -48,12 +49,20 @@ Last update: 2025-18-02
       - sonntag
     night:
       - nacht
+      - nachts
     morning:
       - vormittag
+      - vormittags
+      - morgen
+      - morgens
     afternoon:
+      - mittag
+      - mittags
       - nachmittag
+      - nachmittags
     evening:
       - abend
+      - abends
     part_day_event: Von {start} bis {end} steht {event_summary} im Kalender.
     combine_word: und
     response_translations:
@@ -76,6 +85,5 @@ Last update: 2025-18-02
       October: Oktober
       November: November
       December: Dezember
-    date_format: "%A %-d. %B"
-
+    date_format: "%A"
 ```
