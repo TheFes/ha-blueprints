@@ -2,8 +2,13 @@
 [![Buy me a coffe](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/TheFes)
 [![Paypal](https://img.shields.io/badge/PayPal-00457C?&color=00457c&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/thefes)
 
-# Home Assistant Voice Blueprints
-![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+# thefes.casa Home Assistant blueprints
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="/images/TheFesCasa_logo_bp_darkd.png">
+  <source media="(prefers-color-scheme: light)" srcset="/images/TheFesCasa_logo_bp_light.png">
+  <img alt="thefes.casa blueprints logo" src="/images/TheFesCasa_logo_bp_light.png">
+</picture>
+
 
 ## Under construction
 
