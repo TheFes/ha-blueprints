@@ -10,11 +10,6 @@ blueprint:
 
     This replacement of the alert integration which sends alerts through Telegram.
 
-
-    You need to provide the chat id to which the alert should be sent. At this moment only one chat id per alert is supported,
-    so if you want it sent to multiple chats, you need to create it multiple times.
-
-
     The alert title and all messages support templates, but you can use plain text as well.
 
 
