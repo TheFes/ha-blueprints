@@ -110,7 +110,7 @@ blueprint:
                 - html
                 - markdown
                 - plain_text
-          default: markdownv2
+          default: markdown
         alert_title:
           name: Alert title
           description:
@@ -124,12 +124,32 @@ blueprint:
             You can use templates in this message.
           selector:
             template:
+        disable_web_page_preview:
+          name: Disable web page preview
+          description: Enable to disable link previews for links in the message.
+          selector:
+            boolean:
+          default: false
         done_message:
           name: Done message
           description: The message which should be sent in case the alert is no longer active
           selector:
             template:
           default: ""
+        remove_previous_message:
+          name: Remove previous message
+          description: Remove the previous alert message when a new message is sent
+          selector:
+            boolean:
+          default: true
+        remove_when_done:
+          name: Remove when done
+          description:
+            Remove the last alert message when a the trigger entity is no longer in de problem state
+            or when the alert is acknowledged
+          selector:
+            boolean:
+          default: true
     acknowledge_settings:
       name: Acknowledge settings
       icon: mdi:check
@@ -261,6 +281,8 @@ variables:
   last_message_data: []
   target: !input target
   chat_id: "{{ target | map('state_attr', 'chat_id') | list }}"
+  remove_previous_message: !input remove_previous_message
+  remove_when_done: !input remove_when_done
 actions:
   - alias: Set variables to be used for the inline keyboard
     variables:
@@ -305,9 +327,10 @@ actions:
               title: !input alert_title
               message: !input alert_message
               inline_keyboard: "{{ inline_keyboard }}"
+              disable_web_page_preview: !input disable_web_page_preview
         - alias: Delete previously sent alerts if there were any
           repeat:
-            for_each: "{{ last_message_data }}"
+            for_each: "{{ last_message_data if remove_previous_message else [] }}"
             sequence:
               - variables:
                   delete_data:
@@ -373,7 +396,7 @@ actions:
                     sequence:
                       - alias: Delete previously sent alerts if there were any
                         repeat:
-                          for_each: "{{ last_message_data }}"
+                          for_each: "{{ last_message_data if remove_when_done else [] }}"
                           sequence:
                             - variables:
                                 delete_data:
@@ -393,6 +416,7 @@ actions:
                                 pase_mode: !input parse_mode
                                 target: "{{ wait.trigger.event.data.chat_id }}"
                                 message: "{{ acknowledge_message }}"
+                                disable_web_page_preview: !input disable_web_page_preview
                           - alias: Send acknowledge message
                             action: telegram_bot.send_message
                             data: "{{ ack_action_data | combine(config_entry_data) }}"
@@ -405,7 +429,7 @@ actions:
                     sequence:
                       - alias: Delete previously sent alerts if there were any
                         repeat:
-                          for_each: "{{ last_message_data }}"
+                          for_each: "{{ last_message_data if remove_when_done else [] }}"
                           sequence:
                             - variables:
                                 delete_data:
@@ -425,6 +449,7 @@ actions:
                                 pase_mode: !input parse_mode
                                 target: "{{ chat_id }}"
                                 message: "{{ done_message }}"
+                                disable_web_page_preview: !input disable_web_page_preview
                           - alias: Send acknowledge message
                             action: telegram_bot.send_message
                             data: "{{ done_action_data | combine(config_entry_data) }}"
@@ -445,7 +470,7 @@ actions:
     then:
       - alias: Delete previously sent alerts if there were any
         repeat:
-          for_each: "{{ last_message_data }}"
+          for_each: "{{ last_message_data if remove_when_done else [] }}"
           sequence:
             - variables:
                 delete_data:
@@ -462,6 +487,7 @@ actions:
             pase_mode: !input parse_mode
             target: "{{ chat_id }}"
             message: "{{ done_message }}"
+            disable_web_page_preview: !input disable_web_page_preview
       - alias: Send acknowledge message
         action: telegram_bot.send_message
         data: "{{ done_action_data | combine(config_entry_data) }}"
