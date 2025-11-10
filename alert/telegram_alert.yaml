@@ -1,0 +1,372 @@
+blueprint:
+  domain: automation
+  name: Send alerts using Telegram
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.yaml
+  description:
+    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+
+    # Telegram Alert
+
+    This replacement of the alert integration which sends alerts through Telegram.
+
+
+    You need to provide the chat id to which the alert should be sent. At this moment only one chat id per alert is supported,
+    so if you want it sent to multiple chats, you need to create it multiple times.
+
+
+    The alert title and all messages support templates, but you can use plain text as well.
+
+
+    ### Repeat settings
+
+    The repeat setting either needs to be provided as a number or a list of numbers. In case a list of numbers is provided, the last
+    value will be used in case there are more repeats needed compared to items in the list
+
+
+    Example single number:
+
+    ```
+
+    15
+
+    ```
+
+
+    Example list of numbers:
+
+    ```
+
+    - 15
+
+    - 30
+
+    - 60
+
+    ```
+    "
+  homeassistant:
+    min_version: 2025.11.0
+  input:
+    trigger_settings:
+      name: Trigger settings
+      icon: mdi:flag
+      description: Settings to determine when the alert should be triggered.
+      input:
+        trigger_entity:
+          name: Trigger Entity
+          description: The entity_id of the entity on which the alert should trigger
+          selector:
+            entity: {}
+        problem_state:
+          name: Problem state
+          description: The state on which the enitity should be for the alert to be actvie
+          selector:
+            text:
+    repeat_settings:
+      name: Repeat settings
+      icon: mdi:repeat
+      description: Settings to determine how fast the alert should be sent
+      input:
+        repeat:
+          name: Repeat
+          description:
+            Number of minutes before the notification should be repeated.
+            Can be either a number or a list of numbers.
+          selector:
+            object: {}
+        skip_first:
+          name: Skip first
+          description:
+            Controls whether the notification should be sent immediately or after
+            the first delay.
+          selector:
+            boolean: {}
+          default: false
+    message_settings:
+      name: Message settings
+      icon: mdi:message
+      description: Settings regarding the messages sent by the alert
+      input:
+        chat_id:
+          name: Chat ID
+          description: The chat ID of the telegram chat to which the alert should be sent.
+          selector:
+            number:
+              min: 0
+              max: 999999999999
+              mode: box
+        alert_title:
+          name: Alert title
+          description:
+            The title for the message which is sent on every repeat of the alert.
+            You can use templates in this title.
+          selector:
+            template:
+        alert_message:
+          name: Alert message
+          description: The message which is sent on every repeat of the alert.
+            You can use templates in this message.
+          selector:
+            template:
+        done_message:
+          name: Done message
+          description: The message which should be sent in case the alert is no longer active
+          selector:
+            template:
+          default: ""
+    acknowledge_settings:
+      name: Acknowledge settings
+      icon: mdi:check
+      description:
+        You can use this to enable the option to acknowledge the alert and
+        other settings related to that.
+      collapsed: true
+      input:
+        can_acknowledge:
+          name: "Can acknowledge"
+          description:
+            When enabled it shows a button below the alert message to turn the
+            alert off until it's triggered again.
+          selector:
+            boolean:
+          default: false
+        acknowledge_button_label:
+          name: Acknowlegde button labeld
+          description:
+            The text to be shown on the button to acknowledge the alert.
+            For example "Stop bugging me"
+          selector:
+            text:
+          default: Acknowlegde alert
+        acknowledge_message:
+          name: Acknowledge message
+          description:
+            Message which will be sent as confirmation that the alert is now
+            acknowledged. Leave empty when you don't want a message sent.
+          selector:
+            template:
+          default: ""
+    actionable_buttons:
+      name: Actionable button settings
+      icon: mdi:list-box
+      description:
+        You can optionally add buttons and assign actions to those buttons.
+        If you for example have an alert when a light is on, you can add a button to
+        turn that light off.
+        You can add a maximum of 5 buttons
+      collapsed: true
+      input:
+        button_1_label:
+          name: Button 1 label
+          description: The text to be shown on the button. Leave empty to not use this button.
+          selector:
+            text:
+              multiline: false
+          default: ""
+        button_1_actions:
+          name: Button 1 actions
+          description: The actions to be performed when the button is pressed
+          selector:
+            action:
+          default: []
+        button_2_label:
+          name: Button 2 label
+          description: The text to be shown on the button. Leave empty to not use this button.
+          selector:
+            text:
+              multiline: false
+          default: ""
+        button_2_actions:
+          name: Button 2 actions
+          description: The actions to be performed when the button is pressed
+          selector:
+            action:
+          default: []
+        button_3_label:
+          name: Button 3 label
+          description: The text to be shown on the button. Leave empty to not use this button.
+          selector:
+            text:
+              multiline: false
+          default: ""
+        button_3_actions:
+          name: Button 3 actions
+          description: The actions to be performed when the button is pressed
+          selector:
+            action:
+          default: []
+        button_4_label:
+          name: Button 4 label
+          description: The text to be shown on the button. Leave empty to not use this button.
+          selector:
+            text:
+              multiline: false
+          default: ""
+        button_4_actions:
+          name: Button 4 actions
+          description: The actions to be performed when the button is pressed
+          selector:
+            action:
+          default: []
+        button_5_label:
+          name: Button 5 label
+          description: The text to be shown on the button. Leave empty to not use this button.
+          selector:
+            text:
+              multiline: false
+          default: ""
+        button_5_actions:
+          name: Button 5 actions
+          description: The actions to be performed when the button is pressed
+          selector:
+            action:
+          default: []
+triggers:
+  - alias: Start alert when trigger entity changes to the problem state
+    trigger: state
+    entity_id: !input trigger_entity
+    to: !input problem_state
+variables:
+  alert_title: !input alert_title
+  skip_first: !input skip_first
+  trigger_entity: !input trigger_entity
+  problem_state: !input problem_state
+  can_acknowledge: !input can_acknowledge
+  ack_label: !input acknowledge_button_label
+  repeat: !input repeat
+  repeat_list: >
+    {{ (repeat if repeat is list else [repeat]) | select('is_number') | map('float') | list }}
+  done_message: !input done_message
+  acknowledge_message: !input acknowledge_message
+  repeat_needed: true
+actions:
+  - alias: Set variables to be used for the inline keyboard
+    variables:
+      tag: "{{ context.id }}"
+      acknowledge_button: >
+        {{ [ack_label~':/acknowledge'~tag] if can_acknowledge else [] }}
+      button_1_label: !input button_1_label
+      button_1: >
+        {{ [button_1_label~':/button_1'~tag] if button_1_label else [] }}
+      button_2_label: !input button_2_label
+      button_2: >
+        {{ [button_2_label~':/button_2'~tag] if button_2_label else [] }}
+      button_3_label: !input button_3_label
+      button_3: >
+        {{ [button_3_label~':/button_3'~tag] if button_3_label else [] }}
+      button_4_label: !input button_4_label
+      button_4: >
+        {{ [button_4_label~':/button_4'~tag] if button_4_label else [] }}
+      button_5_label: !input button_5_label
+      button_5: >
+        {{ [button_5_label~':/button_5'~tag] if button_5_label else [] }}
+      inline_keyboard: >
+        {{
+          button_1
+          + button_2
+          + button_3
+          + button_4
+          + button_5
+          + acknowledge_button
+        }}
+  - alias: Sends the alert messages based on the repeat list provided in the blueprint
+    repeat:
+      while: "{{ repeat_needed and is_state(trigger_entity, problem_state) }}"
+      sequence:
+        - alias: Set variables to determine how long to wait for the next alert message
+          variables:
+            repeat_minutes: "{{ repeat_list[repeat.index-1] | default(repeat_list | last) }}"
+            repeat_end: "{{ now() + timedelta(minutes=repeat_minutes) }}"
+        - alias: Check if alert needs to be sent, skip the first alert if skip_first is set to false
+          if: "{{ (repeat.index > 1 or not skip_first) and is_state(trigger_entity, problem_state) }}"
+          then:
+            - alias: Send the alert to the provided chat id
+              action: telegram_bot.send_message
+              data:
+                parser: markdownv2
+                target: !input chat_id
+                title: !input alert_title
+                message: !input alert_message
+                inline_keyboard: "{{ inline_keyboard }}"
+            - alias:
+                Keep waiting for the right button presses until this repeat period ends or the entity
+                is no longer in the problem state
+              repeat:
+                while: >
+                  {{
+                    repeat_needed
+                    and is_state(trigger_entity, problem_state)
+                    and now() < repeat_end | as_datetime
+                  }}
+                sequence:
+                  - alias: Wait for button presses on the inline keyboard or when until the entity changes state
+                    wait_for_trigger:
+                      - alias: button press on inline keyboard
+                        trigger: event
+                        event_type: telegram_callback
+                        id: button_press
+                      - trigger: state
+                        entity_id: !input trigger_entity
+                        not_to: !input problem_state
+                        id: done
+                    timeout:
+                      seconds: >
+                        {{
+                          [(repeat_end | as_datetime - now()).total_seconds(), 0] | max
+                          if is_state(trigger_entity, problem_state)
+                          else 0
+                        }}
+                  - choose:
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1' ~ tag }}"
+                        sequence: !input button_1_actions
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_2' ~ tag }}"
+                        sequence: !input button_2_actions
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_3' ~ tag }}"
+                        sequence: !input button_3_actions
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_4' ~ tag }}"
+                        sequence: !input button_4_actions
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_5' ~ tag }}"
+                        sequence: !input button_5_actions
+                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge' ~ tag }}"
+                        sequence:
+                          - alias: Send acknowledge message if provided
+                            if: "{{ acknowledge_message != '' }}"
+                            then:
+                              - alias: Send acknowledge message
+                                action: telegram_bot.send_message
+                                data:
+                                  parser: markdownv2
+                                  target: !input chat_id
+                                  message: "{{ acknowledge_message }}"
+                          - alias: Inidcate that alert is no londer needed
+                            variables:
+                              repeat_needed: false
+                          - alias: Stop the repeat loop waiting for the button presses and entity state change
+                            stop: "Alert ({{ alert_title }}) acknowlwedged"
+                      - conditions: "{{ wait.trigger.id == 'done' }}"
+                        sequence:
+                          - alias: Send done message if provided
+                            if: "{{ done_message != '' }}"
+                            then:
+                              - alias: Send done message
+                                action: telegram_bot.send_message
+                                data:
+                                  parser: markdownv2
+                                  target: !input chat_id
+                                  message: "{{ done_message }}"
+                          - alias: Inidcate that alert is no londer needed
+                            variables:
+                              repeat_needed: false
+                          - alias: Stop the repeat loop waiting for the button presses and entity state change
+                            stop: >
+                              Trigger entity for alert "{{ alert_title }}" no longer in problem state "{{ problem_state }}".
+  - alias: Send done message if while loop ended and message was not sent yet
+    if: "{{ repeat_needed and not is_state(trigger_entity, problem_state) and done_message != '' }}"
+    then:
+      - alias: Send done message
+        action: telegram_bot.send_message
+        data:
+          target: !input chat_id
+          message: "{{ done_message }}"
+mode: single
+max_exceeded: silent
