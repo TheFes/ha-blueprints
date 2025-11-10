@@ -1,6 +1,7 @@
 blueprint:
   domain: automation
   name: Send alerts using Telegram
+  author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.yaml
   description:
     "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
@@ -239,6 +240,7 @@ variables:
   done_message: !input done_message
   acknowledge_message: !input acknowledge_message
   repeat_needed: true
+  alert_count: 0
 actions:
   - alias: Set variables to be used for the inline keyboard
     variables:
@@ -288,80 +290,89 @@ actions:
                 title: !input alert_title
                 message: !input alert_message
                 inline_keyboard: "{{ inline_keyboard }}"
-            - alias:
-                Keep waiting for the right button presses until this repeat period ends or the entity
-                is no longer in the problem state
-              repeat:
-                while: >
-                  {{
-                    repeat_needed
-                    and is_state(trigger_entity, problem_state)
-                    and now() < repeat_end | as_datetime
-                  }}
-                sequence:
-                  - alias: Wait for button presses on the inline keyboard or when until the entity changes state
-                    wait_for_trigger:
-                      - alias: button press on inline keyboard
-                        trigger: event
-                        event_type: telegram_callback
-                        id: button_press
-                      - trigger: state
-                        entity_id: !input trigger_entity
-                        not_to: !input problem_state
-                        id: done
-                    timeout:
-                      seconds: >
-                        {{
-                          [(repeat_end | as_datetime - now()).total_seconds(), 0] | max
-                          if is_state(trigger_entity, problem_state)
-                          else 0
-                        }}
-                  - choose:
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1' ~ tag }}"
-                        sequence: !input button_1_actions
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_2' ~ tag }}"
-                        sequence: !input button_2_actions
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_3' ~ tag }}"
-                        sequence: !input button_3_actions
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_4' ~ tag }}"
-                        sequence: !input button_4_actions
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_5' ~ tag }}"
-                        sequence: !input button_5_actions
-                      - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge' ~ tag }}"
-                        sequence:
-                          - alias: Send acknowledge message if provided
-                            if: "{{ acknowledge_message != '' }}"
-                            then:
-                              - alias: Send acknowledge message
-                                action: telegram_bot.send_message
-                                data:
-                                  parser: markdownv2
-                                  target: !input chat_id
-                                  message: "{{ acknowledge_message }}"
-                          - alias: Inidcate that alert is no londer needed
-                            variables:
-                              repeat_needed: false
-                          - alias: Stop the repeat loop waiting for the button presses and entity state change
-                            stop: "Alert ({{ alert_title }}) acknowlwedged"
-                      - conditions: "{{ wait.trigger.id == 'done' }}"
-                        sequence:
-                          - alias: Send done message if provided
-                            if: "{{ done_message != '' }}"
-                            then:
-                              - alias: Send done message
-                                action: telegram_bot.send_message
-                                data:
-                                  parser: markdownv2
-                                  target: !input chat_id
-                                  message: "{{ done_message }}"
-                          - alias: Inidcate that alert is no londer needed
-                            variables:
-                              repeat_needed: false
-                          - alias: Stop the repeat loop waiting for the button presses and entity state change
-                            stop: >
-                              Trigger entity for alert "{{ alert_title }}" no longer in problem state "{{ problem_state }}".
+            - alias: increase alert count
+              variables:
+                alert_count: "{{ alert_count + 1 }}"
+        - alias:
+            Keep waiting for the right button presses until this repeat period ends or the entity
+            is no longer in the problem state
+          repeat:
+            while: >
+              {{
+                repeat_needed
+                and is_state(trigger_entity, problem_state)
+                and now() < repeat_end | as_datetime
+              }}
+            sequence:
+              - alias: Wait for button presses on the inline keyboard or when until the entity changes state
+                wait_for_trigger:
+                  - alias: button press on inline keyboard
+                    trigger: event
+                    event_type: telegram_callback
+                    id: button_press
+                  - trigger: state
+                    entity_id: !input trigger_entity
+                    not_to: !input problem_state
+                    id: done
+                timeout:
+                  seconds: >
+                    {{
+                      [(repeat_end | as_datetime - now()).total_seconds(), 0] | max
+                      if is_state(trigger_entity, problem_state)
+                      else 0
+                    }}
+              - choose:
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1' ~ tag }}"
+                    sequence: !input button_1_actions
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_2' ~ tag }}"
+                    sequence: !input button_2_actions
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_3' ~ tag }}"
+                    sequence: !input button_3_actions
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_4' ~ tag }}"
+                    sequence: !input button_4_actions
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_5' ~ tag }}"
+                    sequence: !input button_5_actions
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge' ~ tag }}"
+                    sequence:
+                      - alias: Send acknowledge message if provided
+                        if: "{{ acknowledge_message != '' }}"
+                        then:
+                          - alias: Send acknowledge message
+                            action: telegram_bot.send_message
+                            data:
+                              parser: markdownv2
+                              target: !input chat_id
+                              message: "{{ acknowledge_message }}"
+                      - alias: Inidcate that alert is no londer needed
+                        variables:
+                          repeat_needed: false
+                      - alias: Stop the repeat loop waiting for the button presses and entity state change
+                        stop: "Alert ({{ alert_title }}) acknowlwedged"
+                  - conditions: "{{ wait.trigger.id == 'done' }}"
+                    sequence:
+                      - alias: Send done message if provided
+                        if: "{{ alert_count > 0 and done_message != '' }}"
+                        then:
+                          - alias: Send done message
+                            action: telegram_bot.send_message
+                            data:
+                              parser: markdownv2
+                              target: !input chat_id
+                              message: "{{ done_message }}"
+                      - alias: Inidcate that alert is no londer needed
+                        variables:
+                          repeat_needed: false
+                      - alias: Stop the repeat loop waiting for the button presses and entity state change
+                        stop: >
+                          Trigger entity for alert "{{ alert_title }}" no longer in problem state "{{ problem_state }}".
   - alias: Send done message if while loop ended and message was not sent yet
-    if: "{{ repeat_needed and not is_state(trigger_entity, problem_state) and done_message != '' }}"
+    if: >
+      {{ 
+        alert_count > 0 
+        and repeat_needed 
+        and not is_state(trigger_entity, problem_state) 
+        and done_message != ''
+      }}
     then:
       - alias: Send done message
         action: telegram_bot.send_message
