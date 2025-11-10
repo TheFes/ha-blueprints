@@ -268,6 +268,11 @@ triggers:
   - alias: Trigger on automation reload in case the automation was changes
     trigger: event
     event_type: automation_reloaded
+conditions:
+  - alias: Only trigger when the trigger entity is in the problem state
+    condition: state
+    entity_id: !input trigger_entity
+    state: !input problem_state
 variables:
   alert_title: !input alert_title
   skip_first: !input skip_first
