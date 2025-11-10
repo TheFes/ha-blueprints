@@ -3,8 +3,8 @@ blueprint:
   name: Send alerts using Telegram
   author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.yaml
-  description:
-    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+  description: >
+    ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
     # Telegram Alert
 
@@ -44,7 +44,6 @@ blueprint:
     - 60
 
     ```
-    "
   homeassistant:
     min_version: 2025.11.0
   input:
@@ -88,14 +87,35 @@ blueprint:
       icon: mdi:message
       description: Settings regarding the messages sent by the alert
       input:
-        chat_id:
-          name: Chat ID
-          description: The chat ID of the telegram chat to which the alert should be sent.
+        config_entry:
+          name: Telegram Bot Config entry
+          description: The config entry for the Telegram Bot you want to use. Leave blank to use the default one.
           selector:
-            number:
-              min: 0
-              max: 999999999999
-              mode: box
+            config_entry:
+              integration: telegram_bot
+          default: none
+        target:
+          name: Target
+          description:
+            Select the telegram chats you want to target in this alert. The blueprint uses the event entities and
+            takes the chat_id from the attribute of these entities.
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - integration: telegram_bot
+                  domain: event
+        parse_mode:
+          name: Parse mode
+          description: "Parser for the message text: `markdownv2`, `html`, `markdown` or `plain_text` ."
+          selector:
+            select:
+              options:
+                - markdownv2
+                - html
+                - markdown
+                - plain_text
+          default: markdownv2
         alert_title:
           name: Alert title
           description:
@@ -237,10 +257,15 @@ variables:
   repeat: !input repeat
   repeat_list: >
     {{ (repeat if repeat is list else [repeat]) | select('is_number') | map('float') | list }}
+  config_entry: !input config_entry
+  config_entry_data: "{{ dict(config_entry=config_entry) if config_entry is not none else dict() }}"
   done_message: !input done_message
   acknowledge_message: !input acknowledge_message
   repeat_needed: true
   alert_count: 0
+  last_message_data: []
+  target: !input target
+  chat_id: "{{ target | map('state_attr', 'chat_id') | list }}"
 actions:
   - alias: Set variables to be used for the inline keyboard
     variables:
@@ -279,20 +304,37 @@ actions:
           variables:
             repeat_minutes: "{{ repeat_list[repeat.index-1] | default(repeat_list | last) }}"
             repeat_end: "{{ now() + timedelta(minutes=repeat_minutes) }}"
+            action_data:
+              parse_mode: !input parse_mode
+              target: "{{ chat_id }}"
+              title: !input alert_title
+              message: !input alert_message
+              inline_keyboard: "{{ inline_keyboard }}"
+        - alias: Delete previously sent alerts if there were any
+          repeat:
+            for_each: "{{ last_message_data }}"
+            sequence:
+              - variables:
+                  delete_data:
+                    message_id: "{{ repeat.item.message_id }}"
+                    chat_id: "{{ repeat.item.chat_id }}"
+              - alias: Delete message
+                action: telegram_bot.delete_message
+                data: "{{ delete_data | combine(config_entry_data) }}"
+              - alias: Clean up variable
+                variables:
+                  last_message_data: []
         - alias: Check if alert needs to be sent, skip the first alert if skip_first is set to false
           if: "{{ (repeat.index > 1 or not skip_first) and is_state(trigger_entity, problem_state) }}"
           then:
             - alias: Send the alert to the provided chat id
               action: telegram_bot.send_message
-              data:
-                parser: markdownv2
-                target: !input chat_id
-                title: !input alert_title
-                message: !input alert_message
-                inline_keyboard: "{{ inline_keyboard }}"
-            - alias: increase alert count
+              data: "{{ action_data | combine(config_entry_data) }}"
+              response_variable: response
+            - alias: increase alert count and store message info
               variables:
                 alert_count: "{{ alert_count + 1 }}"
+                last_message_data: "{{ response.chats }}"
         - alias:
             Keep waiting for the right button presses until this repeat period ends or the entity
             is no longer in the problem state
@@ -334,15 +376,31 @@ actions:
                     sequence: !input button_5_actions
                   - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge' ~ tag }}"
                     sequence:
+                      - alias: Delete previously sent alerts if there were any
+                        repeat:
+                          for_each: "{{ last_message_data }}"
+                          sequence:
+                            - variables:
+                                delete_data:
+                                  message_id: "{{ repeat.item.message_id }}"
+                                  chat_id: "{{ repeat.item.chat_id }}"
+                            - alias: Delete message
+                              action: telegram_bot.delete_message
+                              data: "{{ delete_data | combine(config_entry_data) }}"
+                            - alias: Clean up variable
+                              variables:
+                                last_message_data: []
                       - alias: Send acknowledge message if provided
                         if: "{{ acknowledge_message != '' }}"
                         then:
+                          - variables:
+                              ack_action_data:
+                                pase_mode: !input parse_mode
+                                target: "{{ wait.trigger.event.data.chat_id }}"
+                                message: "{{ acknowledge_message }}"
                           - alias: Send acknowledge message
                             action: telegram_bot.send_message
-                            data:
-                              parser: markdownv2
-                              target: !input chat_id
-                              message: "{{ acknowledge_message }}"
+                            data: "{{ ack_action_data | combine(config_entry_data) }}"
                       - alias: Inidcate that alert is no londer needed
                         variables:
                           repeat_needed: false
@@ -350,15 +408,31 @@ actions:
                         stop: "Alert ({{ alert_title }}) acknowlwedged"
                   - conditions: "{{ wait.trigger.id == 'done' }}"
                     sequence:
+                      - alias: Delete previously sent alerts if there were any
+                        repeat:
+                          for_each: "{{ last_message_data }}"
+                          sequence:
+                            - variables:
+                                delete_data:
+                                  message_id: "{{ repeat.item.message_id }}"
+                                  chat_id: "{{ repeat.item.chat_id }}"
+                            - alias: Delete message
+                              action: telegram_bot.delete_message
+                              data: "{{ delete_data | combine(config_entry_data) }}"
+                            - alias: Clean up variable
+                              variables:
+                                last_message_data: []
                       - alias: Send done message if provided
                         if: "{{ alert_count > 0 and done_message != '' }}"
                         then:
-                          - alias: Send done message
+                          - variables:
+                              done_action_data:
+                                pase_mode: !input parse_mode
+                                target: "{{ chat_id }}"
+                                message: "{{ done_message }}"
+                          - alias: Send acknowledge message
                             action: telegram_bot.send_message
-                            data:
-                              parser: markdownv2
-                              target: !input chat_id
-                              message: "{{ done_message }}"
+                            data: "{{ done_action_data | combine(config_entry_data) }}"
                       - alias: Inidcate that alert is no londer needed
                         variables:
                           repeat_needed: false
@@ -374,10 +448,27 @@ actions:
         and done_message != ''
       }}
     then:
-      - alias: Send done message
+      - alias: Delete previously sent alerts if there were any
+        repeat:
+          for_each: "{{ last_message_data }}"
+          sequence:
+            - variables:
+                delete_data:
+                  message_id: "{{ repeat.item.message_id }}"
+                  chat_id: "{{ repeat.item.chat_id }}"
+            - alias: Delete message
+              action: telegram_bot.delete_message
+              data: "{{ delete_data | combine(config_entry_data) }}"
+            - alias: Clean up variable
+              variables:
+                last_message_data: []
+      - variables:
+          done_action_data:
+            pase_mode: !input parse_mode
+            target: "{{ chat_id }}"
+            message: "{{ done_message }}"
+      - alias: Send acknowledge message
         action: telegram_bot.send_message
-        data:
-          target: !input chat_id
-          message: "{{ done_message }}"
+        data: "{{ done_action_data | combine(config_entry_data) }}"
 mode: single
 max_exceeded: silent
