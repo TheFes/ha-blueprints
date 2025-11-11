@@ -6,37 +6,26 @@ blueprint:
   description: >
     ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
-    # Telegram Alert
+    # 🚨 Telegram Alert
 
-    This replacement of the alert integration which sends alerts through Telegram.
+    This is a replacement for the alert integration which sends alerts through Telegram.
 
-    The alert title and all messages support templates, but you can use plain text as well.
+    ## ❓How to use
 
+    For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.md>).
 
-    ### Repeat settings
+    ## ☕ Coffee
 
-    The repeat setting either needs to be provided as a number or a list of numbers. In case a list of numbers is provided, the last
-    value will be used in case there are more repeats needed compared to items in the list
+    If you think I deserve a coffe, please feel free to buy me one (I might spend it on another beverage though).
 
+    In case you decide to do so, thanks a lot!
 
-    Example single number:
-
-    ```
-
-    15
-
-    ```
+    <a href="https://www.buymeacoffee.com/thefes" target="_blank">![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)</a>
 
 
-    Example list of numbers:
+    Or you can do a small donation using PayPal.
 
-    ```
-
-    - 15
-
-    - 30
-
-    - 60
+    [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/thefes)
 
     ```
   homeassistant:
@@ -48,7 +37,7 @@ blueprint:
       description: Settings to determine when the alert should be triggered.
       input:
         trigger_entity:
-          name: Trigger Entity
+          name: Trigger entity
           description: The entity_id of the entity on which the alert should trigger
           selector:
             entity: {}
@@ -57,6 +46,19 @@ blueprint:
           description: The state on which the enitity should be for the alert to be actvie
           selector:
             text:
+        attribute_key:
+          name: Attribute name
+          description:
+            The name of the attribute which should be used in the trigger. Only used when the
+            Use attribute setting is enabled.
+
+            Make sure to use the key as shown in developer tools > states, not the one shown in e.g.
+            the more-info card.
+
+            Leave empty to use the state of the entity.
+          selector:
+            text:
+          default: ""
     repeat_settings:
       name: Repeat settings
       icon: mdi:repeat
@@ -83,7 +85,7 @@ blueprint:
       description: Settings regarding the messages sent by the alert
       input:
         config_entry:
-          name: Telegram Bot Config entry
+          name: Telegram bot config entry
           description: The config entry for the Telegram Bot you want to use. Leave blank to use the default one.
           selector:
             config_entry:
@@ -130,23 +132,22 @@ blueprint:
           selector:
             boolean:
           default: false
+    done_settings:
+      name: Done message settings
+      icon: mdi:check-all
+      description: Settings related to the message which will be sent when the alert is done
+      input:
         done_message:
           name: Done message
           description: The message which should be sent in case the alert is no longer active
           selector:
             template:
           default: ""
-        remove_previous_message:
-          name: Remove previous message
-          description: Remove the previous alert message when a new message is sent
-          selector:
-            boolean:
-          default: true
-        remove_when_done:
-          name: Remove when done
+        use_done_title:
+          name: Use alert title on done message
           description:
-            Remove the last alert message when a the trigger entity is no longer in de problem state
-            or when the alert is acknowledged
+            When enabled it will add the alert title as title to the done
+            message
           selector:
             boolean:
           default: true
@@ -167,7 +168,7 @@ blueprint:
             boolean:
           default: false
         acknowledge_button_label:
-          name: Acknowlegde button labeld
+          name: Acknowlegde button label
           description:
             The text to be shown on the button to acknowledge the alert.
             For example "Stop bugging me"
@@ -182,6 +183,36 @@ blueprint:
           selector:
             template:
           default: ""
+        use_ack_title:
+          name: Use alert title on acknowledgement
+          description:
+            When enabled it will add the alert title as title to the acknowlege
+            message
+          selector:
+            boolean:
+          default: true
+    message_cleanup:
+      name: Message cleanup settings
+      icon: mdi:broom
+      description:
+        Settings to remove the messages from the chat after sending a new alert
+        or when the alert is no longer needed.
+      collapsed: true
+      input:
+        remove_previous_message:
+          name: Remove previous message
+          description: Automatically remove the previous alert message when a new message is sent
+          selector:
+            boolean:
+          default: true
+        remove_when_done:
+          name: Remove when done
+          description:
+            Automatically remove the alert messages when a the trigger entity is no longer in de problem
+            state or when the alert is acknowledged
+          selector:
+            boolean:
+          default: true
     actionable_buttons:
       name: Actionable button settings
       icon: mdi:list-box
@@ -257,11 +288,21 @@ blueprint:
           selector:
             action:
           default: []
+trigger_variables:
+  attribute_key: !input attribute_key
+  use_attribute: "{{ iif(attribute_key) }}"
 triggers:
   - alias: Start alert when trigger entity changes to the problem state
     trigger: state
     entity_id: !input trigger_entity
     to: !input problem_state
+    enabled: "{{ not use_attribute }}"
+  - alias: Start alert when trigger entity changes to the problem state
+    trigger: state
+    entity_id: !input trigger_entity
+    attribute: !input attribute_key
+    to: !input problem_state
+    enabled: "{{ use_attribute }}"
   - alias: Trigger on Home Assistant start to restart alerts where needed
     trigger: homeassistant
     event: start
@@ -297,24 +338,24 @@ variables:
 actions:
   - alias: Set variables to be used for the inline keyboard
     variables:
-      tag: "{{ context.id }}"
+      tag: "{{ this.entity_id | replace('automation.', '') }}"
       acknowledge_button: >
-        {{ [ack_label~':/acknowledge'~tag] if can_acknowledge else [] }}
+        {{ [ack_label~':/acknowledge_'~tag] if can_acknowledge else [] }}
       button_1_label: !input button_1_label
       button_1: >
-        {{ [button_1_label~':/button_1'~tag] if button_1_label else [] }}
+        {{ [button_1_label~':/button_1_'~tag] if button_1_label else [] }}
       button_2_label: !input button_2_label
       button_2: >
-        {{ [button_2_label~':/button_2'~tag] if button_2_label else [] }}
+        {{ [button_2_label~':/button_2_'~tag] if button_2_label else [] }}
       button_3_label: !input button_3_label
       button_3: >
-        {{ [button_3_label~':/button_3'~tag] if button_3_label else [] }}
+        {{ [button_3_label~':/button_3_'~tag] if button_3_label else [] }}
       button_4_label: !input button_4_label
       button_4: >
-        {{ [button_4_label~':/button_4'~tag] if button_4_label else [] }}
+        {{ [button_4_label~':/button_4_'~tag] if button_4_label else [] }}
       button_5_label: !input button_5_label
       button_5: >
-        {{ [button_5_label~':/button_5'~tag] if button_5_label else [] }}
+        {{ [button_5_label~':/button_5_'~tag] if button_5_label else [] }}
       inline_keyboard: >
         {{
           button_1
@@ -326,7 +367,7 @@ actions:
         }}
   - alias: Sends the alert messages based on the repeat list provided in the blueprint
     repeat:
-      while: "{{ repeat_needed and is_state(trigger_entity, problem_state) }}"
+      while: "{{ repeat_needed and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) }}"
       sequence:
         - alias: Set variables to determine how long to wait for the next alert message
           variables:
@@ -354,7 +395,7 @@ actions:
                 variables:
                   last_message_data: []
         - alias: Check if alert needs to be sent, skip the first alert if skip_first is set to false
-          if: "{{ (repeat.index > 1 or not skip_first) and is_state(trigger_entity, problem_state) }}"
+          if: "{{ (repeat.index > 1 or not skip_first) and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) }}"
           then:
             - alias: Send the alert to the provided chat id
               action: telegram_bot.send_message
@@ -363,7 +404,7 @@ actions:
             - alias: increase alert count and store message info
               variables:
                 alert_count: "{{ alert_count + 1 }}"
-                last_message_data: "{{ response.chats }}"
+                last_message_data: "{{ last_message_data + response.chats }}"
         - alias:
             Keep waiting for the right button presses until this repeat period ends or the entity
             is no longer in the problem state
@@ -371,7 +412,7 @@ actions:
             while: >
               {{
                 repeat_needed
-                and is_state(trigger_entity, problem_state)
+                and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state))
                 and now() < repeat_end | as_datetime
               }}
             sequence:
@@ -389,21 +430,21 @@ actions:
                   seconds: >
                     {{
                       [(repeat_end | as_datetime - now()).total_seconds(), 0] | max
-                      if is_state(trigger_entity, problem_state)
+                      if (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state))
                       else 0
                     }}
               - choose:
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1_'~tag }}"
                     sequence: !input button_1_actions
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_2' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_2_'~tag }}"
                     sequence: !input button_2_actions
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_3' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_3_'~tag }}"
                     sequence: !input button_3_actions
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_4' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_4_'~tag }}"
                     sequence: !input button_4_actions
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_5' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_5_'~tag }}"
                     sequence: !input button_5_actions
-                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge' ~ tag }}"
+                  - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/acknowledge_'~tag }}"
                     sequence:
                       - alias: Delete previously sent alerts if there were any
                         repeat:
@@ -426,11 +467,17 @@ actions:
                               ack_action_data:
                                 pase_mode: !input parse_mode
                                 target: "{{ wait.trigger.event.data.chat_id }}"
+                                title: !input alert_title
                                 message: "{{ acknowledge_message }}"
                                 disable_web_page_preview: !input disable_web_page_preview
                           - alias: Send acknowledge message
                             action: telegram_bot.send_message
-                            data: "{{ ack_action_data | combine(config_entry_data) }}"
+                            data: >
+                              {{
+                                ack_action_data
+                                  | combine(config_entry_data)
+                                  | combine(dict(title=alert_title) if done_ack_title else dict())
+                              }}
                       - alias: Inidcate that alert is no londer needed
                         variables:
                           repeat_needed: false
@@ -463,7 +510,12 @@ actions:
                                 disable_web_page_preview: !input disable_web_page_preview
                           - alias: Send acknowledge message
                             action: telegram_bot.send_message
-                            data: "{{ done_action_data | combine(config_entry_data) }}"
+                            data: >
+                              {{
+                                done_action_data
+                                  | combine(config_entry_data)
+                                  | combine(dict(title=alert_title) if done_use_title else dict())
+                              }}
                       - alias: Inidcate that alert is no londer needed
                         variables:
                           repeat_needed: false
@@ -475,7 +527,7 @@ actions:
       {{ 
         alert_count > 0 
         and repeat_needed 
-        and not is_state(trigger_entity, problem_state) 
+        and not (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) 
         and done_message != ''
       }}
     then:
@@ -489,7 +541,7 @@ actions:
                   chat_id: "{{ repeat.item.chat_id }}"
             - alias: Delete message
               action: telegram_bot.delete_message
-              data: "{{ delete_data | combine(config_entry_data) }}"
+              data: "{{ delete_data | combine(config_entry_data) | combine(dict(title=alert_title)) }}"
             - alias: Clean up variable
               variables:
                 last_message_data: []
@@ -497,10 +549,16 @@ actions:
           done_action_data:
             pase_mode: !input parse_mode
             target: "{{ chat_id }}"
+            title: !input alert_title
             message: "{{ done_message }}"
             disable_web_page_preview: !input disable_web_page_preview
       - alias: Send acknowledge message
         action: telegram_bot.send_message
-        data: "{{ done_action_data | combine(config_entry_data) }}"
+        data: >
+          {{
+            done_action_data
+              | combine(config_entry_data)
+              | combine(dict(title=alert_title) if done_use_title else dict())
+          }}
 mode: single
 max_exceeded: silent
