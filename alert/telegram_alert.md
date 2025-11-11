@@ -35,7 +35,7 @@ Then create a new automation using the blueprint. The settings are divided into 
 
 The text between brackets is the key for the input used in YAML.
 
-### Trigger settings
+### 🏴 <u>Trigger settings</u>
 
 #### **Trigger entity**  _(trigger_entity)_ | no default
 
@@ -54,7 +54,7 @@ The state the trigger entity needs to change to to start the alert. Note that if
 You can optionally provide an attribute name so the alert will not trigger on the state of the entity, but on an attribute value. It will use the problem state provided, in combination with the attribute name. This has to be the attribute as shown in developer tools > states, do not use the value from e.g. a more-info card, as they make changes to the name (for example the first character is capitalized).
 When left empty, the state of the entity will be used.
 
-### Repeat settings
+### 🔁 <u>Repeat settings</u>
 
 #### **Repeat** _(repeat)_ | no default
 
@@ -74,7 +74,7 @@ Example list of numbers:
 #### **Skip first** _(skip_first)_ | default: `false`
 Controls if the first alert message should be sent immediately when the entity changes to the problem state, or after the first wait period.
 
-### Message settings
+### 💬 <u>Message settings</u>
 
 #### **Telegram bot config entry** _(config_entry)_ | default: `none`
 The config entry of the telegram bot to use, this is not required if you only have one Telegram bot configured.
@@ -94,7 +94,7 @@ The messge which is sent on every repeat of the alert message. Jinja templates a
 #### **Disable web page preview** _(disable_web_page_preview)_| default: `false`
 When disabled the alert message will not display previews of web pages in case an website url is sent in the message.
 
-### Done message settings
+### ✅ <u>Done message settings</u>
 
 #### **Done message** _(done_message)_ | default: `""`
 The message which will be sent when the entity is no longer in the problem state. Leave empty to not send a done message.
@@ -102,7 +102,7 @@ The message which will be sent when the entity is no longer in the problem state
 #### **Use alert title on done message** _(use_done_title)_ | default: `true`
 By default the alert title will be used as first line for the done message, you can use this setting to turn that off.
 
-### Acknowledge settings
+### ☑️ <u>Acknowledge settings</u>
 
 #### **Can acknowlegde** _(can_acknowledge)_ | default: `false`
 When enabled it shows a button below the alert message to turn the alert off until it's triggered again.
@@ -116,7 +116,7 @@ The message which will be sent when the acknowledge button is pressed in the cha
 #### **Use alert title on acknowledgement** _(use_ack_title)_ | default: `true`
 By default the alert title will be used as first line for the acknowledgement message, you can use this setting to turn that off.
 
-### Message cleanup settings
+### 🧹 <u>Message cleanup settings</u>
 
 #### **Remove previous message** _(remove_previouse_message)_ | default: `true`
 By default the previous alert message will be removed in the chat when a new alert message is sent. You can use this setting to turn that off.
@@ -124,7 +124,7 @@ By default the previous alert message will be removed in the chat when a new ale
 #### **Remove when done** _(remove_when_done)_ | default: `true`
 By default the previous alert messages will be removed in the chat when the entity is no longer in the problem state or when the alert is acknowledged. You can use this setting to turn that off.
 
-### **Actionable button settings**
+### 📋 <u>Actionable button settings</u>
 You can optionally add buttons and assign actions to those buttons.
 If you for example have an alert when a light is on, you can add a button to turn that light off.
 You can add a maximum of 5 buttons. Below you see the description of button 1, besides the number the settings are the same for the other 4 buttons.
