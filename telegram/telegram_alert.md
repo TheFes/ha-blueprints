@@ -33,7 +33,7 @@ Known limitations:
 
 Import the blueprint using this button:
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Falert%2Ftelegram_alert.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftelegram%2Ftelegram_alert.yaml)
 
 Then create a new automation using the blueprint. The settings are divided into separate sections. For every setting where there is no default provided, you'll need to provide input. Note that the `Acknowlegde settings`, `Message cleanup settings` and `Actionable buttons settings` are collapsed by default.
 

@@ -2,7 +2,7 @@ blueprint:
   domain: automation
   name: Send alerts using Telegram
   author: TheFes
-  source_url: https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.yaml
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/telegram/telegram_alert.yaml
   description: >
     ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
@@ -12,7 +12,7 @@ blueprint:
 
     ## ❓How to use
 
-    For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.md>).
+    For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/telegram/telegram_alert.md>).
 
     ## ☕ Coffee
 
