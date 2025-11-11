@@ -86,7 +86,7 @@ The text between brackets is the key for the input used in YAML.
 * #### **Alert message** _(alert_message)_ | no default
   The messge which is sent on every repeat of the alert message. Jinja templates are allowed, but you can also use plain text.
 
-* #### **Disable web page preview** _(disable_web_page_preview)_| default: `false`
+* #### **Disable web page preview** _(disable_web_page_preview)_ | default: `false`
   When disabled the alert message will not display previews of web pages in case an website url is sent in the message.
 
 ### ✅ <u>Done message settings</u>
