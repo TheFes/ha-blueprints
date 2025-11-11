@@ -8,7 +8,7 @@
 
 This blueprint creates an automation which processes all messages sent in a Telegram chat as voice commands. I can process them locally (only) and/or send them to an LLM for processing.
 
-<img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_bot_example_image.jpeg">
+<img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_assist_example.jpeg">
 
 ***
 
@@ -22,17 +22,15 @@ Then create a new automation using the blueprint and provide the settings.
 
 The text between brackets is the key for the input used in YAML.
 
-### 🏴 <u>Trigger settings</u>
-
 * #### **Telegram event entity**  _(telegram_event)_ | no default
-  The event entity or entities which belong to the Telegram chats for which the messages should be handled as voice messages.
+The event entity or entities which belong to the Telegram chats for which the messages should be handled as voice messages.
 
 * #### **LLM conversation entity** _(llm_entity)_  | no default
-  The conversation entity from your LLM to be used as fallback of the local.
-  Set to `Home Assistant (conversation.home_assistant)` to use local handling only.
+The conversation entity from your LLM to be used as fallback of the local.
+Set to `Home Assistant (conversation.home_assistant)` to use local handling only.
 
 * #### **Prefer local** _(prefer_local)_  | default: `true`
-  Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used.
+Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used.
 
 ***
 
