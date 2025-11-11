@@ -25,6 +25,8 @@ Known limitations:
 - on restart of Home Assistant or when you change the automation it will start sending messages for alerts which were previously acknowledged and which are still in the problem state
 - After restart of Home Assistant the automation will no longer clean up previous messages from an alert which was active before the restart.
 
+<img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_bot_example_image.jpeg">
+
 ***
 
 ## ❓ How to use
