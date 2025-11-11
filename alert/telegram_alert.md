@@ -23,6 +23,7 @@ In addition, it also supports:
 Known limitations:
 - on restart of Home Assistant or when you change the automation for a specific alert it will restart the repeat sequence, so it will restart the wait period, and it will start at the top of the repeat list if a list is provided
 - on restart of Home Assistant or when you change the automation it will start sending messages for alerts which were previously acknowledged and which are still in the problem state
+- After restart of Home Assistant the automation will no longer clean up previous messages from an alert which was active before the restart.
 
 ***
 
