@@ -25,10 +25,13 @@ The text between brackets is the key for the input used in YAML.
 * #### **Telegram event entity**  _(telegram_event)_ | no default
   The event entity or entities which belong to the Telegram chats for which the messages should be handled as voice messages.
 
-* #### **LLM conversation entity** _(llm_entity)_  | no default
+* #### **LLM conversation entity** _(llm_entity)_  | default: `[]`
   The LLM conversation entities to be used as fallback of the local processing.
   They will be processed in order, and the first result which isn't an error will be returned.
   Leave empty to use local handling only.
+
+* #### **Prefer local** _(prefer_local)_  | default: `true`
+  Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used.
 
 ***
 
