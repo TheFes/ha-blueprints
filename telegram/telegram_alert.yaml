@@ -434,9 +434,18 @@ actions:
                     trigger: event
                     event_type: telegram_callback
                     id: button_press
-                  - trigger: state
+                  - alias: Trigger entity no longer on problem state
+                    trigger: state
                     entity_id: !input trigger_entity
                     not_to: !input problem_state
+                    enabled: "{{ not use_attribute }}"
+                    id: done
+                  - alias: Trigger entity attribute no longer on problem value
+                    trigger: state
+                    entity_id: !input trigger_entity
+                    attribute: !input attribute_key
+                    to: !input problem_state
+                    enabled: "{{ use_attribute }}"
                     id: done
                 timeout:
                   seconds: >
