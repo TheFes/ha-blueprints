@@ -62,34 +62,38 @@ blueprint:
     prefer_local:
       name: Prefer local
       description:
+        The conversation entity from your LLM to be used as fallback of the local. Leave empty to only use local handling.
         Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used.
       selector:
         boolean:
       default: true
-triggers:
-  - trigger: state
-    entity_id: !input telegram_event
-    not_from: unavailable
-conditions:
-  - condition: state
-    entity_id: !input telegram_event
-    state: telegram_text
-    attribute: event_type
 variables:
   telegram_event: !input telegram_event
   prefer_local: !input prefer_local
   llm_entity: !input llm_entity
+  chat_id: "{{ trigger.event.data.chat_id }}"
+  allowed_chats: "{{ telegram_event | map('state_attr', 'chat_id') | list }}"
+triggers:
+  - alias: Trigger on the Telegram text event
+    trigger: event
+    event_type: telegram_text
+conditions:
+  - alias: Check if the message was sent in an allowed chat
+    condition: template
+    value_template: "{{ chat_id in allowed_chats }}"
 actions:
   - alias: Use local handling first if set
     if: "{{ prefer_local or llm_entity | count == 0 }}"
     then:
-      - action: conversation.process
+      - alias: Process Telegram chat text locally
+        action: conversation.process
         data:
           agent_id: conversation.home_assistant
-          text: "{{ trigger.to_state.attributes.text }}"
+          text: "{{ trigger.event.data.text }}"
           conversation_id: telegram_assist
         response_variable: response
-  - repeat:
+  - alias: Process Telegram chat text by LLM
+    repeat:
       while: >
         {{
           repeat.index < llm_entity | count
@@ -100,16 +104,18 @@ actions:
           )
         }}
       sequence:
-      - action: conversation.process
+      - alias: Ask LLM to process the telegram chat text
+        action: conversation.process
         data:
-          text: "{{ trigger.to_state.attributes.text }}"
+          text: "{{ trigger.event.data.text }}"
           conversation_id: telegram_assist
           agent_id: "{{ llm_entity[repeat.index-1] }}"
         response_variable: response
-  - action: telegram_bot.send_message
+  - alias: Send respone to Telegram chat
+    action: telegram_bot.send_message
     data:
-      config_entry_id: "{{ config_entry_id(trigger.entity_id) }}"
-      target: "{{ state_attr(trigger.entity_id, 'chat_id') }}"
+      config_entry_id: "{{ trigger.event.data.bot.config_entry_id }}"
+      target: "{{ chat_id }}"
       message: "{{ response.response.speech.plain.speech }}"
       message_tag: conversation_response
 mode: parallel
