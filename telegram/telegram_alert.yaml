@@ -12,7 +12,7 @@ blueprint:
 
     ## ❓How to use
 
-    For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/telegram/telegram_alert.md>).
+    For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.md>).
 
     ## ☕ Coffee
 
@@ -59,6 +59,22 @@ blueprint:
           selector:
             text:
           default: ""
+        problem_type:
+          name: Problem type
+          description:
+            Indicate if the entity state should exactly match the problem state, or if should be above or below.
+
+            In case above or below is used, the problem state needs to be numeric.
+          selector:
+            select:
+              options:
+                - label: Entity state equal to problem state
+                  value: equal
+                - label: Entity state below problem state
+                  value: below
+                - label: Entity state above problem state
+                  value: above
+          default: equal
     repeat_settings:
       name: Repeat settings
       icon: mdi:repeat
@@ -313,19 +329,31 @@ blueprint:
           default: update_thefes_alert_sensor
 trigger_variables:
   attribute_key: !input attribute_key
+  problem_type: !input problem_type
   use_attribute: "{{ iif(attribute_key) }}"
+  trigger_entity: !input trigger_entity
+  problem_state: !input problem_state
 triggers:
   - alias: Start alert when trigger entity changes to the problem state
-    trigger: state
-    entity_id: !input trigger_entity
-    to: !input problem_state
-    enabled: "{{ not use_attribute }}"
-  - alias: Start alert when trigger entity changes to the problem state
-    trigger: state
-    entity_id: !input trigger_entity
-    attribute: !input attribute_key
-    to: !input problem_state
-    enabled: "{{ use_attribute }}"
+    trigger: template
+    value_template: &is_problem >
+      {% set entity_value = state_attr(trigger_entity, attribute_key) if use_attribute else states(trigger_entity) %}
+      {% if problem_type == 'equal' %}
+        {% set is_problem = entity_value | string == problem_state %}
+      {% elif problem_type == 'below' %}
+        {% set is_problem =
+          entity_value | is_number
+          and problem_state | is_number
+          and entity_value | float < problem_state | float
+        %}
+      {% elif problem_type == 'above' %}
+        {% set is_problem =
+          entity_value | is_number
+          and problem_state | is_number
+          and entity_value | float > problem_state | float
+        %}
+      {% endif %}
+      {{ is_problem }}
   - alias: Trigger on Home Assistant start to restart alerts where needed
     trigger: homeassistant
     event: start
@@ -338,8 +366,6 @@ variables:
   target: !input target
   alert_title: !input alert_title
   skip_first: !input skip_first
-  trigger_entity: !input trigger_entity
-  problem_state: !input problem_state
   can_acknowledge: !input can_acknowledge
   done_message: !input done_message
   acknowledge_message: !input acknowledge_message
@@ -404,9 +430,10 @@ actions:
           + button_5
           + acknowledge_button
         }}
+      is_problem: *is_problem
   - alias: Sends the alert messages based on the repeat list provided in the blueprint
     repeat:
-      while: "{{ repeat_needed and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) }}"
+      while: "{{ repeat_needed and is_problem }}"
       sequence:
         - alias: Delete previously sent alerts if there were any
           repeat:
@@ -423,13 +450,13 @@ actions:
                   message_data: "{{ message_data | rejectattr('id', 'eq', repeat.item.id) | list }}"
         - alias: Set variables to determine how long to wait for the next alert message
           variables:
+            repeat_minutes: "{{ repeat_list[alert_count-1] | default(repeat_list | last) }}"
             repeat_start: >
               {{
                 alert_sensor_data.get('repeat_start', now())
                 if restart
                 else now()
               }}
-            repeat_minutes: "{{ repeat_list[alert_count-1] | default(repeat_list | last) }}"
             repeat_end: >
               {{ repeat_start | as_datetime + timedelta(minutes=repeat_minutes) }}
         - alias: Send alert data to sensor if provided
@@ -450,16 +477,15 @@ actions:
                         }
                     }
                   }}
+        - alias: Check if there still is a problem
+          variables:
+            is_problem: *is_problem
         - alias: Check if alert needs to be sent, skip the first alert if skip_first is set to false
           if: >
             {{
               (alert_count > 1 or not skip_first) 
               and (not restart or message_data | count == 0)
-              and (
-                is_state_attr(trigger_entity, attribute_key, problem_state) 
-                if use_attribute
-                else is_state(trigger_entity, problem_state)
-                )
+              and is_problem
             }}
           then:
             - repeat:
@@ -470,10 +496,10 @@ actions:
                     data:
                       config_entry_id: "{{ config_entry_id(repeat.item) }}"
                       target: "{{ state_attr(repeat.item, 'chat_id')}}"
-                      parse_mode: !input parse_mode
                       title: !input alert_title
                       message: !input alert_message
                       inline_keyboard: "{{ inline_keyboard }}"
+                      parse_mode: !input parse_mode
                       disable_web_page_preview: !input disable_web_page_preview
                     response_variable: response
                   - alias: Store message info
@@ -511,6 +537,9 @@ actions:
                         }
                     }
                   }}
+        - alias: Check if there still is a problem
+          variables:
+            is_problem: *is_problem
         - alias:
             Keep waiting for the right button presses until this repeat period ends or the entity
             is no longer in the problem state
@@ -518,9 +547,7 @@ actions:
             while: >
               {{
                 repeat_needed
-                and (is_state_attr(trigger_entity, attribute_key, problem_state)
-                  if use_attribute
-                  else is_state(trigger_entity, problem_state))
+                and is_problem
                 and (now() < repeat_end | as_datetime or restart)
               }}
             sequence:
@@ -530,15 +557,31 @@ actions:
                     trigger: event
                     event_type: telegram_callback
                     id: button_press
-                  - trigger: state
-                    entity_id: !input trigger_entity
-                    not_to: !input problem_state
+                  - trigger: template
+                    value_template: &is_not_problem >
+                      {% set entity_value = state_attr(trigger_entity, attribute_key) if use_attribute else states(trigger_entity) %}
+                      {% if problem_type == 'equal' %}
+                        {% set is_problem = entity_value | string == problem_state %}
+                      {% elif problem_type == 'below' %}
+                        {% set is_problem =
+                          entity_value | is_number
+                          and problem_state | is_number
+                          and entity_value | float < problem_state | float
+                        %}
+                      {% elif problem_type == 'above' %}
+                        {% set is_problem =
+                          entity_value | is_number
+                          and problem_state | is_number
+                          and entity_value | float > problem_state | float
+                        %}
+                      {% endif %}
+                      {{ not is_problem }}
                     id: done
                 timeout:
                   seconds: >
                     {{
                       [(repeat_end | as_datetime - now()).total_seconds(), 0] | max
-                      if (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state))
+                      if is_problem
                       else 0
                     }}
               - choose:
@@ -594,10 +637,10 @@ actions:
                             action: telegram_bot.send_message
                             data:
                               config_entry_id: "{{ config_entry }}"
-                              pase_mode: !input parse_mode
                               target: "{{ chat_id }}"
                               title: "{{ alert_title if use_ack_title else '' }}"
                               message: "{{ acknowledge_message }}"
+                              pase_mode: !input parse_mode
                               disable_web_page_preview: !input disable_web_page_preview
                       - alias: Remove this entry for the recipent list
                         variables:
@@ -625,9 +668,9 @@ actions:
                                   data:
                                     config_entry_id: "{{ config_entry_id(repeat.item) }}"
                                     target: "{{ state_attr(repeat.item, 'chat_id')}}"
-                                    pase_mode: !input parse_mode
                                     title: "{{ alert_title if use_done_title else '' }}"
                                     message: "{{ done_message }}"
+                                    pase_mode: !input parse_mode
                                     disable_web_page_preview: !input disable_web_page_preview
                       - alias: Remove data from the sensor
                         if: "{{ alert_data_sensor is not none }}"
@@ -642,16 +685,23 @@ actions:
                       - alias: Stop the repeat loop waiting for the button presses and entity state change
                         stop: >
                           Trigger entity for alert "{{ alert_title }}" no longer in problem state "{{ problem_state }}".
-        - alias: Update alert count
+              - alias: Check if there still is a problem
+                variables:
+                  restart: false
+                  is_problem: *is_problem
+        - alias: Update alert count and is_problem variable
           variables:
             alert_count: "{{ alert_count + 1 }}"
-            restart: false
+            is_problem: *is_problem
+  - alias: Check if there is no longer a problem
+    variables:
+      is_not_problem: *is_not_problem
   - alias: Send done message and cleanup data if while loop ended and this was not done yet
     if: >
       {{ 
         message_data | count > 0
         and repeat_needed
-        and not (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state))
+        and is_not_problem
       }}
     then:
       - alias: Send done message to each chat

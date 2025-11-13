@@ -17,6 +17,7 @@ This blueprint is intended as a replacement for the [alert](<https://www.home-as
 
 ### 🦾 In addition, it also supports:
 - Trigger alerts based on an attribute value instead of the entity state
+- Trigger on a numeric value being either below or above a certain value
 - Add actionable buttons which will perform assigned actions
 - Optionally automatically remove previous messages for the alert when a new message is sent
 - Optionally automatically remove previous messages for the alert when the alert is done (either the entity state changed or the alert is acknowledged)
@@ -56,6 +57,14 @@ The text between brackets is the key for the input used in YAML.
 * #### **Attribute name** _(attribute_key)_  | default: `""`
   You can optionally provide an attribute name so the alert will not trigger on the state of the entity, but on an attribute value. It will use the problem state provided, in combination with the attribute name. This has to be the attribute as shown in developer tools > states, do not use the value from e.g. a more-info card, as they make changes to the name (for example the first character is capitalized).
   When left empty, the state of the entity will be used.
+
+* #### **Problem type** _(problem_type)_  | default: `"equal"`
+Indicate if the entity state should exactly match the problem state, or if should be above or below.
+In case above or below is used, the problem state needs to be numeric. Possible options are:
+  - Entity state equal to problem state _(equal)_
+  - Entity state below problem state _(below)_
+  - Entity state above problem state _(above)_
+
 
 ### 🔁 <u>Repeat settings</u>
 
