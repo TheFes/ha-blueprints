@@ -65,7 +65,6 @@ In case above or below is used, the problem state needs to be numeric. Possible 
   - Entity state below problem state _(below)_
   - Entity state above problem state _(above)_
 
-
 ### 🔁 <u>Repeat settings</u>
 
 * #### **Repeat** _(repeat)_ | no default
