@@ -49,4 +49,5 @@ template:
 ```
 
 ## ⚠️ NOTE: 
-If you change the entity_id in the GUI settings, make sure to change it as well in the settings above, otherwise the sensor will no longer work.
+* If you change the entity_id in the GUI settings, make sure to change it as well in the settings above, otherwise the sensor will no longer work.
+* To limit the number of options in the alert automations, I've added the device class `current` and unit of measurement `A` (for Alert in this case 😉). So if you have some template sensors which e.g. calculate an average of all sensors with device class `current`, this one might be included. If that's the case, exclude it in your templates.
