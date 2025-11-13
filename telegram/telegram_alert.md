@@ -26,8 +26,8 @@ This blueprint is intended as a replacement for the [alert](<https://www.home-as
 - After restarting Home Assistant or modifying the automation, messages may be sent for alerts previously acknowledged but still in the problem state
 - After restarting Home Assistant, automations will no longer clean up previous alert messages that were active before the restart.
 
-_Note: these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor.
-If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint._
+_Note: these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor._
+_If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint._
 
 ### 👇 Example:
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_bot_example_image.jpeg">
