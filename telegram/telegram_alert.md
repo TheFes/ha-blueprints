@@ -11,23 +11,23 @@ This blueprint is intended as a replacement for the [alert](<https://www.home-as
 ### 🫶 It supports these features of the alert integration:
 - Start alert when the state of an entity goes to a certain problem state
 - Provide a fixed number of minutes the alert should be repeated, or a list of numbers for a variable interval
-- Optionally skip the first message, so it won't be sent immediately when the entity changes to the problem state
+- Optionally skip the first message, .so it won’t be sent immediately when the entity changes to the problem state
 - Provide an option to acknowledge an alert before the entity is no longer in the problem state
-- Send a message when the entity changes state, and is no longer in the problem state
+- Send a message when the entity changes state, to indicate it is no longer in the problem state
 
 ### 🦾 In addition, it also supports:
-- Trigger on an attribute value instead of the entity state
+- Trigger alerts based on an attribute value instead of the entity state
 - Add actionable buttons which will perform assigned actions
 - Optionally automatically remove previous messages for the alert when a new message is sent
 - Optionally automatically remove previous messages for the alert when the alert is done (either the entity state changed or the alert is acknowledged)
 
 ### ⚠️ Known limitations:
-- On restart of Home Assistant or when you change the automation for a specific alert it will restart the repeat sequence, so it will restart the wait period, and it will start at the top of the repeat list if a list is provided
-- On restart of Home Assistant or when you change the automation it will start sending messages for alerts which were previously acknowledged and which are still in the problem state
-- After restart of Home Assistant the automation will no longer clean up previous messages from an alert which was active before the restart.
+- On restart of Home Assistant or when modifying the automation for a specific alert, the repeat sequence will restart. This includes resetting any wait periods and starting at the beginning of the repeat list if a list is provided
+- After restarting Home Assistant or modifying the automation, messages may be sent for alerts previously acknowledged but still in the problem state
+- After restarting Home Assistant, automations will no longer clean up previous alert messages that were active before the restart.
 
-However, these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor.
-If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint.
+_Note: these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor.
+If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint._
 
 ### 👇 Example:
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_bot_example_image.jpeg">
@@ -40,7 +40,7 @@ Import the blueprint using this button:
 
 [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftelegram%2Ftelegram_alert.yaml)
 
-Then create a new automation using the blueprint. The settings are divided into separate sections. For every setting where there is no default provided, you'll need to provide input. Note that the `Acknowlegde settings`, `Message cleanup settings` and `Actionable buttons settings` are collapsed by default.
+Then create a new automation using the blueprint. The settings are divided into separate sections. For every setting where there is no default provided, you'll need to provide input. Note that the `Acknowledge settings`, `Message cleanup settings` and `Actionable buttons settings` are collapsed by default.
 
 The text between brackets is the key for the input used in YAML.
 
@@ -83,7 +83,7 @@ The text between brackets is the key for the input used in YAML.
   The config entry of the telegram bot to use, this is not required if you only have one Telegram bot configured.
 
 * #### **Target** _(target)_ | no default
-  The target chats to which the alerts should be sent. The selector is using the event entities as created by the Telegram bot integartion. These entities have the chat id of the Telegram chat as an attribute, so in the end those chat id's are used as target of the alert messages.
+  The target chats to which the alerts should be sent. The selector is using the event entities as created by the Telegram bot integration. These entities have the chat id of the Telegram chat as an attribute, so in the end those chat id's are used as target of the alert messages.
 
 * #### **Parse mode** _(parse_mode)_ | default: `markdown`
   This will determine the formatting of the message. By default `markdown` formatting is used, but you can also select `markdownv2`, `html` and `plain_text`. Note that `markdownv2` needs escaping of special characters and will otherwise result in an error.
@@ -92,7 +92,7 @@ The text between brackets is the key for the input used in YAML.
   The title for the alert. This will be the first line of the alert messages sent to the telegram chat(s). Jinja templates are allowed, but you can also use plain text.
 
 * #### **Alert message** _(alert_message)_ | no default
-  The messge which is sent on every repeat of the alert message. Jinja templates are allowed, but you can also use plain text.
+  The message which is sent on every repeat of the alert message. Jinja templates are allowed, but you can also use plain text.
 
 * #### **Disable web page preview** _(disable_web_page_preview)_ | default: `false`
   When disabled the alert message will not display previews of web pages in case an website url is sent in the message.
@@ -103,11 +103,11 @@ The text between brackets is the key for the input used in YAML.
   The message which will be sent when the entity is no longer in the problem state. Leave empty to not send a done message.
 
 * #### **Use alert title on done message** _(use_done_title)_ | default: `true`
-  By default the alert title will be used as first line for the done message, you can use this setting to turn that off.
+  By default the alert title will be used as first line for the done message. You can use this setting to turn that off.
 
 ### ☑️ <u>Acknowledge settings</u>
 
-* #### **Can acknowlegde** _(can_acknowledge)_ | default: `false`
+* #### **Can acknowledge** _(can_acknowledge)_ | default: `false`
   When enabled it shows a button below the alert message to turn the alert off until it's triggered again.
 
 * #### **Acknowledge button label** _(acknowledge_button_label)_ | default: `"Acknowledge alert"`
@@ -117,11 +117,11 @@ The text between brackets is the key for the input used in YAML.
   The message which will be sent when the acknowledge button is pressed in the chat. Leave empty to not send a message.
 
 * #### **Use alert title on acknowledgement** _(use_ack_title)_ | default: `true`
-  By default the alert title will be used as first line for the acknowledgement message, you can use this setting to turn that off.
+  By default the alert title will be used as first line for the acknowledgement message. You can use this setting to turn that off.
 
 ### 🧹 <u>Message cleanup settings</u>
 
-* #### **Remove previous message** _(remove_previouse_message)_ | default: `true`
+* #### **Remove previous message** _(remove_previous_message)_ | default: `true`
   By default the previous alert message will be removed in the chat when a new alert message is sent. You can use this setting to turn that off.
 
 * #### **Remove when done** _(remove_when_done)_ | default: `true`
@@ -140,7 +140,7 @@ You can add a maximum of 5 buttons. Below you see the description of button 1, b
 
 ### 🤖 <u>Alert data settings</u>
 
-* #### **Alert data sensorl** _(alert_data_sensor)_ | default: `none`
+* #### **Alert data sensor** _(alert_data_sensor)_ | default: `none`
   To ensure the alert will continue as it should after a HA restart, you can set up an alert data sensor. More instructions [here](/other/alert_data_sensor.md).
 
 * #### **Alert data sensor trigger event** _(alert_event)_ | default: `"update_thefes_alert_sensor"`
