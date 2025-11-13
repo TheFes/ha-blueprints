@@ -1,11 +1,35 @@
 blueprint:
   name: Template sensor to store alert data
-  description: "
+  description: >
     ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
-    # 🚨 Template sensor to store alert data
+    # 🚨 Alert data sensor
 
-    Creates a template sensor which stores data of active alerts"
+    This blueprint helps you create a template sensor which stores the data of active alert automations created using the [Telegram alert blueprint](/telegram/telegram_alert.md).
+
+
+    By using this template sensor alerts can be continued after a restart of HA or reload of the alert automation. If the sensor is not used the alert will start over from scratch then.
+    
+    The alert automation also has functionality to remove old messages from the Telegram chat, which will only work for messages sent before a HA restart or auotomation reload in case this sesnor is used.
+
+
+    ## ❓ How to use
+
+    For more information how to import and use it, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/other/alert_data_sensor.md>).
+
+
+    ## ☕ Coffee
+
+    If you think I deserve a coffe, please feel free to buy me one (I might spend it on another beverage though).
+
+    In case you decide to do so, thanks a lot!
+
+    <a href="https://www.buymeacoffee.com/thefes" target="_blank">![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)</a>
+
+
+    Or you can do a small donation using PayPal.
+
+    [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/thefes)
   author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/other/alert_data_sensor.yaml
   domain: template

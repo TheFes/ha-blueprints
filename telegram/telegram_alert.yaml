@@ -10,9 +10,11 @@ blueprint:
 
     This is a replacement for the alert integration which sends alerts through Telegram.
 
+
     ## ❓How to use
 
     For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.md>).
+
 
     ## ☕ Coffee
 
@@ -26,8 +28,6 @@ blueprint:
     Or you can do a small donation using PayPal.
 
     [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/thefes)
-
-    ```
   homeassistant:
     min_version: 2025.11.0
   input:

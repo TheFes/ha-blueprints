@@ -28,7 +28,7 @@ You only need to do this once, it will store the data of all the Telegram alert 
 # Basic alert data sensor configuration
 template:
   - use_blueprint:
-      path: TheFes/alert_store_messages.yaml
+      path: TheFes/alert_data_sensor.yaml
     name: thefes.casa alert data
     unique_id: b6fcfc77-8ffc-434c-87c0-1824b1e990dc
 ```
@@ -40,7 +40,7 @@ By default the sensor will have the entity_id `sensor.thefes_alert_data`  which 
 # Configuration with optional input
 template:
   - use_blueprint:
-      path: TheFes/alert_store_messages.yaml
+      path: TheFes/alert_data_sensor.yaml
       input:
         trigger_event: update_thefes_alert_sensor
         entity_id: sensor.thefes_alert_data
