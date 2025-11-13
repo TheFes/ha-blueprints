@@ -8,6 +8,7 @@
 
 This blueprint creates an automation which processes all messages sent in a Telegram chat as voice commands. I can process them locally (only) and/or send them to an LLM for processing.
 
+### 👇 Example:
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_assist_example.jpeg">
 
 ***
