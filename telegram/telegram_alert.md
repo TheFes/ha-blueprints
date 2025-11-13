@@ -137,6 +137,7 @@ You can add a maximum of 5 buttons. Below you see the description of button 1, b
 
 * #### **Button 1 actions** _(button_1_actions)_ | default: `[]`
   The actions to be performed when the button is pressed. When these actions cause the entity to no longer be in the problem state, the alert will be ended, and the done message will be sent (if set).
+  ⚠️ NOTE: In case you use actions with a long processing period or wait periods, it might take longer than the actual repeat time of the alert. In such cases it is advisable to create a script, and start this script in the automation using `script.turn_on`. In that case it won't delay sending the alert messages.
 
 ### 🤖 <u>Alert data settings</u>
 
