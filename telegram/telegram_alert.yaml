@@ -10,11 +10,9 @@ blueprint:
 
     This is a replacement for the alert integration which sends alerts through Telegram.
 
-
     ## ❓How to use
 
     For more information on all settings, see the [documentation](<https://github.com/TheFes/ha-blueprints/blob/main/alert/telegram_alert.md>).
-
 
     ## ☕ Coffee
 
@@ -28,6 +26,8 @@ blueprint:
     Or you can do a small donation using PayPal.
 
     [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/thefes)
+
+    ```
   homeassistant:
     min_version: 2025.11.0
   input:
@@ -423,13 +423,15 @@ actions:
                   message_data: "{{ message_data | rejectattr('id', 'eq', repeat.item.id) | list }}"
         - alias: Set variables to determine how long to wait for the next alert message
           variables:
+            repeat_start: >
+              {{
+                alert_sensor_data.get('repeat_start', now())
+                if restart
+                else now()
+              }}
             repeat_minutes: "{{ repeat_list[alert_count-1] | default(repeat_list | last) }}"
             repeat_end: >
-              {{
-                alert_sensor_data.get('repeat_end', now() + timedelta(minutes=repeat_minutes))
-                if restart
-                else now() + timedelta(minutes=repeat_minutes)
-              }}
+              {{ repeat_start | as_datetime + timedelta(minutes=repeat_minutes) }}
         - alias: Send alert data to sensor if provided
           if: "{{ alert_data_sensor is not none }}"
           then:
@@ -442,7 +444,8 @@ actions:
                       tag: {
                             'message_data': message_data,
                             'alert_count': alert_count,
-                            'repeat_end': repeat_end,
+                            'repeat_start': repeat_start,
+                            'next_alert': repeat_end,
                             'target': target
                         }
                     }
@@ -502,7 +505,8 @@ actions:
                       tag: {
                             'message_data': message_data,
                             'alert_count': alert_count,
-                            'repeat_end': repeat_end,
+                            'repeat_start': repeat_start,
+                            'next_alert': repeat_end,
                             'target': target
                         }
                     }
@@ -517,7 +521,7 @@ actions:
                 and (is_state_attr(trigger_entity, attribute_key, problem_state)
                   if use_attribute
                   else is_state(trigger_entity, problem_state))
-                and now() < repeat_end | as_datetime
+                and (now() < repeat_end | as_datetime or restart)
               }}
             sequence:
               - alias: Wait for button presses on the inline keyboard or when until the entity changes state
@@ -526,18 +530,9 @@ actions:
                     trigger: event
                     event_type: telegram_callback
                     id: button_press
-                  - alias: Trigger entity no longer on problem state
-                    trigger: state
+                  - trigger: state
                     entity_id: !input trigger_entity
                     not_to: !input problem_state
-                    enabled: "{{ not use_attribute }}"
-                    id: done
-                  - alias: Trigger entity attribute no longer on problem value
-                    trigger: state
-                    entity_id: !input trigger_entity
-                    attribute: !input attribute_key
-                    to: !input problem_state
-                    enabled: "{{ use_attribute }}"
                     id: done
                 timeout:
                   seconds: >
