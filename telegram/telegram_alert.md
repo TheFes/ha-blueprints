@@ -7,23 +7,27 @@
 # 🚨 Telegram alert blueprint
 
 This blueprint is intended as a replacement for the [alert](<https://www.home-assistant.io/integrations/alert/>) integration and uses Telegram to send the alert messages.
-It supports these features of the alert integration:
+
+### 🫶 It supports these features of the alert integration:
 - Start alert when the state of an entity goes to a certain problem state
 - Provide a fixed number of minutes the alert should be repeated, or a list of numbers for a variable interval
 - Optionally skip the first message, so it won't be sent immediately when the entity changes to the problem state
 - Provide an option to acknowledge an alert before the entity is no longer in the problem state
 - Send a message when the entity changes state, and is no longer in the problem state
 
-In addition, it also supports:
+### 🦾 In addition, it also supports:
 - Trigger on an attribute value instead of the entity state
 - Add actionable buttons which will perform assigned actions
 - Optionally automatically remove previous messages for the alert when a new message is sent
 - Optionally automatically remove previous messages for the alert when the alert is done (either the entity state changed or the alert is acknowledged)
 
-Known limitations:
-- on restart of Home Assistant or when you change the automation for a specific alert it will restart the repeat sequence, so it will restart the wait period, and it will start at the top of the repeat list if a list is provided
-- on restart of Home Assistant or when you change the automation it will start sending messages for alerts which were previously acknowledged and which are still in the problem state
+### ⚠️ Known limitations:
+- On restart of Home Assistant or when you change the automation for a specific alert it will restart the repeat sequence, so it will restart the wait period, and it will start at the top of the repeat list if a list is provided
+- On restart of Home Assistant or when you change the automation it will start sending messages for alerts which were previously acknowledged and which are still in the problem state
 - After restart of Home Assistant the automation will no longer clean up previous messages from an alert which was active before the restart.
+
+However, these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor.
+If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint.
 
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_bot_example_image.jpeg">
 
@@ -132,6 +136,15 @@ You can add a maximum of 5 buttons. Below you see the description of button 1, b
 
 * #### **Button 1 actions** _(button_1_actions)_ | default: `[]`
   The actions to be performed when the button is pressed. When these actions cause the entity to no longer be in the problem state, the alert will be ended, and the done message will be sent (if set).
+
+### 🤖 <u>Alert data settings</u>
+
+* #### **Alert data sensorl** _(alert_data_sensor)_ | default: `none`
+  To ensure the alert will continue as it should after a HA restart, you can set up an alert data sensor. More instructions [here](/other/alert_data_sensor.md).
+
+* #### **Alert data sensor trigger event** _(alert_event)_ | default: `"update_thefes_alert_sensor"`
+  The manual event type on which the alert data sensor triggers.
+  In case you didn't change this while setting up the alert data sensor, you can just keep the default setting.
 
 ***
 

@@ -281,6 +281,36 @@ blueprint:
           selector:
             action:
           default: []
+    alert_sensor_data:
+      name: Alert sensor data
+      icon: mdi:robot
+      description:
+        To ensure the alert will continue as it should after a HA restart, you can set up an
+        alert data sensor. More instructions
+        [here](<https://github.com/TheFes/ha-blueprints/blob/main/other/alert_data_sensor.md>).
+      collapsed: true
+      input:
+        alert_data_sensor:
+          name: Alert data sensor
+          description: The entity id which stores the alert data.
+          selector:
+            entity:
+              multiple: false
+              filter:
+                - domain: sensor
+                  integration: template
+                  device_class: current
+          default: null
+        alert_event:
+          name: Alert data sensor trigger event
+          description:
+            The manual event type on which the alert data sensor triggers.
+
+            In case you didn't change this while setting up the alert data sensor, you can just
+            keep the default setting.
+          selector:
+            text:
+          default: update_thefes_alert_sensor
 trigger_variables:
   attribute_key: !input attribute_key
   use_attribute: "{{ iif(attribute_key) }}"
@@ -299,14 +329,11 @@ triggers:
   - alias: Trigger on Home Assistant start to restart alerts where needed
     trigger: homeassistant
     event: start
+    id: restart
   - alias: Trigger on automation reload in case the automation was changes
     trigger: event
     event_type: automation_reloaded
-conditions:
-  - alias: Only trigger when the trigger entity is in the problem state
-    condition: state
-    entity_id: !input trigger_entity
-    state: !input problem_state
+    id: restart
 variables:
   target: !input target
   alert_title: !input alert_title
@@ -322,16 +349,35 @@ variables:
   use_ack_title: !input use_ack_title
   use_done_title: !input use_done_title
   repeat: !input repeat
+  alert_data_sensor: !input alert_data_sensor
   repeat_list: >
     {{ (repeat if repeat is list else [repeat]) | select('is_number') | map('float') | list }}
   repeat_needed: true
-  alert_count: 0
-  last_message_data: []
-
+  restart: "{{ trigger.id == 'restart' }}"
 actions:
-  - alias: Set variables to be used for the inline keyboard
+  - alias: Set variables to be used for the inline keyboard and for data storage
     variables:
       tag: "{{ this.entity_id | replace('automation.', '') }}"
+      alert_sensor_data: >
+        {{ (state_attr(alert_data_sensor | default('', true), 'alert_data') | default({}, true)).get(tag, {}) }}
+      message_data: >
+        {{
+          alert_sensor_data.get('message_data', [])
+          if restart
+          else []
+        }}
+      alert_count: >
+        {{
+          alert_sensor_data.get('alert_count', 1)
+          if restart
+          else 1
+        }}
+      target: >
+        {{
+          alert_sensor_data.get('target', target)
+          if restart
+          else target
+        }}
       acknowledge_button: >
         {{ [ack_label~':/acknowledge_'~tag] if can_acknowledge else [] }}
       button_1_label: !input button_1_label
@@ -362,14 +408,9 @@ actions:
     repeat:
       while: "{{ repeat_needed and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) }}"
       sequence:
-        - alias: Set variables to determine how long to wait for the next alert message
-          variables:
-            repeat_minutes: "{{ repeat_list[repeat.index-1] | default(repeat_list | last) }}"
-            repeat_end: "{{ now() + timedelta(minutes=repeat_minutes) }}"
-            action_data:
         - alias: Delete previously sent alerts if there were any
           repeat:
-            for_each: "{{ last_message_data if remove_previous_message else [] }}"
+            for_each: "{{ message_data if remove_previous_message and not restart else [] }}"
             sequence: &delete_message
               - alias: Delete message
                 action: telegram_bot.delete_message
@@ -379,9 +420,44 @@ actions:
                   config_entry_id: "{{ repeat.item.config_entry_id }}"
               - alias: Clean up message from list
                 variables:
-                  last_message_data: "{{ last_message_data | rejectattr('id', 'eq', repeat.item.id) | list }}"
+                  message_data: "{{ message_data | rejectattr('id', 'eq', repeat.item.id) | list }}"
+        - alias: Set variables to determine how long to wait for the next alert message
+          variables:
+            repeat_minutes: "{{ repeat_list[alert_count-1] | default(repeat_list | last) }}"
+            repeat_end: >
+              {{
+                alert_sensor_data.get('repeat_end', now() + timedelta(minutes=repeat_minutes))
+                if restart
+                else now() + timedelta(minutes=repeat_minutes)
+              }}
+        - alias: Send alert data to sensor if provided
+          if: "{{ alert_data_sensor is not none }}"
+          then:
+            - alias: Send event to update alert data
+              event: !input alert_event
+              event_data:
+                alert_data: >
+                  {{
+                    { 
+                      tag: {
+                            'message_data': message_data,
+                            'alert_count': alert_count,
+                            'repeat_end': repeat_end,
+                            'target': target
+                        }
+                    }
+                  }}
         - alias: Check if alert needs to be sent, skip the first alert if skip_first is set to false
-          if: "{{ (repeat.index > 1 or not skip_first) and (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state)) }}"
+          if: >
+            {{
+              (alert_count > 1 or not skip_first) 
+              and (not restart or message_data | count == 0)
+              and (
+                is_state_attr(trigger_entity, attribute_key, problem_state) 
+                if use_attribute
+                else is_state(trigger_entity, problem_state)
+                )
+            }}
           then:
             - repeat:
                 for_each: "{{ target }}"
@@ -397,24 +473,40 @@ actions:
                       inline_keyboard: "{{ inline_keyboard }}"
                       disable_web_page_preview: !input disable_web_page_preview
                     response_variable: response
-                  - alias: increase alert count and store message info
+                  - alias: Store message info
                     variables:
-                      alert_count: "{{ alert_count + 1 }}"
-                      last_message_data: >
+                      message_data: >
                         {{
-                          last_message_data
+                          message_data
                           + [
                               response.chats
                                 | first
                                 | combine(
                                     dict(
                                       config_entry_id=config_entry_id(repeat.item),
-                                      event_entity=target,
-                                      id=last_message_data | count +1
+                                      event_entity=repeat.item,
+                                      id=message_data | count +1
                                     )
                                   )
                             ]
                         }}
+        - alias: Send alert data to sensor if provided
+          if: "{{ alert_data_sensor is not none }}"
+          then:
+            - alias: Send event to update alert data
+              event: !input alert_event
+              event_data:
+                alert_data: >
+                  {{
+                    { 
+                      tag: {
+                            'message_data': message_data,
+                            'alert_count': alert_count,
+                            'repeat_end': repeat_end,
+                            'target': target
+                        }
+                    }
+                  }}
         - alias:
             Keep waiting for the right button presses until this repeat period ends or the entity
             is no longer in the problem state
@@ -476,10 +568,27 @@ actions:
                               {% set ns.mapping = ns.mapping + [dict(event=event, test=config_entry_id(event)~state_attr(event, 'chat_id'))] %}
                             {% endfor %}
                             {{ ns.mapping | selectattr('test', 'eq', config_entry~chat_id) | map(attribute='event') | first | default }}
-                      - alias: Delete previously sent alerts if there were any
+                      - alias: Delete previously for this chat if there were any
                         repeat:
-                          for_each: "{{ last_message_data | selectattr('event_entity', 'eq', event_entity) | list if remove_when_done else [] }}"
+                          for_each: "{{ message_data | selectattr('event_entity', 'eq', event_entity) | list if remove_when_done else [] }}"
                           sequence: *delete_message
+                      - alias: Send alert data to sensor if provided
+                        if: "{{ alert_data_sensor is not none }}"
+                        then:
+                          - alias: Send event to update alert data
+                            event: !input alert_event
+                            event_data:
+                              alert_data: >
+                                {{
+                                  { 
+                                    tag: {
+                                          'message_data': message_data,
+                                          'alert_count': alert_count,
+                                          'repeat_end': repeat_end,
+                                          'target': target
+                                      }
+                                  }
+                                }}
                       - alias: Send acknowledge message if provided
                         if: "{{ acknowledge_message != '' }}"
                         then:
@@ -507,7 +616,7 @@ actions:
                     sequence:
                       - alias: Delete previously sent alerts if there were any
                         repeat:
-                          for_each: "{{ last_message_data if remove_when_done else [] }}"
+                          for_each: "{{ message_data if remove_when_done else [] }}"
                           sequence: *delete_message
                       - alias: Send done message if provided
                         if: "{{ alert_count > 0 and done_message != '' }}"
@@ -525,26 +634,45 @@ actions:
                                     title: "{{ alert_title if use_done_title else '' }}"
                                     message: "{{ done_message }}"
                                     disable_web_page_preview: !input disable_web_page_preview
+                      - alias: Remove data from the sensor
+                        if: "{{ alert_data_sensor is not none }}"
+                        then:
+                          - alias: Send event to update alert data
+                            event: !input alert_event
+                            event_data:
+                              alert_data: "{{ {tag: {}} }}"
                       - alias: Inidcate that alert is no londer needed
                         variables:
                           repeat_needed: false
                       - alias: Stop the repeat loop waiting for the button presses and entity state change
                         stop: >
                           Trigger entity for alert "{{ alert_title }}" no longer in problem state "{{ problem_state }}".
-  - alias: Send done message if while loop ended and message was not sent yet
+        - alias: Update alert count
+          variables:
+            alert_count: "{{ alert_count + 1 }}"
+            restart: false
+  - alias: Send done message and cleanup data if while loop ended and this was not done yet
     if: >
       {{ 
-        alert_count > 0
+        message_data | count > 0
         and repeat_needed
         and not (is_state_attr(trigger_entity, attribute_key, problem_state) if use_attribute else is_state(trigger_entity, problem_state))
-        and done_message != ''
       }}
     then:
+      - alias: Send done message to each chat
+        if: "{{ done_message != ''}}"
+        then:
+          repeat: *send_done_message
       - alias: Delete previously sent alerts if there were any
         repeat:
-          for_each: "{{ last_message_data if remove_when_done else [] }}"
+          for_each: "{{ message_data if remove_when_done else [] }}"
           sequence: *delete_message
-      - alias: Send done message to each chat
-        repeat: *send_done_message
+      - alias: Remove data from the sensor
+        if: "{{ alert_data_sensor is not none }}"
+        then:
+          - alias: Send event to update alert data
+            event: !input alert_event
+            event_data:
+              alert_data: "{{ {tag: {}} }}"
 mode: single
 max_exceeded: silent
