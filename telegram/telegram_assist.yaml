@@ -118,7 +118,7 @@ actions:
   - alias: Send respone to Telegram chat
     action: telegram_bot.send_message
     data:
-      config_entry_id: "{{ confg_entry }}"
+      config_entry_id: "{{ config_entry }}"
       target: "{{ chat_id }}"
       message: "{{ response.response.speech.plain.speech }}"
       message_tag: conversation_response
