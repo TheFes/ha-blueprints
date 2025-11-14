@@ -32,7 +32,7 @@ The text between brackets is the key for the input used in YAML.
   Leave empty to use local handling only.
 
 * #### **Prefer local** _(prefer_local)_  | default: `true`
-  Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used.
+  Disable if you only want to use the LLM. In case no LLM entity is provided, this setting will not be used and commands will always be processed with the local conversation agent only.
 
 ***
 
