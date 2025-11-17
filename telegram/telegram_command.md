@@ -6,11 +6,11 @@
 
 # 💬 Telegram command blueprint
 
-This blueprint creates an automation to use custom commands in Telegram, including a `/help` command to show all available commands, and commands to restart and update Home Assistant components.
+This blueprint creates an automation to use custom commands in Telegram.
 
-By default the following commands are added
+By default the following commands are added:
 
-`/help`: This will display all available commands with a description. The descriptions can be provided and/or adjusted in the blueprint settings
+`/help`: This will display all available commands with a description. The descriptions can be provided and/or adjusted in the blueprint settings. The example below shows two custom commands added using the blueprint (`/status`  and `/toggle`). These examples are shown in the [How to use](#how-to-use) section.
 
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_help_example.png">
 
