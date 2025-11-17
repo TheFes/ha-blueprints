@@ -4,7 +4,7 @@
   <img alt="thefes.casa blueprints logo" src="https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true">
 </picture>
 
-# 💬 Telegram command bluepring
+# 💬 Telegram command blueprint
 
 This blueprint creates an automation to use custom commands in Telegram, including a `/help` command to show all available commands, and commands to restart and update Home Assistant components.
 
