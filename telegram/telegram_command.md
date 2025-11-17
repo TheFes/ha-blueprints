@@ -11,13 +11,16 @@ This blueprint creates an automation to use custom commands in Telegram, includi
 By default the following commands are added
 
 `/help`: This will display all available commands with a description. The descriptions can be provided and/or adjusted in the blueprint settings
+
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_help_example.png">
 
 `/restart`: This command will show Home Assistant components which can be restarted. By default an option to restart Home Assistant Core is added. For each component an argument is provided (for Home Assistant Core this is 
 `core`) which can be added as argument to prevent the first message asking which component to restart. For example `/restart core` will immediately indicate that you want to restart the Home Assistant Core component. Optionally you can let the bot ask for confirmation before the restart command is issued. This is enabled by default. In case no components to restart are provided, so when the default Home Assistant Core option is removed, and no others are added, the command is disabled.
+
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_restart_example.png">
 
 `/update`: This command will list all pending updates in Home Assistant, and for each of them show some details and buttons to either install or skip the update. You can optionally provide entities or integrations which should not be used for this command. All related text can optionally be amended or translated.
+
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_update_example.png">
 
 There is also an option to provide custom commands. By default the `/ping` command is added, which will simply return `Pong 🏓` and can be used to test if the automation is working.
@@ -53,6 +56,7 @@ For now here are some examples for custom commands:
 ```
 
 Result:
+
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_status_example.png">
 
 ### Custom command to toggle a light 
@@ -67,6 +71,7 @@ Result:
 ```
 
 Result:
+
 <img alt="telegram alert example image" src="https://github.com/TheFes/ha-blueprints/blob/main/images/telegram_command_toggle_example.png">
 
 ⚠️ IMPORTANT: Only actions actually using `action:` are supported. If you need building blocks like `choose` or `delay` or others you can create a script and use that. Use `script.turn_on`  and target the script, to avoid delays or other wait periods affecting the command automation.
