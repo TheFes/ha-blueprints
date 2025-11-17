@@ -150,6 +150,11 @@ The text between brackets is the key for the input used in YAML.
 All texts used messages regarding the `/restart` command can be adjusted here. You can also use this to translate the default English texts to another language.
 The `restart_text` input field support Jinja templates. You can use `restart_name` variable to refer to the name used for the component.
 
+### 🗒️ <u>Update button texts</u>
+
+All texts used messages regarding the `/update` command can be adjusted here. You can also use this to translate the default English texts to another language.
+Several fields support Jinja templates. In these fields you can use the `update_name`, `installed_version`, `latest_version` and `release_url` variables. The value for `release_url`  will be `none` in case the update entity doesn't provide it.
+
 ***
 
 ## ☕ Coffee
