@@ -87,7 +87,7 @@ blueprint:
               unit_of_measurement: minutes
         timeout_message:
           name: Timeout message
-          description: Text to be shown after the wait period for a button press is over
+          description: Text to be shown after the wait period for a button press is over.
           default: Button press timeout for {{ command }} exceeded. The command is stopped.
           selector:
             template:
@@ -158,12 +158,12 @@ blueprint:
               actions:
                 - action: homeassistant.restart
                   data: {}
-        restart_verify_message:
-          name: Restart verify message
-          description: Text to be shown in the message for restart verification
-          default: Are you sure?
+        ask_verification:
+          name: Ask verification
+          description: Ask for verification before performing a restert
+          default: true
           selector:
-            text:
+            boolean:
     restart_button_texts:
       name: Restart button texts
       icon: mdi:text-box-check
@@ -188,20 +188,20 @@ blueprint:
           default: "{{ restart_name}} will now restart"
           selector:
             template:
-        ask_verification:
-          name: Ask verification
-          description: Ask for verification before performing a restert
-          default: true
-          selector:
-            boolean:
-        restart_verify_confirm:
+        restart_verify_message:
           name: Restart verify message
+          description: Text to be shown in the message for restart verification
+          default: Are you sure?
+          selector:
+            text:
+        restart_verify_confirm:
+          name: Restart confirm button label
           description: Button label to confirm restart
           default: "Yes"
           selector:
             text:
         restart_verify_cancel:
-          name: Restart verify message
+          name: Restart cancel button label
           description: Button label to cancel restart
           default: "No"
           selector:
@@ -385,7 +385,7 @@ actions:
               restart_verify_confirm: !input restart_verify_confirm
               restart_verify_cancel: !input restart_verify_cancel
           - alias: Ask which component to restart if not already provided
-            if: "{{ args | select('in', valid_args) | list | count == 0 }}"
+            if: "{{ args | first | default not in valid_args }}"
             then:
               - alias: Set variables for restart message
                 variables:
@@ -443,14 +443,14 @@ actions:
                           sequence:
                             - alias: Set variables to continue to next step
                               variables:
-                                args:
-                                  - "{{ arg }}"
+                                args: "{{ [arg] + args }}"
                                 repeat_button_pressed: true
           - alias: Ask for verification in case valid argument is provided and verification is requested
             if: >
               {{
-                args | select('in', valid_args) | list | count > 0 
+                args | first | default in valid_args 
                 and ask_verification
+                and args | last | default != 'yes'
               }}
             then:
               - alias: Set variables for verification message and for while loop
@@ -499,15 +499,20 @@ actions:
           - alias: Perform restart actions if everything is correct
             if: >
               {{
-                args | select('in', valid_args) | list | count > 0 
-                and (not ask_verification or perform_restart | default(false))
+                args | first | default in valid_args 
+                and
+                  (
+                    not ask_verification 
+                    or perform_restart | default(false)
+                    or args | last | default == 'yes'
+                  )
               }}
             then:
               - alias: Set variables for message
                 variables:
                   item: "{{ restart | selectattr('arg', 'eq', args | first) | first }}"
                   restart_name: "{{ item.name }}"
-                  message: !input restart_message
+                  message: !input restart_text
                   inline_keyboard: []
               - *send_message
               - *perform_actions
