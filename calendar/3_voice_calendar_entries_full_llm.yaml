@@ -11,7 +11,7 @@ blueprint:
 
     #### Required
 
-    * Set one or more calendar entries for which you want to get the eventa
+    * Set one or more calendar entries for which you want to get the events
 
     #### Optional
 
@@ -21,7 +21,7 @@ blueprint:
     #### Note:
 
     * Give the script a clear description. This will be used by the LLM to understand
-    it should use this script for weather forecasts.
+    it should use this script for fetching calendar entries.
 
     * **Make sure to expose the script to Assist after the script has been saved**
 
@@ -32,7 +32,7 @@ blueprint:
 
     ### Usage
 
-    You can request for the calendar entries in any way yuou can think of, using any
+    You can request for the calendar entries in any way you can think of, using any
     language.
     Unless set otherwise in the LLM configuration, the response will be in the same
     language as the command.
@@ -186,7 +186,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 20250129
+      version: 20251018
       start_date: "{{ start_date | as_datetime(default='') }}"
       start_time:
         "{{ start_time | default('00:00:00') | as_timedelta | default('00:00:00',

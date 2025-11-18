@@ -26,7 +26,7 @@ Using this blueprint you can create an script to request for calendar entries. I
 
 ## Usage
 
-You can request for the calendar entries in any way yuou can think of, using any language. Unless set otherwise in the LLM
+You can request for the calendar entries in any way you can think of, using any language. Unless set otherwise in the LLM
 configuration, the response will be in the same language as the command.
 
 You can refer to a single day, multiple days (e.g. next weekend) a part of the day (e.g. next morning) or one or more hours
