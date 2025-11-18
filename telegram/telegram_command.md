@@ -67,6 +67,7 @@ The text between brackets is the key for the input used in YAML.
   - description: The description which will be shown in the `/help` command for this specific command
   - `text`: The text that will be returned in the chat after issuing the command
   - `actions`: The actions which will be performed after issuing the command.
+    
     ⚠️ **IMPORTANT**: Only actions actually using `action:` are supported. If you need building blocks like `choose` or `delay` or others you can create a script and use that. Use `script.turn_on`  and target the script, to avoid delays or other wait periods affecting the command automation.
 
   By default the `/ping` command is added. If issued it will simply return `Pong 🏓` and it can be used to test if the automation is working.
