@@ -150,6 +150,23 @@ The text between brackets is the key for the input used in YAML.
 All texts used messages regarding the `/restart` command can be adjusted here. You can also use this to translate the default English texts to another language.
 The `restart_text` input field support Jinja templates. You can use `restart_name` variable to refer to the name used for the component.
 
+### 🆙 <u>Update settings</u>
+
+ * #### **Use udpdate** _(use_update)_ | default: `true` 
+   Disable if you don't want to use the `/update` command to update any pending update entity
+
+ * #### **Ignore entities** _(ignore_entities)_ | default: `[]` 
+   Entities which can not be updated using the `/update` command
+
+ * #### **Ignore integrations** _(ignore_integrations)_ | default: `[]` 
+   Integrations which should be ignored when using the `/update` command. Provide the entities as a YAML list. You can either use the intergration id, or the config entry title. 
+
+   Example:
+   ```yaml
+   - esphome
+   - Hue bridge downstairs
+   ```
+
 ### 🗒️ <u>Update button texts</u>
 
 All texts used messages regarding the `/update` command can be adjusted here. You can also use this to translate the default English texts to another language.
