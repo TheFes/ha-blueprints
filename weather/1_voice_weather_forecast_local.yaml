@@ -34,6 +34,8 @@ blueprint:
       
       * [Variant 2](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_2.md)
 
+      * [Variant 3](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_3.md)
+
     ### Usage
 
     All sentences need to match the format defined in the trigger sentences. By default the following sentences are configured:
