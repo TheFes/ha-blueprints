@@ -572,7 +572,7 @@ actions:
                   dew_point: "{{ day_forecast.get('dew_point', 0) | round(value_round) }}"
                   pressure: "{{ day_forecast.get('pressure', 0) | round(value_round) }}"
                   humidity: "{{ day_forecast.get('humidity', 0) | round(value_round) }}"
-                  templow: "{{ day_forecast.get('temp_low', 0) | round(value_round) }}"
+                  templow: "{{ day_forecast.get('templow', 0) | round(value_round) }}"
                   wind_gust_speed: "{{ day_forecast.get('wind_gust_speed', 0) | round(value_round) }}"
                   apparent_temperature: "{{ day_forecast.get('apparent_temperature', temperature) | round(value_round) }}"
                   uv_index: "{{ day_forecast.get('uv_index', 0) | round(value_round) }}"
