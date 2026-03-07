@@ -156,6 +156,7 @@ Last update: 2026-03-06
         Es {{ condition_translated }} mit einer Temperatur von {{ state_attr(weather_entity, 'temperature') }} Grad und einer Luftfeuchtigkeit von {{ state_attr(weather_entity, 'humidity') }} Prozent.
         Die Temperatur wird heute bei maximal {{ temperature }}{% if templow is defined %} und minimal {{ templow }}{% endif %} Grad liegen.
       {% endif %}
+
       {%- if temperature != apparent_temperature -%}
         {% if phrase %}
           Es wird sich anfühlen wie {{ apparent_temperature }} Grad.
@@ -163,9 +164,11 @@ Last update: 2026-03-06
           Es fühlt sich an wie {{ apparent_temperature }} Grad.
         {% endif %}
       {% endif %}
+
       {%- if precipitation_probability > rain_warning_threshold -%}
         Es besteht eine {{ precipitation_probability }}% Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter. Nimm also besser einen Regenschirm mit, wenn du rausgehst.
       {% endif %}
+
       {%- if uv_index > 3 and condition in ['clear', 'partlycloudy'] -%}
         {%- if phrase -%}
           Die Sonne wird stark scheinen.
@@ -173,6 +176,7 @@ Last update: 2026-03-06
           Die Sonne scheint stark.
         {%- endif -%}
       {% endif %}
+
       {%- if wind_speed >= wind_threshold -%}
         {%- if phrase -%}
           Der Wind wird {{ wind_phrase }} sein.
@@ -180,6 +184,7 @@ Last update: 2026-03-06
           Der Wind ist {{ wind_phrase }}.
         {%- endif -%}
       {% endif %}
+
       {%- if wind_speed >= wind_warning_threshold -%}
         Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
       {%- elif wind_speed >= wind_joke_threshold -%}
