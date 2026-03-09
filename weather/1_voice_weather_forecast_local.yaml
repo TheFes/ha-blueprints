@@ -2,7 +2,7 @@ blueprint:
   domain: automation
   name: Voice - Weather Forecast - Local Assist Blueprint
   author: TheFes
-  source_url: https://github.com/TheFes/blob/main//ha-blueprints/weather/1_voice_weather_forecast_local.yaml
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/weather/1_voice_weather_forecast_local.yaml
   description:
     "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
 
@@ -34,6 +34,8 @@ blueprint:
       
       * [Variant 2](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_2.md)
 
+      * [Variant 3](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/translations/1_voice_weather_forecast_de_variant_3.md)
+
     ### Usage
 
     All sentences need to match the format defined in the trigger sentences. By default the following sentences are configured:
@@ -42,7 +44,7 @@ blueprint:
 
     - what('s| is) the weather [forecast] [for] [this|next] ({phrase}|day)
     
-    - what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({pharse}|day)]
+    - what('ll| will) the weather [forecast] be [like] [[for] [[the] coming|this] ({phrase}|day)]
 
     #### Trigger sentence syntax
 
@@ -520,7 +522,7 @@ variables:
     fog: !input fog
     hail: !input hail
     lightning: !input lightning
-    lighting-rainy: !input lightning-rainy
+    lightning-rainy: !input lightning-rainy
     partlycloudy: !input partlycloudy
     pouring: !input pouring
     rainy: !input rainy
@@ -570,9 +572,9 @@ actions:
                   dew_point: "{{ day_forecast.get('dew_point', 0) | round(value_round) }}"
                   pressure: "{{ day_forecast.get('pressure', 0) | round(value_round) }}"
                   humidity: "{{ day_forecast.get('humidity', 0) | round(value_round) }}"
-                  templow: "{{ day_forecast.get('temp_low', 0) | round(value_round) }}"
+                  templow: "{{ day_forecast.get('templow', 0) | round(value_round) }}"
                   wind_gust_speed: "{{ day_forecast.get('wind_gust_speed', 0) | round(value_round) }}"
-                  apparent_temperature: "{{ day_forecast.get('apparent_temperatue', temperature) | round(value_round) }}"
+                  apparent_temperature: "{{ day_forecast.get('apparent_temperature', temperature) | round(value_round) }}"
                   uv_index: "{{ day_forecast.get('uv_index', 0) | round(value_round) }}"
                   precipitation: "{{ day_forecast.get('precipitation', 0) | round(value_round) }}"
                   precipitation_probability: "{{ day_forecast.get('precipitation_probability', 0) | round(value_round) }}"
@@ -625,9 +627,9 @@ actions:
                   condition: "{{ day_part_forecast | selectattr('condition', 'defined') | map(attribute='condition') | list | statistical_mode }}"
                   cloud_coverage: "{{ day_part_forecast | selectattr('cloud_coverage', 'defined') | map(attribute='cloud_coverage') | list | average | default(0) | round(value_round) }}"
                   temperature: "{{ day_part_forecast | selectattr('temperature', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  dew_point: "{{ day_part_forecast | selectattr('dew_point', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  pressure: "{{ day_part_forecast | selectattr('pressure', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
-                  humidity: "{{ day_part_forecast | selectattr('humidity', 'defined') | map(attribute='temperature') | list | max | default(0) | round(value_round) }}"
+                  dew_point: "{{ day_part_forecast | selectattr('dew_point', 'defined') | map(attribute='dew_point') | list | max | default(0) | round(value_round) }}"
+                  pressure: "{{ day_part_forecast | selectattr('pressure', 'defined') | map(attribute='pressure') | list | max | default(0) | round(value_round) }}"
+                  humidity: "{{ day_part_forecast | selectattr('humidity', 'defined') | map(attribute='humidity') | list | max | default(0) | round(value_round) }}"
                   apparent_temperature: "{{ day_part_forecast | selectattr('apparent_temperature', 'defined') | map(attribute='apparent_temperature') | list | max | default(temperature) | round(value_round) }}"
                   uv_index: "{{ day_part_forecast | selectattr('uv_index', 'defined') | map(attribute='uv_index') | list | max | default(0) | round(value_round) }}"
                   precipitation: "{{ day_part_forecast | selectattr('precipitation', 'defined') | map(attribute='precipitation') | list | sum | default(0) | round(value_round) }}"
