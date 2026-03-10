@@ -38,6 +38,10 @@ Last update: 2025-27-01
       - zaterdag
       sunday:
       - zondag
+      current:
+      - nu
+      - op dit moment
+      - huidige
       night:
       - vannacht
       - morgennacht
@@ -68,23 +72,32 @@ Last update: 2025-27-01
       snowy-rainy: met sneeuw en regen
       sunny: en zonnig
       windy: en winderig
-      windy-variant: met wind en woken
+      windy-variant: met wind en wolken
       exceptional: met zeer uitzonderlijk weer
-      response_invalid_phrase: Ik kan geen weersvoorspelling ophalen voor {{ phrase
+      wind_direction:
+        N: noorden
+        NE: noordoosten
+        E: oosten
+        SE: zuidoosten
+        S: zuiden
+        SW: zuidwesten
+        W: westen
+        NW: noordwesten
+  response_invalid_phrase: Ik kan geen weersvoorspelling ophalen voor {{ phrase
         }}
       response_no_data: Geen weersvoorspelling beschikbaar voor {{ phrase }}
-      response_forecast: Het wordt {{ temperature }} graden {{ condition_translated
-        }}. {% if temperature != apparent_temperature %}Het voelt als {{ apparent_temperature
-        }} graden.{% endif %} {% if precipitation_probability > rain_warning_threshold
-        %}Er is {{ precipitation_probability }}% kans op {{ precipitation }} milimeter
-        regen, dus neem een paraplu mee als je naar buiten gaat.{% endif %} {% if
+      response_forecast: "Het {{ 'is' if current else 'wordt' }} {{ temperature }} graden 
+        {{ condition_translated }}. {% if temperature != apparent_temperature %}Het voelt als 
+        {{ apparent_temperature }} graden.{% endif %} {% if precipitation_probability > 
+        rain_warning_threshold %}Er is {{ precipitation_probability }}% kans op {{ precipitation }} 
+        milimeter regen, dus neem een paraplu mee als je naar buiten gaat.{% endif %} {% if
         uv_index > 3 and condition in ['clear', 'partlycloudy'] %}De zon schijnt fel
         vandaag, dus doe zonnebrand op als je naar buiten gaat.{% endif %} {% if wind_speed
-        >= wind_threshold %} De wind wordt {{ wind_phrase }}.{% endif %} {% if wind_speed
-        >= wind_warning_threshold %}Dus als je niet per se naar buiten hoeft, blijf
+        >= wind_threshold %} De wind wordt {{ wind_phrase }} en komt uit het {{ wind_direction}}.
+        {% endif %} {% if wind_speed >= wind_warning_threshold %}Dus als je niet per se naar buiten hoeft, blijf
         dan vooral lekker binnen.{% elif wind_speed >= wind_joke_threshold %}Dus zorg
         dat je {% if precipitation_probability > 10 %}paraplu {% else %}'t{% endif
-        %}niet weg waait!{% endif %}
+        %}niet weg waait!{% endif %}"
       wind_phrases:
         windstil: 0
         zwak: 1
@@ -98,6 +111,7 @@ Last update: 2025-27-01
         een zeer zware storm: 103
         een orkaan: 118
       trigger:
-      - Wat voor weer wordt het [[deze|komende] {phrase}]
+      - Wat is het ({phrase};weer)
+      - Wat voor weer (is|wordt) het [[deze|komende] {phrase}]
       - Wat is de [weers]voorspelling [[voor] [deze|komende] {phrase}]
 ```
