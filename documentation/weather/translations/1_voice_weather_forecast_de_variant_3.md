@@ -1,7 +1,9 @@
 # Description
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
+
 Translation by: @PocketMiner82
+
 Last update: 2026-03-06
 
 # How to use this translation
@@ -171,8 +173,9 @@ Last update: 2026-03-06
       {%- if current_temperature != current_apparent_temperature %} Es fühlt sich aber an wie {{ current_apparent_temperature }} Grad.
       {%- endif %}
 
-      {%- if precipitation_probability > rain_warning_threshold %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
-        Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+      {%- if precipitation > 0 %} Heute besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+        {%- endif %}
       {%- endif %}
 
       {%- if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
@@ -191,8 +194,12 @@ Last update: 2026-03-06
       {%- if temperature != apparent_temperature %} Es wird sich aber anfühlen wie {{ apparent_temperature }} Grad.
       {%- endif %}
 
-      {%- if precipitation_probability > rain_warning_threshold %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
-        Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+      {%- if precipitation > 0 %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+        {%- endif %}
+      {%- endif %}
+
+      {%- if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
       {%- endif %}
 
       {%- if uv_index > 3 and condition in ['clear', 'partlycloudy'] %} Die Sonne wird stark scheinen.
