@@ -173,19 +173,21 @@ Last update: 2026-03-06
       {%- if current_temperature != current_apparent_temperature %} Es fühlt sich aber an wie {{ current_apparent_temperature }} Grad.
       {%- endif %}
 
-      {%- if precipitation > 0 %} Heute besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+      {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Heute besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
         {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
         {%- endif %}
       {%- endif %}
 
-      {%- if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
+      {%- if current_uv_index | float(-1) > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
       {%- endif %}
 
-      {%- if current_wind_speed >= wind_threshold %} Der Wind weht {{ current_wind_phrase }} aus {{ current_wind_direction }} Richtung.
-      {%- endif %}
+      {%- if current_wind_speed is not none -%}
+        {%- if current_wind_speed >= wind_threshold %} Der Wind weht {{ current_wind_phrase }} aus {{ current_wind_direction }} Richtung.
+        {%- endif %}
 
-      {%- if current_wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
-      {%- elif current_wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- if current_wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
+        {%- elif current_wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- endif %}
       {%- endif %}
     response_forecast: >-
       Es {{ condition_translated }}. Die Temperatur wird {{ phrase }} bei{% if templow is defined %} minimal {{ templow }} und{% endif %} maximal {{ temperature }} Grad liegen.
@@ -194,22 +196,21 @@ Last update: 2026-03-06
       {%- if temperature != apparent_temperature %} Es wird sich aber anfühlen wie {{ apparent_temperature }} Grad.
       {%- endif %}
 
-      {%- if precipitation > 0 %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+      {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
         {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
         {%- endif %}
       {%- endif %}
 
-      {%- if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
+      {%- if uv_index | float(-1) > 3 and condition in ['clear', 'partlycloudy'] %} Die Sonne wird stark scheinen.
       {%- endif %}
 
-      {%- if uv_index > 3 and condition in ['clear', 'partlycloudy'] %} Die Sonne wird stark scheinen.
-      {%- endif %}
+      {%- if wind_speed is not none -%}
+        {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }} aus {{ wind_direction }} Richtung wehen.
+        {%- endif %}
 
-      {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }} aus {{ wind_direction }} Richtung wehen.
-      {%- endif %}
-
-      {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
-      {%- elif wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
+        {%- elif wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- endif %}
       {%- endif %}
     wind_phrases:
       windstill: 0

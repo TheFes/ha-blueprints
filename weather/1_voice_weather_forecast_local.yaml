@@ -450,10 +450,12 @@ blueprint:
             It is currently {{ current_temperature }} degrees and {{ current_condition_translated }}.
             Temperatures will range from {{ templow }} up to {{ temperature }} degrees today.
             {% if current_temperature != current_apparent_temperature %}It feels like {{ current_apparent_temperature }} degrees.{% endif %}
-            {% if precipitation_probability > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
-            {% if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %}The sun is shining brightly, so be sure to apply sunscreen when going outside.{% endif %}
-            {% if current_wind_speed >= wind_threshold %}The wind is {{ current_wind_phrase }} and coming from {{ current_wind_direction }}.{% endif %}
-            {% if current_wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif current_wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
+            {% if precipitation_probability | float(-1) > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
+            {% if current_uv_index | float(-1) > 3 and current_condition in ['clear', 'partlycloudy'] %}The sun is shining brightly, so be sure to apply sunscreen when going outside.{% endif %}
+            {%- if current_wind_speed is not none -%}
+              {% if current_wind_speed >= wind_threshold %}The wind is {{ current_wind_phrase }} and coming from {{ current_wind_direction }}.{% endif %}
+              {% if current_wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif current_wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
+            {%- endif %}
         response_forecast:
           name: Response when there is a forecast found
           description: The response given by Assist for the weather forecast.
@@ -465,10 +467,12 @@ blueprint:
             It will be {{ temperature }} degrees and {{ condition_translated }}.
             Temperatures will range {% if templow is defined %}from {{ templow }} {% endif %}up to {{ temperature }} degrees.
             {% if temperature != apparent_temperature %}It will feel like {{ apparent_temperature }} degrees.{% endif %}
-            {% if precipitation_probability > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
-            {% if uv_index > 3 and condition in ['clear', 'partlycloudy'] %}The sun will be shining brightly today, so be sure to apply sunscreen when going outside.{% endif %}
-            {% if wind_speed >= wind_threshold %}The wind will be {{ wind_phrase }} and coming from {{ wind_direction }}.{% endif %}
-            {% if wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
+            {% if precipitation_probability | float(-1) > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
+            {% if uv_index | float(-1) > 3 and condition in ['clear', 'partlycloudy'] %}The sun will be shining brightly today, so be sure to apply sunscreen when going outside.{% endif %}
+            {%- if wind_speed is not none -%}
+              {% if wind_speed >= wind_threshold %}The wind will be {{ wind_phrase }} and coming from {{ wind_direction }}.{% endif %}
+              {% if wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
+            {%- endif %}
 
 triggers:
   - trigger: conversation
@@ -547,24 +551,24 @@ variables:
   value_round: !input value_round
   current_condition: "{{ states(weather_entity) }}"
   current_condition_translated: "{{ translations.get(current_condition) }}"
-  current_temperature: "{{ state_attr(weather_entity, 'temperature') | float(0) | round(value_round) }}"
-  current_humidity: "{{ state_attr(weather_entity, 'humidity') | float(0) | round(value_round) }}"
-  current_dew_point: "{{ state_attr(weather_entity, 'dew_point') | float(0) | round(value_round) }}"
-  current_cloud_coverage: "{{ state_attr(weather_entity, 'cloud_coverage') | float(0) | round(value_round) }}"
-  current_uv_index: "{{ state_attr(weather_entity, 'uv_index') | float(0) | round(value_round) }}"
-  current_pressure: "{{ state_attr(weather_entity, 'pressure') | float(0) | round(value_round) }}"
-  current_apparent_temperature: "{{ state_attr(weather_entity, 'apparent_temperature') | float(current_temperature) | round(value_round) }}"
-  current_wind_gust_speed: "{{ state_attr(weather_entity, 'wind_gust_speed') | float(0) | round(value_round) }}"
-  current_visibility: "{{ state_attr(weather_entity, 'visibility') | float(0) | round(value_round) }}"
-  current_precipitation: "{{ state_attr(weather_entity, 'precipitation') | float(0) | round(value_round) }}"
-  current_wind_bearing: "{{ state_attr(weather_entity, 'wind_bearing') | float(0) | round(value_round) }}"
+  current_temperature: "{{ state_attr(weather_entity, 'temperature') | round(value_round, default=none) }}"
+  current_humidity: "{{ state_attr(weather_entity, 'humidity') | round(value_round, default=none) }}"
+  current_dew_point: "{{ state_attr(weather_entity, 'dew_point') | round(value_round, default=none) }}"
+  current_cloud_coverage: "{{ state_attr(weather_entity, 'cloud_coverage') | round(value_round, default=none) }}"
+  current_uv_index: "{{ state_attr(weather_entity, 'uv_index') | round(value_round, default=none) }}"
+  current_pressure: "{{ state_attr(weather_entity, 'pressure') | round(value_round, default=none) }}"
+  current_apparent_temperature: "{{ state_attr(weather_entity, 'apparent_temperature') | round(value_round, default=current_temperature) }}"
+  current_wind_gust_speed: "{{ state_attr(weather_entity, 'wind_gust_speed') | round(value_round, default=none) }}"
+  current_visibility: "{{ state_attr(weather_entity, 'visibility') | round(value_round, default=none) }}"
+  current_precipitation: "{{ state_attr(weather_entity, 'precipitation') | round(value_round, default=none) }}"
+  current_wind_bearing: "{{ state_attr(weather_entity, 'wind_bearing') | round(value_round, default=none) }}"
   current_wind_direction: >
     {% set avg_deg = current_wind_bearing %}
     {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
     {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
     {% set direction = directions[index] %}
     {{ wind_dir.get(direction) }}
-  current_wind_speed: "{{ state_attr(weather_entity, 'wind_speed') | float(0) | round(value_round) }}"
+  current_wind_speed: "{{ state_attr(weather_entity, 'wind_speed') | round(value_round, default=none) }}"
   current_wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', current_wind_speed) | map(attribute='0') | list | last | default }}"
 actions:
   - choose:
@@ -599,18 +603,18 @@ actions:
               - alias: Create variables for response
                 variables:
                   condition: "{{ day_forecast.get('condition') }}"
-                  cloud_coverage: "{{ day_forecast.get('cloud_coverage', 0) | float(0) | round(value_round) }}"
-                  temperature: "{{ day_forecast.get('temperature', 0) | float(0) | round(value_round) }}"
-                  dew_point: "{{ day_forecast.get('dew_point', 0) | float(0) | round(value_round) }}"
-                  pressure: "{{ day_forecast.get('pressure', 0) | float(0) | round(value_round) }}"
-                  humidity: "{{ day_forecast.get('humidity', 0) | float(0) | round(value_round) }}"
-                  templow: "{{ day_forecast.get('templow', 0) | float(0) | round(value_round) }}"
-                  wind_gust_speed: "{{ day_forecast.get('wind_gust_speed', 0) | float(0) | round(value_round) }}"
-                  apparent_temperature: "{{ day_forecast.get('apparent_temperature', temperature) | float(temperature) | round(value_round) }}"
-                  uv_index: "{{ day_forecast.get('uv_index', 0) | float(0) | round(value_round) }}"
-                  precipitation: "{{ day_forecast.get('precipitation', 0) | float(0) | round(value_round) }}"
-                  precipitation_probability: "{{ day_forecast.get('precipitation_probability', 0) | float(0) | round(value_round) }}"
-                  wind_speed: "{{ day_forecast.get('wind_speed', 0) | float(0) | round(value_round) }}"
+                  cloud_coverage: "{{ day_forecast.get('cloud_coverage', none) | round(value_round, default=none) }}"
+                  temperature: "{{ day_forecast.get('temperature', none) | round(value_round, default=none) }}"
+                  dew_point: "{{ day_forecast.get('dew_point', none) | round(value_round, default=none) }}"
+                  pressure: "{{ day_forecast.get('pressure', none) | round(value_round, default=none) }}"
+                  humidity: "{{ day_forecast.get('humidity', none) | round(value_round, default=none) }}"
+                  templow: "{{ day_forecast.get('templow', none) | round(value_round, default=none) }}"
+                  wind_gust_speed: "{{ day_forecast.get('wind_gust_speed', none) | round(value_round, default=none) }}"
+                  apparent_temperature: "{{ day_forecast.get('apparent_temperature', temperature) | round(value_round, default=temperature) }}"
+                  uv_index: "{{ day_forecast.get('uv_index', none) | round(value_round, default=none) }}"
+                  precipitation: "{{ day_forecast.get('precipitation', none) | round(value_round, default=none) }}"
+                  precipitation_probability: "{{ day_forecast.get('precipitation_probability', none) | round(value_round, default=none) }}"
+                  wind_speed: "{{ day_forecast.get('wind_speed', none) | round(value_round, default=none) }}"
                   condition_translated: "{{ translations.get(condition) }}"
                   rain_warning_threshold: !input rain_warning_threshold
                   wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', wind_speed) | map(attribute='0') | list | last | default }}"
