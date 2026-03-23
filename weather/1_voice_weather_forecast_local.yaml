@@ -449,7 +449,7 @@ blueprint:
           default: >-
             It is currently {{ current_temperature }} degrees and {{ current_condition_translated }}.
             Temperatures will range {% if templow is defined %}from {{ templow }} {% endif %}up to {{ temperature }} degrees today.
-            {% if current_temperature != apparent_temperature %}It feels like {{ apparent_temperature }} degrees.{% endif %}
+            {% if current_temperature != current_apparent_temperature %}It feels like {{ current_apparent_temperature }} degrees.{% endif %}
             {% if precipitation_probability > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
             {% if current_uv_index > 3 and current_condition in ['clear', 'partlycloudy'] %}The sun is shining brightly, so be sure to apply sunscreen when going outside.{% endif %}
             {% if current_wind_speed >= wind_threshold %}The wind is {{ current_wind_phrase }} and coming from {{ current_wind_direction }}.{% endif %}
