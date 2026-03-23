@@ -168,7 +168,7 @@ Last update: 2026-03-06
       Es ist keine Wettervorhersage {{ phrase }} verfügbar
     response_current: >-
       Es {{ current_condition_translated }} mit einer Temperatur von {{ current_temperature }} Grad und einer Luftfeuchtigkeit von {{ current_humidity }} Prozent.
-      Die Temperatur wird heute bei{% if templow is defined %} minimal {{ templow }} und{% endif %} maximal {{ temperature }} Grad liegen.
+      Die Temperatur wird heute bei minimal {{ templow }} und maximal {{ temperature }} Grad liegen.
 
       {%- if current_temperature != current_apparent_temperature %} Es fühlt sich aber an wie {{ current_apparent_temperature }} Grad.
       {%- endif %}
