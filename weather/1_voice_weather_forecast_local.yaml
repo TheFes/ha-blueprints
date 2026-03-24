@@ -177,8 +177,8 @@ blueprint:
       collapsed: true
       input:
         current:
-          name: Today
-          description: Phrases to request today's forecast
+          name: Current
+          description: Phrases to request the current forecast
           selector:
             text:
               multiline: false
@@ -478,7 +478,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20260310
+  version: 20260326
   daily_mapping:
     - phrases: !input current
       delta: 0
