@@ -1,7 +1,9 @@
 # Description
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
+
 Translation by: @PocketMiner82
+
 Last update: 2026-03-06
 
 # How to use this translation
@@ -72,6 +74,13 @@ Last update: 2026-03-06
       - diesen sonntag
       - kommende sonntag
       - kommenden sonntag
+    current:
+      - gerade
+      - aktuell
+      - in diesem Moment
+      - jetzt
+      - in dieser Stunde
+      - grad
     night:
       - nacht
       - diese nacht
@@ -113,74 +122,95 @@ Last update: 2026-03-06
       - morgen abend
       - abends
     clear: >-
-      {% if phrase %} wird{% else %} ist{% endif %} klar{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} klar{% if not current %} sein{% endif %}
     clear-night: >-
-      {% if phrase %} wird{% else %} ist{% endif %} klar{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} klar{% if not current %} sein{% endif %}
     cloudy: >-
-      {% if phrase %} wird{% else %} ist{% endif %} bewölkt{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} bewölkt{% if not current %} sein{% endif %}
     fog: >-
-      {% if phrase %} wird{% else %} ist{% endif %} neblig{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} neblig{% if not current %} sein{% endif %}
     hail: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Hagel{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Hagel{% if not current %} geben{% endif %}
     lightning: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Gewitter{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Gewitter{% if not current %} geben{% endif %}
     lightning-rainy: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Gewitter und Regen{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Gewitter und Regen{% if not current %} geben{% endif %}
     partlycloudy: >-
-      {% if phrase %} wird{% else %} ist{% endif %} teilweise bewölkt{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} teilweise bewölkt{% if not current %} sein{% endif %}
     pouring: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Starkregen{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Starkregen{% if not current %} geben{% endif %}
     rainy: >-
-      {% if phrase %} wird{% else %} ist{% endif %} regnerisch{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} regnerisch{% if not current %} sein{% endif %}
     snowy: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Schnee{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Schnee{% if not current %} geben{% endif %}
     snowy-rainy: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Schnee und Regen{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Schnee und Regen{% if not current %} geben{% endif %}
     sunny: >-
-      {% if phrase %} wird{% else %} ist{% endif %} sonnig{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} sonnig{% if not current %} sein{% endif %}
     windy: >-
-      {% if phrase %} wird{% else %} ist{% endif %} windig{% if phrase %} sein{% endif %}
+      {% if not current %} wird{% else %} ist{% endif %} windig{% if not current %} sein{% endif %}
     windy-variant: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} Wind und Wolken{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} Wind und Wolken{% if not current %} geben{% endif %}
     exceptional: >-
-      {% if phrase %} wird{% else %} gibt{% endif %} außergewöhnliches Wetter{% if phrase %} geben{% endif %}
+      {% if not current %} wird{% else %} gibt{% endif %} außergewöhnliches Wetter{% if not current %} geben{% endif %}
+    wind_direction:
+      N: nördlicher
+      NE: nordöstlicher
+      E: östlicher
+      SE: südöstlicher
+      S: südlicher
+      SW: südwestlicher
+      W: westlicher
+      NW: nordwestlicher
     response_invalid_phrase: >-
       Ich kann keine Wettervorhersage für {{ phrase }} abrufen, da der geforderte Zeitraum nicht unterstützt wird
     response_no_data: >-
-      Es ist keine Wettervorhersage für {{ phrase }} verfügbar
+      Es ist keine Wettervorhersage {{ phrase }} verfügbar
+    response_current: >-
+      Es {{ current_condition_translated }} mit einer Temperatur von {{ current_temperature }} Grad und einer Luftfeuchtigkeit von {{ current_humidity }} Prozent.
+      Die Temperatur wird heute bei minimal {{ templow }} und maximal {{ temperature }} Grad liegen.
+
+      {%- if current_temperature != current_apparent_temperature %} Es fühlt sich aber an wie {{ current_apparent_temperature }} Grad.
+      {%- endif %}
+
+      {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Heute besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+        {%- endif %}
+      {%- endif %}
+
+      {%- if current_uv_index | float(-1) > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
+      {%- endif %}
+
+      {%- if current_wind_speed is not none -%}
+        {%- if current_wind_speed >= wind_threshold %} Der Wind weht {{ current_wind_phrase }} aus {{ current_wind_direction }} Richtung.
+        {%- endif %}
+
+        {%- if current_wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
+        {%- elif current_wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- endif %}
+      {%- endif %}
     response_forecast: >-
-      {% if phrase -%}
-        Es {{ condition_translated }}. Die Temperatur wird {{ phrase }} bei maximal {{ temperature }}{% if templow is defined %} und minimal {{ templow }}{% endif %} Grad liegen.
-        Die Luftfeuchtigkeit wird etwa {{ humidity }} Prozent betragen.
-      {%- else -%}
-        Es {{ condition_translated }} mit einer Temperatur von {{ state_attr(weather_entity, 'temperature') }} Grad und einer Luftfeuchtigkeit von {{ state_attr(weather_entity, 'humidity') }} Prozent.
-        Die Temperatur wird heute bei maximal {{ temperature }}{% if templow is defined %} und minimal {{ templow }}{% endif %} Grad liegen.
+      Es {{ condition_translated }}. Die Temperatur wird {{ phrase }} bei{% if templow is defined %} minimal {{ templow }} und{% endif %} maximal {{ temperature }} Grad liegen.
+      Die Luftfeuchtigkeit wird etwa {{ humidity }} Prozent betragen.
+
+      {%- if temperature != apparent_temperature %} Es wird sich aber anfühlen wie {{ apparent_temperature }} Grad.
       {%- endif %}
 
-      {%- if temperature != apparent_temperature %}
-        {%- if phrase %} Es wird sich anfühlen wie {{ apparent_temperature }} Grad.
-        {%- else %} Es fühlt sich an wie {{ apparent_temperature }} Grad.
+      {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
+        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
         {%- endif %}
       {%- endif %}
 
-      {%- if precipitation_probability > rain_warning_threshold %} Es besteht eine {{ precipitation_probability }}% Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
-        Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+      {%- if uv_index | float(-1) > 3 and condition in ['clear', 'partlycloudy'] %} Die Sonne wird stark scheinen.
       {%- endif %}
 
-      {%- if uv_index > 3 and condition in ['clear', 'partlycloudy'] %}
-        {%- if phrase %} Die Sonne wird stark scheinen.
-        {%- else %} Die Sonne scheint stark.
+      {%- if wind_speed is not none -%}
+        {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }} aus {{ wind_direction }} Richtung wehen.
         {%- endif %}
-      {%- endif %}
 
-      {%- if wind_speed >= wind_threshold %}
-        {%- if phrase %} Der Wind wird {{ wind_phrase }} sein.
-        {%- else %} Der Wind ist {{ wind_phrase }}.
+        {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
+        {%- elif wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
         {%- endif %}
-      {%- endif %}
-
-      {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
-      {%- elif wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
       {%- endif %}
     wind_phrases:
       windstill: 0
@@ -192,11 +222,13 @@ Last update: 2026-03-06
       stark: 39
       steif: 50
       stürmisch: 62
-      ein Sturm: 75
-      ein schwerer Sturm: 89
+      sturmartig: 75
+      sehr sturmartig: 89
       orkanartig: 103
-      ein Orkan: 118
+      sehr orkanartig: 118
     trigger:
-      - Wie (wird|ist) das Wetter [{phrase}]
-      - (Was|Wie) (ist|lautet) die [Wetter]vorhersage [[für] {phrase}]
+      - >-
+        [Wie] (wird|ist) [das] Wetter [[für] {phrase}]
+      - >-
+        [Was|Wie] (ist|lautet) [die] [Wetter]vorhersage [[für] {phrase}]
 ```
