@@ -4,7 +4,7 @@
 
 # 🚨 ONLY WORKS ON 2025.4.0 which is in beta now
 
-### Imporatant
+### Important
 
 * This blueprint also needs you to set up a ToDo entity to store the reminders in. The script will create the entries in this ToDo list.
 
