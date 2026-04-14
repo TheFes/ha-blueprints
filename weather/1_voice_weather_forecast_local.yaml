@@ -453,7 +453,7 @@ blueprint:
             {% if precipitation_probability | float(-1) > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
             {% if current_uv_index | float(-1) > 3 and current_condition in ['clear', 'partlycloudy'] %}The sun is shining brightly, so be sure to apply sunscreen when going outside.{% endif %}
             {%- if current_wind_speed is not none -%}
-              {% if current_wind_speed >= wind_threshold %}The wind is {{ current_wind_phrase }} and coming from {{ current_wind_direction }}.{% endif %}
+              {% if current_wind_speed >= wind_threshold %}The wind is {{ current_wind_phrase }}{% if current_wind_direction is not none %} and coming from {{ current_wind_direction }}{% endif %}.{% endif %}
               {% if current_wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif current_wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
             {%- endif %}
         response_forecast:
@@ -470,7 +470,7 @@ blueprint:
             {% if precipitation_probability | float(-1) > rain_warning_threshold %}There is a {{ precipitation_probability }}% chance of {{ precipitation }} mm of rain, so bring an umbrella if you go outside.{% endif %}
             {% if uv_index | float(-1) > 3 and condition in ['clear', 'partlycloudy'] %}The sun will be shining brightly today, so be sure to apply sunscreen when going outside.{% endif %}
             {%- if wind_speed is not none -%}
-              {% if wind_speed >= wind_threshold %}The wind will be {{ wind_phrase }} and coming from {{ wind_direction }}.{% endif %}
+              {% if wind_speed >= wind_threshold %}The wind will be {{ wind_phrase }}{% if wind_direction is not none %} and coming from {{ wind_direction }}{% endif %}.{% endif %}
               {% if wind_speed >= wind_warning_threshold %}So in case you don't have to go out, better stay inside.{% elif wind_speed >= wind_joke_threshold %}So make sure your umbrella doesn't blow away!{% endif %}
             {%- endif %}
 
@@ -478,7 +478,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20260326
+  version: 20260414
   daily_mapping:
     - phrases: !input current
       delta: 0
@@ -564,10 +564,14 @@ variables:
   current_wind_bearing: "{{ state_attr(weather_entity, 'wind_bearing') | round(value_round, default=none) }}"
   current_wind_direction: >
     {% set avg_deg = current_wind_bearing %}
-    {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
-    {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
-    {% set direction = directions[index] %}
-    {{ wind_dir.get(direction) }}
+    {% if avg_deg | is_number %}
+      {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
+      {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
+      {% set direction = directions[index] %}
+      {{ wind_dir.get(direction) }}
+    {% else %}
+      {{ none }}
+    {% endif %}
   current_wind_speed: "{{ state_attr(weather_entity, 'wind_speed') | round(value_round, default=none) }}"
   current_wind_phrase: "{{ wind_phrases.items() | selectattr('1', '<=', current_wind_speed) | map(attribute='0') | list | last | default }}"
 actions:
@@ -622,11 +626,15 @@ actions:
                   wind_joke_threshold: !input wind_joke_threshold
                   wind_warning_threshold: !input wind_warning_threshold
                   wind_direction: >
-                    {% set avg_deg = day_forecast.get('wind_bearing', 0) | float(0) %}
-                    {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
-                    {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
-                    {% set direction = directions[index] %}
-                    {{ wind_dir.get(direction) }}
+                    {% set avg_deg = day_forecast.get('wind_bearing', none) | float(none) %}
+                    {% if avg_deg is not none %}
+                      {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
+                      {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
+                      {% set direction = directions[index] %}
+                      {{ wind_dir.get(direction) }}
+                    {% else %}
+                      {{ none }}
+                    {% endif %}
                   response_current: !input response_current
                   response_forecast: !input response_forecast
               - alias: Send back the response
@@ -692,18 +700,22 @@ actions:
                   wind_joke_threshold: !input wind_joke_threshold
                   wind_warning_threshold: !input wind_warning_threshold
                   wind_direction: >
-                    {% set bearings = day_part_forecast | selectattr('wind_bearing', 'defined') | map(attribute='wind_bearing') | list %}
-                    {% set ns = namespace(sin_sum=0, cos_sum=0) %}
-                    {% for b in bearings %}
-                      {% set ns.sin_sum = ns.sin_sum + sin(b * pi / 180) %}
-                      {% set ns.cos_sum = ns.cos_sum + cos(b * pi / 180) %}
-                    {% endfor %}
-                    {% set avg_rad = atan2(ns.sin_sum, ns.cos_sum) %}
-                    {% set avg_deg = (avg_rad * 180 / pi) % 360 %}
-                    {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
-                    {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
-                    {% set direction = directions[index] %}
-                    {{ wind_dir.get(direction) }}
+                    {% set bearings = day_part_forecast | selectattr('wind_bearing', 'defined') | slectattr('wind_bearing', 'is_number') | map(attribute='wind_bearing') | list %}
+                    {% if bearings | count > 0 %}
+                      {% set ns = namespace(sin_sum=0, cos_sum=0) %}
+                      {% for b in bearings %}
+                        {% set ns.sin_sum = ns.sin_sum + sin(b * pi / 180) %}
+                        {% set ns.cos_sum = ns.cos_sum + cos(b * pi / 180) %}
+                      {% endfor %}
+                      {% set avg_rad = atan2(ns.sin_sum, ns.cos_sum) %}
+                      {% set avg_deg = (avg_rad * 180 / pi) % 360 %}
+                      {% set directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] %}
+                      {% set index = ((avg_deg + 22.5) % 360 / 45) | int %}
+                      {% set direction = directions[index] %}
+                      {{ wind_dir.get(direction) }}
+                    {% else %}
+                      {{ none }}
+                    {% endif %}
                   response_forecast: !input response_forecast
               - alias: Send back the response
                 set_conversation_response: !input response_forecast
