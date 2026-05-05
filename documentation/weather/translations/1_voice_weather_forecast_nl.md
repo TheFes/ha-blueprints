@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
 Translation by: @TheFes
-Last update: 2025-27-01
+Last update: 2026-04-14
 
 # How to use this translation
 
@@ -103,30 +103,32 @@ Last update: 2025-27-01
       response_invalid_phrase: Ik kan geen weersvoorspelling ophalen voor {{ phrase
         }}
       response_no_data: Geen weersvoorspelling beschikbaar voor {{ phrase }}
-      response_forecast: Het {{ 'is' if current else 'wordt' }} {{ temperature }}
-        graden {{ condition_translated }}. {% if temperature != apparent_temperature
-        %}Het voelt als {{ apparent_temperature }} graden.{% endif %} {% if precipitation_probability
-        > rain_warning_threshold %}Er is {{ precipitation_probability }}% kans op
-        {{ precipitation }} milimeter regen, dus neem een paraplu mee als je naar
-        buiten gaat.{% endif %} {% if uv_index > 3 and condition in ['clear', 'partlycloudy']
-        %}De zon schijnt fel vandaag, dus doe zonnebrand op als je naar buiten gaat.{%
-        endif %} {% if wind_speed >= wind_threshold %} De wind wordt {{ wind_phrase
-        }} en komt uit het {{ wind_direction}}. {% endif %} {% if wind_speed >= wind_warning_threshold
-        %}Dus als je niet per se naar buiten hoeft, blijf dan vooral lekker binnen.{%
-        elif wind_speed >= wind_joke_threshold %}Dus zorg dat je {% if precipitation_probability
-        > 10 %}paraplu {% else %}'t{% endif %}niet weg waait!{% endif %}
-      response_current: "Het is nu {{ current_temperature }} graden en {{ current_condition_translated
-        }}. De temperatuur zal vandaag tussen de {{ templow }} en {{ temperature }}
-        graden zijn. {% if current_temperature != current_apparent_temperature %}Het
-        voelt nu als {{ current_apparent_temperature }} graden.{% endif %} {% if precipitation_probability
-        | float(-1) > rain_warning_threshold %}Er is  {{ precipitation_probability
-        }}% kans op {{ precipitation }} mm regen, dus neem een paraplu mee naar buiten.{%
-        endif %} {% if current_uv_index | float(-1) > 3 and current_condition in ['clear',
-        'partlycloudy'] %}De zon schijnt fel vandaag, dus doe zonnebrand op als je
-        naar buiten gaat.{% endif %} {%- if current_wind_speed is not none -%}\n  {%
-        if current_wind_speed >= wind_threshold %} De wind is {{ current_wind_phrase
-        }} en komt uit het {{ current_wind_direction }}.{% endif %}\n  {% if current_wind_speed
+      response_forecast: >
+        Het {{ 'is' if current else 'wordt' }} {{ temperature }} graden {{ condition_translated }}. 
+        {% if temperature != apparent_temperature %}Het voelt als {{ apparent_temperature }} graden.
+        {% endif %} {% if precipitation_probability > rain_warning_threshold %}Er is {{ precipitation_probability }}% 
+        kans op {{ precipitation }} milimeter regen, dus neem een paraplu mee als je naar
+        buiten gaat.{% endif %} {% if uv_index > 3 and condition in ['clear', 'partlycloudy'] %}
+        De zon schijnt fel vandaag, dus doe zonnebrand op als je naar buiten gaat.{% endif %} 
+        {% if wind_speed >= wind_threshold %} De wind wordt {{ wind_phrase }}{% if wind_direction is not none %} 
+        en komt uit het {{ wind_direction}}{% endif %}. {% endif %} {% if wind_speed >= wind_warning_threshold %}
+        Dus als je niet per se naar buiten hoeft, blijf dan vooral lekker binnen.{% elif wind_speed >= 
+        wind_joke_threshold %}Dus zorg dat je {% if precipitation_probability > 10 %}paraplu {% else %}'t
+        {% endif %}niet weg waait!{% endif %}
+      response_current: >
+        Het is nu {{ current_temperature }} graden en {{ current_condition_translated}}. 
+        De temperatuur zal vandaag tussen de {{ templow }} en {{ temperature }}
+        graden zijn. {% if current_temperature != current_apparent_temperature %}
+        Het voelt nu als {{ current_apparent_temperature }} graden.{% endif %} 
+        {% if precipitation_probability | float(-1) > rain_warning_threshold %}
+        Er is {{ precipitation_probability }}% kans op {{ precipitation }} mm regen, 
+        dus neem een paraplu mee naar buiten.{% endif %} {% if current_uv_index | float(-1) 
+        > 3 and current_condition in ['clear','partlycloudy'] %}De zon schijnt fel vandaag, 
+        dus doe zonnebrand op als je naar buiten gaat.{% endif %} {%- if current_wind_speed 
+        is not none -%} {% if current_wind_speed >= wind_threshold %} De wind is 
+        {{ current_wind_phrase }}{% if current_wind_direction is not none %} en komt uit 
+        het {{ current_wind_direction}}{% endif %}.{% endif %} {% if current_wind_speed
         >= wind_warning_threshold %}Dus als je niet per se naar buiten hoeft, kun
         je dat beter niet doen.{% elif current_wind_speed >= wind_joke_threshold %}Dus
-        houd je paraplu goed vast!{% endif %}\n{%- endif %}"
+        houd je paraplu goed vast!{% endif %}{%- endif %}
 ```

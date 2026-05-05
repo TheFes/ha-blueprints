@@ -182,7 +182,7 @@ Last update: 2026-03-06
       {%- endif %}
 
       {%- if current_wind_speed is not none -%}
-        {%- if current_wind_speed >= wind_threshold %} Der Wind weht {{ current_wind_phrase }} aus {{ current_wind_direction }} Richtung.
+        {%- if current_wind_speed >= wind_threshold %} Der Wind weht {{ current_wind_phrase }{% if current_wind_direction is not none %} aus {{ current_wind_direction }} Richtung{% endif %}.
         {%- endif %}
 
         {%- if current_wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
@@ -205,7 +205,7 @@ Last update: 2026-03-06
       {%- endif %}
 
       {%- if wind_speed is not none -%}
-        {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }} aus {{ wind_direction }} Richtung wehen.
+        {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }}{% if wind_direction is not none %} aus {{ wind_direction }} Richtung wehen{% endif %}.
         {%- endif %}
 
         {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
