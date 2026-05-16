@@ -478,7 +478,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20260414
+  version: 20260516
   daily_mapping:
     - phrases: !input current
       delta: 0
@@ -700,7 +700,7 @@ actions:
                   wind_joke_threshold: !input wind_joke_threshold
                   wind_warning_threshold: !input wind_warning_threshold
                   wind_direction: >
-                    {% set bearings = day_part_forecast | selectattr('wind_bearing', 'defined') | slectattr('wind_bearing', 'is_number') | map(attribute='wind_bearing') | list %}
+                    {% set bearings = day_part_forecast | selectattr('wind_bearing', 'defined') | selectattr('wind_bearing', 'is_number') | map(attribute='wind_bearing') | list %}
                     {% if bearings | count > 0 %}
                       {% set ns = namespace(sin_sum=0, cos_sum=0) %}
                       {% for b in bearings %}
