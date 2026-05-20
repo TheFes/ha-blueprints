@@ -1,0 +1,289 @@
+blueprint:
+  name: Voice - Calendar Create Entry - Full LLM script
+  author: TheFes
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/calender/3_voice_calendar_entries_full_llm.yaml
+  description:
+    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+
+    # Create a calendar entry by use of an LLM
+
+    ### Blueprint setup
+
+    #### Required
+
+    * Set one calendar entries for which you want to create the events
+
+    #### Optional
+
+    * Adjust the prompts for each field used in the script. The descriptions guide
+    the LLM to provide the correct input
+
+    #### Note:
+
+    * Give the script a clear description. This will be used by the LLM to understand
+    it should use this script for creating calendar entries.
+
+    * **Make sure to expose the script to Assist after the script has been saved**
+
+    #### Example for script description:
+
+    `Create a calendar event in my calendar. In case the data for the weekend
+    is requested, this means Saturday and Sunday. Only fill start_time and end_time if
+    the user explicity gave a time; otherwise leave it blank. All day events
+    which don't have times specified do not need a start_time or end_time!`
+
+    ### Usage
+
+    You can create a calendar entry using any language.
+    Unless set otherwise in the LLM configuration, the response will be in the same
+    language as the command.
+
+    You can specify a date and time or just a date to create the event. Not providing a
+    time will create an all day event in most cases. Sometimes the LLM will pick times
+    even if not provided. The script description is important to limit this interaction.
+
+    #### Examples
+
+    ```
+
+    Add go to the grocery store to my calendar tomorrow.
+
+    Create an event for go to the doctor at 9am on Tuesday.
+
+    Add jump rope to my calendar on Tuesday from noon to 3pm.
+
+    ```"
+  domain: script
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    calendar_entity:
+      name: Calendar entity
+      description: Select the calendar entity to add entries to
+      selector:
+        entity:
+          multiple: false
+          filter:
+            domain: calendar
+    prompt_settings:
+      name: Prompt settings for the LLM
+      icon: mdi:robot
+      description:
+        You can use these settings to finetune the prompts for your specific
+        LLM (model). In most cases the defaults should be fine.
+      collapsed: true
+      input:
+        summary_prompt:
+          name: Summary prompt
+          description:
+            The prompt which will be used to the LLM can provide the summary for
+            the new event
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default:
+            "This argument is mandatory and must always be provided no matter
+            what!
+
+            Provide the summary/title for the new event. The summary should be a 
+            maximum of 10 words and should not include the date or time of the 
+            event, only the description of it."
+        start_date_prompt:
+          name: Start Date prompt
+          description:
+            The prompt which will be used to the LLM can provide the start
+            date for the new event
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default:
+            "This argument is mandatory and must always be provided no matter
+            what!
+
+            Provide the date on which the new event starts. This date should
+            be in the format YYYY-MM-DD. Always provide a date, so in case request
+            is the forecast for today, provide today's date."
+        end_date_prompt:
+          name: End Date prompt
+          description:
+            The prompt which will be used to the LLM can provide the end
+            date for the new event
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default:
+            "This argument is mandatory and must always be provided no matter
+            what!
+
+            Provide the date on which the new event ends. This date should
+            be in the format YYYY-MM-DD. Always provide a date, so in case the
+            date is not provided use the same date as the start date."
+        start_time_prompt:
+          name: Start Time prompt
+          description:
+            The prompt which will be used to the LLM can provide the start
+            time for the new event
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default:
+            "The start time is not required and can be blank if not specified. 
+            Events can be all day, which means that there is no reason to pick a
+            start time.
+
+            This is the time the event starts if the user provides one.
+            This time can be the empty string '' if no time is provide otherwise 
+            it should be in the format HH:MM:SS in 24 hour format (for example 17:00:00)."
+        end_time_prompt:
+          name: End Time prompt
+          description:
+            The prompt which will be used to the LLM can provide the end
+            time for the new event
+          selector:
+            text:
+              multiline: true
+              multiple: false
+          default:
+            "            
+            Provide the time on which the requested period ends. This time should
+            be in the format HH:MM:SS in 24 hour format (for example 17:00:00). 
+            If no time is provided then exclude this argument."
+mode: parallel
+max_exceeded: silent
+fields:
+  summary:
+    name: Summary
+    description: !input summary_prompt
+    selector:
+      text:
+    required: true
+  start_date:
+    name: Start Date
+    description: !input start_date_prompt
+    selector:
+      date:
+    required: true
+  end_date:
+    name: End Date
+    description: !input end_date_prompt
+    selector:
+      date:
+    required: true
+  start_time:
+    name: Start Time
+    description: !input start_time_prompt
+    default: ""
+    selector:
+      text:
+    required: false
+  end_time:
+    name: End Time
+    description: !input end_time_prompt
+    default: ""
+    selector:
+      text:
+    required: false
+sequence:
+  - variables:
+      version: 20251019
+      start_date:
+        "{{ start_date | as_datetime(default='') }}"
+      end_date:
+        "{{ end_date | as_datetime(default='') }}"
+      start_time:
+        >-
+          {% set time_val = start_time | default('') %}
+          {% set date_dt = start_date | as_datetime %}
+          {% if time_val and date_dt %}
+            {% set date_str = (date_dt | as_timestamp | timestamp_custom('%Y-%m-%d')) %}
+            {{ (date_str ~ ' ' ~ time_val) | as_datetime }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+      end_time:
+        >-
+          {% set time_val = end_time | default('') %}
+          {% set date_dt = end_date | as_datetime %}
+          {% if time_val and date_dt %}
+            {% set date_str = (date_dt | as_timestamp | timestamp_custom('%Y-%m-%d')) %}
+            {{ (date_str ~ ' ' ~ time_val) | as_datetime }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+      start:
+        >-
+          {% if start_time %}
+            {{ start_time | as_datetime | as_local }}
+          {% elif start_date %}
+            {{ (start_date | as_datetime | as_local | as_timestamp) | timestamp_custom('%Y-%m-%d') }}
+          {% else %}
+            NA
+          {% endif %}
+      end:
+        >-
+          {% if end_time %}
+            {{ end_time | as_datetime | as_local }}
+          {% elif end_date %}
+            {% if end_date == start_date %}
+              {{  ((start_date | as_datetime) + timedelta(days=1))
+                  | as_local
+                  | as_timestamp
+                  | timestamp_custom('%Y-%m-%d')
+              }}
+            {% else %}
+              {{  (end_date | as_datetime)
+                  | as_local
+                  | as_timestamp
+                  | timestamp_custom('%Y-%m-%d')
+              }}
+            {% endif %}
+          {% else %}
+            {{ none }}
+          {% endif %}
+  - alias: Check if variables were set correctly
+    if:
+      - condition: template
+        value_template: "{{ start == 'NA' or end | as_datetime < now() }}"
+    then:
+      - alias: Set variable for eror message
+        variables:
+          response:
+            error:
+              Unable to provide calendar events because not all parameters were set by the
+              AI agent
+      - alias: Stop the script
+        stop:
+          Unable to determine the date for the calendar entries, or the date is in
+          the past
+        response_variable: response
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ start_time is not none }}"
+        sequence:
+          - action: calendar.create_event
+            target:
+              entity_id: !input calendar_entity
+            data:
+              summary: "{{ summary }}"
+              start_date_time: "{{ start }}"
+              end_date_time: "{{ end }}"
+    default:
+      - action: calendar.create_event
+        target:
+          entity_id: !input calendar_entity
+        data:
+          summary: "{{ summary }}"
+          start_date: "{{ start }}"
+          end_date: "{{ end }}"
+  - variables:
+      result:
+        success: true
+        message: >-
+          Created calendar event "{{ summary }}"
+  - stop: ""
+    response_variable: result
