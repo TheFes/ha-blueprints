@@ -11,7 +11,7 @@ This blueprint is intended as a replacement for the [alert](<https://www.home-as
 ### 🫶 It supports these features of the alert integration:
 - Start alert when the state of an entity goes to a certain problem state
 - Provide a fixed number of minutes the alert should be repeated, or a list of numbers for a variable interval
-- Optionally skip the first message, .so it won’t be sent immediately when the entity changes to the problem state
+- Optionally skip the first message, so it won’t be sent immediately when the entity changes to the problem state
 - Provide an option to acknowledge an alert before the entity is no longer in the problem state
 - Send a message when the entity changes state, to indicate it is no longer in the problem state
 
@@ -27,7 +27,7 @@ This blueprint is intended as a replacement for the [alert](<https://www.home-as
 - After restarting Home Assistant or modifying the automation, messages may be sent for alerts previously acknowledged but still in the problem state
 - After restarting Home Assistant, automations will no longer clean up previous alert messages that were active before the restart.
 
-_Note: these limitation can be addressed by saving the alert data in a trigger based template sensor. So I've included support for this, and created a blueprint to create this template sensor._
+_Note: these limitations can be addressed by saving the alert data in a trigger-based template sensor. So I've included support for this, and created a blueprint to create this template sensor._
 _If you want to use this template sensor, first create it using the [instructions](/other/alert_data_sensor.md). After creation you can select it in the `Alert sensor settings` in the blueprint._
 
 ### 👇 Example:
@@ -48,19 +48,19 @@ The text between brackets is the key for the input used in YAML.
 ### 🏴 <u>Trigger settings</u>
 
 * #### **Trigger entity**  _(trigger_entity)_ | no default
-  The entity which state will be monitored to start the alert. 
+  The entity whose state will be monitored to start the alert. 
 
 
 * #### **Problem state** _(problem_state)_  | no default
-  The state the trigger entity needs to change to to start the alert. Note that if the entity is already in this state when the automation is created, the alert will not start, it has to change to the state to start the alert.
+  The state the trigger entity needs to change to for the alert to start. Note that if the entity is already in this state when the automation is created, the alert will not start; it has to change to the state to start the alert.
 
 * #### **Attribute name** _(attribute_key)_  | default: `""`
   You can optionally provide an attribute name so the alert will not trigger on the state of the entity, but on an attribute value. It will use the problem state provided, in combination with the attribute name. This has to be the attribute as shown in developer tools > states, do not use the value from e.g. a more-info card, as they make changes to the name (for example the first character is capitalized).
   When left empty, the state of the entity will be used.
 
 * #### **Problem type** _(problem_type)_  | default: `"equal"`
-Indicate if the entity state should exactly match the problem state, or if should be above or below.
-In case above or below is used, the problem state needs to be numeric. Possible options are:
+  Indicate if the entity state should exactly match the problem state, or if it should be above or below.
+  In case above or below is used, the problem state needs to be numeric. Possible options are:
   - Entity state equal to problem state _(equal)_
   - Entity state below problem state _(below)_
   - Entity state above problem state _(above)_
@@ -91,7 +91,7 @@ In case above or below is used, the problem state needs to be numeric. Possible 
   The config entry of the telegram bot to use, this is not required if you only have one Telegram bot configured.
 
 * #### **Target** _(target)_ | no default
-  The target chats to which the alerts should be sent. The selector is using the event entities as created by the Telegram bot integration. These entities have the chat id of the Telegram chat as an attribute, so in the end those chat id's are used as target of the alert messages.
+  The target chats to which the alerts should be sent. Messages are sent with the `telegram_bot.send_message` action. Prefer the **notify** entities created by the Telegram bot integration (one per allowed chat); those are passed as `entity_id`. **Event** entities from the same integration are also accepted; for those the blueprint reads the `chat_id` attribute and calls the action with `config_entry_id` + `chat_id`.
 
 * #### **Parse mode** _(parse_mode)_ | default: `markdown`
   This will determine the formatting of the message. By default `markdown` formatting is used, but you can also select `markdownv2`, `html` and `plain_text`. Note that `markdownv2` needs escaping of special characters and will otherwise result in an error.
@@ -103,7 +103,7 @@ In case above or below is used, the problem state needs to be numeric. Possible 
   The message which is sent on every repeat of the alert message. Jinja templates are allowed, but you can also use plain text.
 
 * #### **Disable web page preview** _(disable_web_page_preview)_ | default: `false`
-  When disabled the alert message will not display previews of web pages in case an website url is sent in the message.
+  When disabled the alert message will not display previews of web pages in case a website URL is sent in the message.
 
 ### ✅ <u>Done message settings</u>
 
@@ -160,7 +160,7 @@ You can add a maximum of 5 buttons. Below you see the description of button 1, b
 
 ## ☕ Coffee
 
-If you think I deserve a coffe, please feel free to buy me one (I might spend it on another beverage though).
+If you think I deserve a coffee, please feel free to buy me one (I might spend it on another beverage though).
 In case you decide to do so, thanks a lot!
 
 <a href="https://www.buymeacoffee.com/thefes" target="_blank">![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)</a>
