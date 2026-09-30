@@ -598,6 +598,15 @@ actions:
                       if is_problem
                       else 0
                     }}
+              - alias: Answer Telegram callback query for keyboard button presses
+                if: "{{ wait.trigger is not none and wait.trigger.id == 'button_press' }}"
+                then:
+                  - action: telegram_bot.answer_callback_query
+                    data:
+                      config_entry_id: "{{ wait.trigger.event.data.bot.config_entry_id }}"
+                      callback_query_id: "{{ wait.trigger.event.data.id }}"
+                      message: OK
+                      show_alert: false
               - choose:
                   - conditions: "{{ wait.trigger.id == 'button_press' and wait.trigger.event.data.data == '/button_1_'~tag }}"
                     sequence: !input button_1_actions
