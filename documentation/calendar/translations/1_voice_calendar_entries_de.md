@@ -47,6 +47,8 @@ Last update: 2025-23-10
       - samstag
     sunday:
       - sonntag
+    this_week:
+      - diese woche
     night:
       - nacht
       - nachts

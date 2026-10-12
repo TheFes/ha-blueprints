@@ -38,6 +38,8 @@ Last update: 2025-29-01
       - zaterdag
       sunday:
       - zondag
+      this_week:
+      - deze week
       night:
       - vannacht
       - morgennacht
