@@ -459,7 +459,9 @@ actions:
             {{ ns.events }}
           dates: "{{ listed_events | map(attribute='day') | unique | list }}"
       - variables:
+          # collect unindented lines, indented lines are rendered as code blocks in the Assist markdown
           response_events: >
+            {%- set ns = namespace(lines=[]) %}
             {%- for d in dates %}
               {%- set day_events = listed_events | selectattr('day', 'eq', d) | list %}
               {#- all-day events have a date-only start ('YYYY-MM-DD' <= d), events
@@ -471,14 +473,17 @@ actions:
                   {%- set formatted.date = formatted.date | replace(k, v) %}
                 {%- endfor %}
               {%- endif %}
-              {{ event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural) }}
+              {%- set ns.lines = ns.lines + [event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural)] %}
               {%- set names = full_day | map(attribute='summary') | list %}
               {%- set event_list = names[:-1] | join(', ') ~ ' ' ~ combine_word ~ ' ' ~ names[-1] if names | count > 1 else names | first | default('') %}
-                {% if full_day %}{{ day_event.format(event_list=event_list) }}{% endif %}
-                {%- for e in day_events | reject('in', full_day) %}
-                  {{ part_day_event.format(start=as_datetime(e.start).strftime(time_format), end=as_datetime(e.end).strftime(time_format), event_summary=e.summary) }}
-                {%- endfor %}
+              {%- if full_day %}
+                {%- set ns.lines = ns.lines + [day_event.format(event_list=event_list)] %}
+              {%- endif %}
+              {%- for e in day_events | reject('in', full_day) %}
+                {%- set ns.lines = ns.lines + [part_day_event.format(start=as_datetime(e.start).strftime(time_format), end=as_datetime(e.end).strftime(time_format), event_summary=e.summary)] %}
+              {%- endfor %}
             {%- endfor %}
+            {{ ns.lines | join('\n') }}
       - alias: Send back the response
         set_conversation_response: "{{ response_events }}"
     else:
