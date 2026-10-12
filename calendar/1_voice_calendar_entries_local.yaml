@@ -473,6 +473,9 @@ actions:
                   {%- set formatted.date = formatted.date | replace(k, v) %}
                 {%- endfor %}
               {%- endif %}
+              {%- if not loop.first %}
+                {%- set ns.lines = ns.lines + [''] %}
+              {%- endif %}
               {%- set ns.lines = ns.lines + [event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural)] %}
               {%- set names = full_day | map(attribute='summary') | list %}
               {%- set event_list = names[:-1] | join(', ') ~ ' ' ~ combine_word ~ ' ' ~ names[-1] if names | count > 1 else names | first | default('') %}
