@@ -323,7 +323,7 @@ triggers:
   - trigger: conversation
     command: !input trigger
 variables:
-  version: 20250318
+  version: 20261012
   daily_mapping:
     - phrases: !input today
       delta: 0
@@ -431,20 +431,15 @@ actions:
           part_day_event: !input part_day_event
           event_singular: !input event_singular
           event_plural: !input event_plural
-          dates: >
-            {%- set ns = namespace(dates=[]) %}
-            {%- for start in events | map(attribute='start') %}
-              {%- set d = as_datetime(start).date() | string %}
-              {%- if d not in ns.dates %}
-                {%- set ns.dates = ns.dates + [d] %}
-              {%- endif %}
-            {%- endfor %}
-            {{ ns.dates }}
+          combine_word: !input combine_word
+          dates: "{{ [as_datetime(start).date() | string] }}"
       - variables:
           response_events: >
             {%- for d in dates %}
-              {%- set day_events = events | selectattr('start', 'contains', d) | list %}
-              {%- set full_day = day_events | selectattr('start', 'eq', d) | list %}
+              {%- set day_events = events %}
+              {#- all-day events have a date-only start ('YYYY-MM-DD' <= d), events
+                  which started before the requested day also cover it entirely #}
+              {%- set full_day = day_events | selectattr('start', 'le', d) | list %}
               {%- set formatted = namespace(date=as_datetime(d).strftime(date_format)) %}
               {%- if translations %}
                 {%- for k, v in translations.items() %}
@@ -452,11 +447,9 @@ actions:
                 {%- endfor %}
               {%- endif %}
               {{ event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural) }}
-              {%- set text = namespace(message='') %}
-                {%- for e in full_day %}
-                  {% set text.message = text.message + (((' ' ~ combine_word ~ ' ') if loop.last and not loop.first) ~ e.summary ~ (', ' if not loop.last) ) %}
-                {%- endfor %}
-                {% if full_day %}{{ day_event.format(event_list=text.message) }}{% endif %}
+              {%- set names = full_day | map(attribute='summary') | list %}
+              {%- set event_list = names[:-1] | join(', ') ~ ' ' ~ combine_word ~ ' ' ~ names[-1] if names | count > 1 else names | first | default('') %}
+                {% if full_day %}{{ day_event.format(event_list=event_list) }}{% endif %}
                 {%- for e in day_events | reject('in', full_day) %}
                   {{ part_day_event.format(start=as_datetime(e.start).strftime(time_format), end=as_datetime(e.end).strftime(time_format), event_summary=e.summary) }}
                 {%- endfor %}
