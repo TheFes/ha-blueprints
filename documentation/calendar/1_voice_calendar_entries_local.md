@@ -9,7 +9,7 @@ Using this blueprint you can create an automation to request the calendar entrie
 ## Limitations of this automation
 
 * The sentences used to trigger the automation are rather strict
-* For full days you can only ask calendar entries up to one weak ahead and for a period of one full day. For partial days only `night`, `morning`, `afternoon` and `evening` are possible, no other (subset of) hours.
+* For full days you can only ask calendar entries up to one weak ahead and for a period of one full day, or for the rest of the current week (`this week`, from today until Sunday). For partial days only `night`, `morning`, `afternoon` and `evening` are possible, no other (subset of) hours.
 * The response is predefined, and therefor will follow the same format every time you request the calendar entries. 
 * In case you want to use it in another language as English, you need to provide translations for a large number of settings.
 

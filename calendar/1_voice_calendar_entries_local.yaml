@@ -194,6 +194,15 @@ blueprint:
               multiple: true
           default:
             - sunday
+        this_week:
+          name: This week
+          description: Phrases to request the calendar entries from today until the end of the week (Sunday)
+          selector:
+            text:
+              multiline: false
+              multiple: true
+          default:
+            - this week
     day_part_calender_settings:
       name: Settings for the calendar entries for part of a day
       icon: mdi:calendar
@@ -365,6 +374,11 @@ variables:
       delta: "{{ 6 - now().weekday() + (7 if 6 <= now().weekday() else 0) }}"
       start: 00:00:00
       end: "23:59:59"
+    - phrases: !input this_week
+      delta: 0
+      end_delta: "{{ 6 - now().weekday() }}"
+      start: 00:00:00
+      end: "23:59:59"
   day_part_mapping:
     - phrases: !input night
       start: 00:00:00
@@ -399,6 +413,9 @@ actions:
       delta:
         "{{ 1 if next_day and part_day else daily_mapping | selectattr('phrases', 'contains', phrase) |
         map(attribute='delta') | list | first | default(0) }}"
+      end_delta:
+        "{{ daily_mapping | selectattr('phrases', 'contains', phrase) |
+        map(attribute='end_delta', default=delta) | list | first | default(delta) }}"
       start_time:
         "{{ (daily_mapping + day_part_mapping) | selectattr('phrases', 'contains', phrase)
         | map(attribute='start') | list | first }}"
@@ -406,7 +423,7 @@ actions:
         "{{ (daily_mapping + day_part_mapping) | selectattr('phrases', 'contains', phrase)
         | map(attribute='end') | list | first }}"
       start: "{{ today_at() + timedelta(days=delta) + as_timedelta(start_time) }}"
-      end: "{{ today_at() + timedelta(days=delta) + as_timedelta(end_time) }}"
+      end: "{{ today_at() + timedelta(days=end_delta) + as_timedelta(end_time) }}"
   - alias: Get the forecast data
     action: calendar.get_events
     data:
@@ -432,13 +449,23 @@ actions:
           event_singular: !input event_singular
           event_plural: !input event_plural
           combine_word: !input combine_word
-          dates: "{{ [as_datetime(start).date() | string] }}"
+          first_day: "{{ as_datetime(start).date() | string }}"
+          # list each event once, on its start day or on the first requested day if it started earlier
+          listed_events: >
+            {%- set ns = namespace(events=[]) %}
+            {%- for e in events %}
+              {%- set ns.events = ns.events + [dict(e, day=[e.start[:10], first_day] | max)] %}
+            {%- endfor %}
+            {{ ns.events }}
+          dates: "{{ listed_events | map(attribute='day') | unique | list }}"
       - variables:
+          # collect unindented lines, indented lines are rendered as code blocks in the Assist markdown
           response_events: >
+            {%- set ns = namespace(lines=[]) %}
             {%- for d in dates %}
-              {%- set day_events = events %}
+              {%- set day_events = listed_events | selectattr('day', 'eq', d) | list %}
               {#- all-day events have a date-only start ('YYYY-MM-DD' <= d), events
-                  which started before the requested day also cover it entirely #}
+                  which started before this day also cover it entirely #}
               {%- set full_day = day_events | selectattr('start', 'le', d) | list %}
               {%- set formatted = namespace(date=as_datetime(d).strftime(date_format)) %}
               {%- if translations %}
@@ -446,14 +473,20 @@ actions:
                   {%- set formatted.date = formatted.date | replace(k, v) %}
                 {%- endfor %}
               {%- endif %}
-              {{ event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural) }}
+              {%- if not loop.first %}
+                {%- set ns.lines = ns.lines + [''] %}
+              {%- endif %}
+              {%- set ns.lines = ns.lines + [event_count.format(date=formatted.date, event_count=day_events|count, events=event_singular if day_events|count==1 else event_plural)] %}
               {%- set names = full_day | map(attribute='summary') | list %}
               {%- set event_list = names[:-1] | join(', ') ~ ' ' ~ combine_word ~ ' ' ~ names[-1] if names | count > 1 else names | first | default('') %}
-                {% if full_day %}{{ day_event.format(event_list=event_list) }}{% endif %}
-                {%- for e in day_events | reject('in', full_day) %}
-                  {{ part_day_event.format(start=as_datetime(e.start).strftime(time_format), end=as_datetime(e.end).strftime(time_format), event_summary=e.summary) }}
-                {%- endfor %}
+              {%- if full_day %}
+                {%- set ns.lines = ns.lines + [day_event.format(event_list=event_list)] %}
+              {%- endif %}
+              {%- for e in day_events | reject('in', full_day) %}
+                {%- set ns.lines = ns.lines + [part_day_event.format(start=as_datetime(e.start).strftime(time_format), end=as_datetime(e.end).strftime(time_format), event_summary=e.summary)] %}
+              {%- endfor %}
             {%- endfor %}
+            {{ ns.lines | join('\n') }}
       - alias: Send back the response
         set_conversation_response: "{{ response_events }}"
     else:
