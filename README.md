@@ -68,8 +68,9 @@ Using these blueprints you can ask for the calendar entries from one or more cal
 |Option|Import Button|
 |---|---|
 |[1: Local](/documentation/calendar/1_voice_calendar_entries_local.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F1_voice_calendar_entries_local.yaml)|
-|2: LLM Enhanced|To be created|
+|[2: LLM Enhanced](/documentation/calendar/2_voice_calendar_entries_llm_enhanced.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F2_voice_calendar_entries_llm_enhanced.yaml)|
 |[3: Full LLM](/documentation/calendar/3_voice_calendar_entries_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_calendar_entries_full_llm.yaml)|
+|[3: Full LLM v2 (AI Task)](/documentation/calendar/3_voice_calendar_entries_full_llm_v2.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_calendar_entries_full_llm_v2.yaml)|
 
 
 ### ✅ ToDo
@@ -112,7 +113,7 @@ Using these bleuprints you can issue voice commands to play media on your Music 
 
 ## Planned
 
-1. Add missing options for weather and calendar
+1. ~~Add missing options for weather and calendar~~
 2. ~~Add blueprints to create reminders~~
 3. Add blueprints to add and list todo items, including due dates/times
 4. ...
