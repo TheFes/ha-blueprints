@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_get_todo_entries_local](/todo/1_voice_get_todo_entries_local.yaml)
 Translation by: @TheFes
-Last update: 2025-30-01
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -12,7 +12,7 @@ Last update: 2025-30-01
 4. Find the automation (it should be at the bottom if you just created it)
 5. Paste the YAML code shown below right under the automation
 5. Save the file
-6. Relaod AUTOMATIONS in developer tools > YAML
+6. Reload AUTOMATIONS in developer tools > YAML
 7. (optionally) make further adjustments by clicking on the automation in Settings > Automations & Scenes
 
 # Translations

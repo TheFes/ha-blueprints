@@ -24,11 +24,11 @@ blueprint:
     #### Example for script description:
 
     `Fetch todo items from my todo lists. Note that the shopping list is also considered
-    a todo list. Ignore items marked as completed, unless the uses specifically requests them.`
+    a todo list. Ignore items marked as completed, unless the user specifically requests them.`
 
     ### Usage
 
-    You can request for the todo items in any way you can think of, using any
+    You can request the todo items in any way you can think of, using any
     language. Unless set otherwise in the LLM configuration, the response will be
     in the same language as the command.
 
@@ -69,11 +69,10 @@ blueprint:
             what!
 
             Based on the request by the user, select one or more todo entities from which
-            the items on the list should be fetched. Make sure to use the entity_id of the
-            todo list, not the name.
+            the items on the list should be fetched. Use the entity_id of the todo list
+            (preferred) or its name.
 
-            Ignore items which are marked as completed, unless the user specifically requests
-            completed items."
+            Completed items are only returned when the include_completed field is set to true."
 mode: parallel
 max_exceeded: silent
 fields:
@@ -84,17 +83,69 @@ fields:
           domain: todo
         multiple: true
     name: ToDo entities
+    required: true
     description: !input todo_entities_prompt
+  include_completed:
+    name: Include completed items
+    description: >-
+      Set to true only when the user explicitly asks for items which are completed (done).
+      By default only the items which still need to be done are returned.
+    selector:
+      boolean: {}
 sequence:
-  - variables:
-      version: 20250203
+  - alias: Match the requested lists with the todo entities
+    variables:
+      version: 20261116
+      requested: >
+        {% set t = todo_entities | default([], true) %}
+        {{ ([t] if t is string else t | list) | map('string') | map('lower') | map('trim') | list }}
+      available: >
+        {% set ns = namespace(l=[]) %}
+        {% for s in states.todo | rejectattr('state', 'eq', 'unavailable') %}
+          {% set ns.l = ns.l + [{'entity_id': s.entity_id, 'name': s.name}] %}
+        {% endfor %}
+        {{ ns.l }}
       todo: >
-        {% set by_entity = states.todo | selectattr('entity_id', 'in', todo_entities) | map(attribute='entity_id') | list %}
-        {% set by_name = states.todo | selectattr('name', 'in', todo_entities) | map(attribute='entity_id') | list %}
-        {{ by_entity + by_name }}
+        {% set ns = namespace(found=[]) %}
+        {% for r in requested %}
+          {% set ns2 = namespace(e=none, p=none) %}
+          {% for s in available %}
+            {% set n = s.name | lower %}
+            {% if ns2.e is none and (s.entity_id == r or n == r) %}
+              {% set ns2.e = s.entity_id %}
+            {% elif ns2.p is none and (r in n or n in r or r in s.entity_id) %}
+              {% set ns2.p = s.entity_id %}
+            {% endif %}
+          {% endfor %}
+          {% set m = ns2.e or ns2.p %}
+          {% set ns.found = ns.found + ([m] if m else []) %}
+        {% endfor %}
+        {{ ns.found | unique | list }}
+  - alias: Stop when no list was found
+    if:
+      - condition: template
+        value_template: "{{ todo | count == 0 }}"
+    then:
+      - variables:
+          response:
+            error: >-
+              No todo list found for {{ requested | join(', ') }}. Available lists (entity_id = name):
+              {% for s in available %}{{ s.entity_id }} = {{ s.name }}{{ '; ' if not loop.last }}{% endfor %}
+      - stop: No todo list found
+        response_variable: response
   - action: todo.get_items
+    continue_on_error: true
     target:
       entity_id: "{{ todo }}"
+    data:
+      status: "{{ ['needs_action', 'completed'] if include_completed | default(false) | bool(false) else ['needs_action'] }}"
     response_variable: response
+  - if:
+      - condition: template
+        value_template: "{{ response is not defined }}"
+    then:
+      - variables:
+          response:
+            error: Unable to retrieve the items of the todo list
   - stop: ""
     response_variable: response
