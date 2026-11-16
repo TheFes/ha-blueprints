@@ -127,7 +127,8 @@ blueprint:
             the way people say them. When the user asks about something specific (an appointment,
             whether they are free), answer that first. Only mention the calendar an event is in when
             it adds something. When there are many events, summarize them instead of reading out
-            every event. Only use the events below, don't make anything up.
+            every event. Events marked with already_ended are in the past: don't present them as
+            upcoming. Only use the events below, don't make anything up.
           selector:
             text:
               multiline: true
@@ -281,6 +282,8 @@ actions:
               'all_day': e.start | string | length == 10,
               'calendar': cal
             } %}
+            {% set ev = dict(ev, weekday=as_datetime(e.start).strftime('%A')) %}
+            {% set ev = dict(ev, already_ended=true) if (as_datetime(e.end) | as_local if e.end | string | length > 10 else today_at() + timedelta(days=(as_datetime(e.end).date() - now().date()).days)) <= now() else ev %}
             {% set ev = dict(ev, location=e.location | regex_replace('\\s+', ' ') | trim) if e.location else ev %}
             {% set desc = e.description | default('', true) | string | regex_replace('\\s+', ' ') | trim %}
             {% set ev = dict(ev, description=desc[:200] ~ ('...' if desc | length > 200 else '')) if desc else ev %}
@@ -295,6 +298,7 @@ actions:
           'requested_period': period_description,
           'start_of_period': start,
           'end_of_period': end,
+          'current_time': now().isoformat(),
           'number_of_events': all_events | count,
           'events': all_events[:100]
         } %}
