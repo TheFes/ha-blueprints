@@ -3,7 +3,7 @@ blueprint:
   author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/weather/3_voice_weather_forecast_full_llm.yaml
   description:
-    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+    "![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
     # Request the weather forecast by use of an LLM
 

@@ -6,7 +6,7 @@ blueprint:
   homeassistant:
     min_version: 2026.11.0
   description: |
-    ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+    ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
     More detailed information can be found [here](https://github.com/TheFes/ha-blueprints/blob/main/documentation/todo/2_voice_add_todo_item_llm_enhanced.md)
 

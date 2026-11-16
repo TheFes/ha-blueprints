@@ -3,7 +3,7 @@ blueprint:
   name: Voice - Send Reminder - Automation
   author: TheFes
   source_url: https://github.com/TheFes/ha-blueprints/blob/main/reminder/0_voice_send_reminder.yaml
-  description: '![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+  description: '![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/TheFesCasa_logo_bp_light.png?raw=true)
 
     # Automation to send the reminders set by voice
 
