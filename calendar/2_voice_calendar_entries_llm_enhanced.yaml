@@ -122,7 +122,8 @@ blueprint:
             and `{{ period_description }}`.
           default: >-
             You are a voice assistant answering a question about the calendar. Answer in the same
-            language as the question. Keep it short and natural. The answer will be read aloud by a
+            language as the question, also when the events are in another language. Use the day
+            field of each event for the day it takes place. Keep it short and natural. The answer will be read aloud by a
             text-to-speech engine, so don't use markdown, lists or emoji, and write dates and times
             the way people say them. When the user asks about something specific (an appointment,
             whether they are free), answer that first. Only mention the calendar an event is in when
@@ -282,7 +283,7 @@ actions:
               'all_day': e.start | string | length == 10,
               'calendar': cal
             } %}
-            {% set ev = dict(ev, weekday=as_datetime(e.start).strftime('%A')) %}
+            {% set ev = dict(ev, day=as_datetime(e.start).strftime('%A %-d %B %Y')) %}
             {% set ev = dict(ev, already_ended=true) if (as_datetime(e.end) | as_local if e.end | string | length > 10 else today_at() + timedelta(days=(as_datetime(e.end).date() - now().date()).days)) <= now() else ev %}
             {% set ev = dict(ev, location=e.location | regex_replace('\\s+', ' ') | trim) if e.location else ev %}
             {% set desc = e.description | default('', true) | string | regex_replace('\\s+', ' ') | trim %}
