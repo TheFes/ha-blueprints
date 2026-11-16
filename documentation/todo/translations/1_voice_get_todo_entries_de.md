@@ -4,7 +4,7 @@ Translation for: [1_voice_get_todo_entries_local](/todo/1_voice_get_todo_entries
 
 Translation by: @sascha-hemi
 
-Last update: 2026-10-04
+Last update: 2026-11-16
 
 # How to use this translation
 

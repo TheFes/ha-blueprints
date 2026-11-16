@@ -1,10 +1,13 @@
 ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
 
-# Get ToDo items Entries - Full LLM
+# Get ToDo items - Full LLM
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F1_voice_get_todo_entries_local.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F3_voice_get_todo_entries_full_llm.yaml)
 
-Using this blueprint you can create an automation to script to list or are questions about todo items.
+Using this blueprint you can create a script which an LLM can use to list todo items, or answer questions about them.
+
+> [!TIP]
+> There is also a [version 2](3_voice_get_todo_entries_full_llm_v2.md) of this script, with a single `query` field and an AI Task to select the list.
 
 ## Limitations of this script
 
@@ -14,19 +17,24 @@ Using this blueprint you can create an automation to script to list or are quest
 ## How to use the blueprint
 
 1. Import the blueprint using the button above
-2. Create an script using the blueprint
-3. Select the weather entity to be used for the forecasts
-4. (optionally) adjust the prompts which will are used to instruct the LLM how to use the script fields
-5. Make sure to provide a clear description for the script (example below)
-6. Save the script, and expose it to Assist
+2. Create a script using the blueprint
+3. (optionally) adjust the prompt which is used to instruct the LLM how to use the script field
+4. Make sure to provide a clear description for the script (example below)
+5. Save the script, and expose it to Assist
 
 ### Example for script description:
 
-> Fetch todo items from my todo lists. Note that the shopping list is also considered a todo list. Ignore items marked as completed, unless the uses specifically requests them.
+> Fetch todo items from my todo lists. Note that the shopping list is also considered a todo list.
+
+## How the lists are found
+
+The LLM passes one or more lists in the `todo_entities` field. Each one is matched (not case sensitive) on the entity id or the name of the list, first completely, then on a part of the name. When no list matches, the LLM gets an error with the available lists, so it can try again.
+
+Only open items are returned, unless the LLM sets `include_completed` to `true` (when you ask for completed items).
 
 ### Usage
 
-You can request for the todo items in any way you can think of, using any language. Unless set otherwise in the LLM configuration, the response will be in the same language as the command.
+You can request the todo items in any way you can think of, using any language. Unless set otherwise in the LLM configuration, the response will be in the same language as the command.
 
 #### Examples
 
