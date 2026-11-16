@@ -28,15 +28,21 @@ blueprint:
     ### Usage
 
     By default the sentence needs to contain a due moment after the list name, so a sentence
-    without a due moment is still handled by the built-in intent:
+    without a due moment (and for example "add 5 minutes to the timer") is still handled by the
+    built-in intents:
 
-    - (add|put) {item} (on|to) [the|my] {list_name} list {due}
+    - (add|put) {item} (on|to) [the|my] {list} (for|on|at|due|before|by) {due}
+    - (add|put) {item} (on|to) [the|my] {list} (today|tonight|tomorrow|this|next) [{due}]
 
-    The due moment can contain a day (`today`, `tomorrow`, `day after tomorrow`, a weekday), a time
-    (`17:30`, `9.15`, `5 pm`) and a part of the day (`morning`, `afternoon`, `evening`, `tonight`).
+    The item and the list are determined from the complete sentence: the list is found by looking
+    for the name of one of your lists (with or without the word "list"), so items with "to" or "on"
+    in them ("go to the gym") and list names with "list" in them work as well. The due moment is
+    everything after the list name. It can contain a day (`today`, `tomorrow`, `day after tomorrow`,
+    a weekday), a time (`17:30`, `9.15`, `5 pm`) and a part of the day (`morning`, `evening`, `tonight`).
 
     #### Examples
     * Add call the plumber to the home assistant list tomorrow at 10
+    * Add go to the gym to my chores for friday
     * Put buy a present on my todo list for friday
     * Add take out the trash to my chores list tonight
   input:
@@ -54,15 +60,40 @@ blueprint:
         default_list_names:
           name: Default list names
           description: >-
-            When the spoken list name is one of these, the default list is used. Other names are
-            matched with the names of your todo lists (not case sensitive, first the complete name,
-            then a part of the name).
+            Names which refer to the default list, for example "shopping". Other names are matched
+            with the names of your todo lists (not case sensitive).
           default:
             - shopping
             - grocery
             - groceries
             - todo
             - to do
+          selector:
+            text:
+              multiple: true
+        list_words:
+          name: Words for list
+          description: >-
+            Words for "list". A list name is also recognized with one of these words after it, also
+            when written as one word (for example "boodschappenlijst" for the list "Boodschappen"), and
+            without it when the name of the list ends with it.
+          default:
+            - list
+          selector:
+            text:
+              multiple: true
+        list_separators:
+          name: Words between the item and the list
+          description: >-
+            The words between the item and the list in your trigger sentences, used to split the item
+            and the list. Put longer variants first ("to the" before "to").
+          default:
+            - to the
+            - to my
+            - on the
+            - on my
+            - to
+            - "on"
           selector:
             text:
               multiple: true
@@ -74,11 +105,13 @@ blueprint:
         trigger:
           name: Trigger sentences
           description: >-
-            {item} is the item to add, {list_name} the name of the list and {due} the due moment.
-            Keep a {due} part in the sentences, sentences without a due moment are handled by the
-            built-in intent.
+            The sentences need an {item} and a {list} wildcard. The item, the list and the due moment
+            are determined from the complete sentence, so the exact split of the wildcards doesn't matter.
+            Keep a word for the due moment after {list}, so sentences without a due moment (and other
+            sentences like "add 5 minutes to the timer") are still handled by the built-in intents.
           default:
-            - "(add|put) {item} (on|to) [the|my] {list_name} list {due}"
+            - "(add|put) {item} (on|to) [the|my] {list} (for|on|at|due|before|by) {due}"
+            - "(add|put) {item} (on|to) [the|my] {list} (today|tonight|tomorrow|this|next) [{due}]"
           selector:
             text:
               multiple: true
@@ -212,25 +245,70 @@ variables:
   weekday_phrases: !input weekday_phrases
   day_part_phrases: !input day_part_phrases
   pm_phrases: !input pm_phrases
-  item: "{{ (trigger.slots.get('item') or '') | trim }}"
-  request_name: "{{ (trigger.slots.get('list_name') or '') | lower | trim }}"
-  due_text: "{{ (trigger.slots.get('due') or '') | lower | trim }}"
-  list_entity: >
-    {% set ns = namespace(exact=none, part=none) %}
-    {% if request_name in default_list_names | map('lower') | list or not request_name %}
-      {% set ns.exact = default_list %}
-    {% else %}
-      {% for s in states.todo | rejectattr('state', 'eq', 'unavailable') %}
-        {% set n = s.name | lower %}
-        {% if ns.exact is none and n == request_name %}
-          {% set ns.exact = s.entity_id %}
-        {% elif ns.part is none and (request_name in n or n in request_name) %}
-          {% set ns.part = s.entity_id %}
+  list_words: !input list_words
+  list_separators: !input list_separators
+  parsed: >
+    {% set orig = trigger.sentence | regex_replace('\\s+', ' ') | trim %}
+    {% set low = orig | lower %}
+    {% set item_slot = (trigger.slots.get('item') or '') | regex_replace('\\s+', ' ') | lower | trim %}
+    {% set start = low.find(item_slot) if item_slot else -1 %}
+    {% set req = low[start:] if start >= 0 else '' %}
+    {% set req_orig = orig[start:] if start >= 0 else '' %}
+    {% set words = list_words | map('lower') | map('trim') | reject('eq', '') | list %}
+    {% set ns = namespace(v=[]) %}
+    {% set sources = namespace(l=[]) %}
+    {% for s in states.todo | rejectattr('state', 'eq', 'unavailable') %}
+      {% set sources.l = sources.l + [[s.name | lower | trim, s.entity_id]] %}
+    {% endfor %}
+    {% for n in default_list_names | map('lower') | map('trim') %}
+      {% set sources.l = sources.l + [[n, default_list]] %}
+    {% endfor %}
+    {% for n, e in sources.l if n %}
+      {% set ns.v = ns.v + [[n, e]] %}
+      {% for w in words %}
+        {% set ns.v = ns.v + [[n ~ ' ' ~ w, e], [n ~ w, e]] %}
+        {% if n.endswith(' ' ~ w) %}
+          {% set ns.v = ns.v + [[n[:-(w | length + 1)], e]] %}
+        {% elif n.endswith(w) and n | length > w | length %}
+          {% set ns.v = ns.v + [[n[:-(w | length)], e]] %}
         {% endif %}
       {% endfor %}
+    {% endfor %}
+    {% set c = namespace(item=none, entity=none, rest='', spoken='') %}
+    {% for sep in list_separators | map('lower') | map('trim') | reject('eq', '') %}
+      {% set parts = req.split(' ' ~ sep ~ ' ') %}
+      {% for i in range(1, parts | count) %}
+        {% if c.item is none %}
+          {% set rest = parts[i:] | join(' ' ~ sep ~ ' ') %}
+          {% set lm = namespace(e=none, l=0) %}
+          {% for v in ns.v %}
+            {% if (rest == v[0] or rest.startswith(v[0] ~ ' ')) and v[0] | length > lm.l %}
+              {% set lm.e = v[1] %}{% set lm.l = v[0] | length %}
+            {% endif %}
+          {% endfor %}
+          {% if lm.e %}
+            {% set c.item = req_orig[:(parts[:i] | join(' ' ~ sep ~ ' ')) | length] | trim %}
+            {% set c.entity = lm.e %}
+            {% set c.spoken = rest[:lm.l] %}
+            {% set c.rest = rest[lm.l:] | trim %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    {% if c.item is none %}
+      {# no known list found, use the wildcards as they were matched #}
+      {% set list_slot = (trigger.slots.get('list') or trigger.slots.get('list_name') or '') | lower | trim %}
+      {% set due_slot = (trigger.slots.get('due') or '') | lower | trim %}
+      {% set c.item = trigger.slots.get('item', '') | trim %}
+      {% set c.spoken = list_slot %}
+      {% set p = low.rfind(list_slot) if list_slot else -1 %}
+      {% set c.rest = low[p + list_slot | length:] | trim if p >= 0 else due_slot %}
     {% endif %}
-    {{ ns.exact or ns.part or none }}
-  list_name: "{{ state_attr(list_entity, 'friendly_name') if list_entity else trigger.slots.get('list_name', '') }}"
+    {{ {'item': c.item, 'entity': c.entity, 'list': c.spoken, 'due': c.rest} }}
+  item: "{{ parsed.item }}"
+  due_text: "{{ parsed.due }}"
+  list_entity: "{{ parsed.entity if parsed.entity in states.todo | map(attribute='entity_id') | list else none }}"
+  list_name: "{{ state_attr(list_entity, 'friendly_name') if list_entity else parsed.list }}"
   due: >
     {% set text = ' ' ~ due_text | regex_replace('\\s+', ' ') ~ ' ' %}
     {% set ns = namespace(delta=none, length=0, part=none, part_length=0) %}
@@ -295,7 +373,7 @@ actions:
       - condition: template
         value_template: "{{ list_entity is none }}"
     then:
-      - set_conversation_response: "{{ response_invalid_list.format(item=item, list_name=trigger.slots.get('list_name', ''), due=due_text) }}"
+      - set_conversation_response: "{{ response_invalid_list.format(item=item, list_name=parsed.list, due=due_text) }}"
       - stop: List not found
   - alias: Stop when the due moment was not recognized
     if:
