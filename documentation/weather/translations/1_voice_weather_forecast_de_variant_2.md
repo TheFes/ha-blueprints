@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
 Translation by: @felixschndr
-Last update: 2025-23-10
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -90,13 +90,13 @@ Last update: 2025-23-10
           {% endif %}
         {% endif %}
 
-        {%- if precipitation_probability > rain_warning_threshold -%}
+        {%- if rain_expected -%}
           Es besteht eine {{ precipitation_probability }}% Wahrscheinlichkeit für {{
           precipitation }} Millimeter Regen – nimm also besser einen Regenschirm
           mit, wenn du rausgehst.
         {% endif %}
 
-        {%- if uv_index > 3 and condition in ['clear', 'partlycloudy'] -%}
+        {%- if uv_index | float(-1) > 3 and condition in ['sunny', 'partlycloudy', 'clear'] -%}
           {%- if phrase -%}
             Die Sonne wird stark scheinen.
           {%- else -%}
@@ -104,7 +104,7 @@ Last update: 2025-23-10
           {%- endif -%}
         {% endif %}
 
-        {%- if wind_speed >= wind_threshold -%}
+        {%- if wind_speed | float(0) >= wind_threshold -%}
           {%- if phrase -%}
             Der Wind wird {{ wind_phrase }} sein.
           {%- else -%}
@@ -112,9 +112,9 @@ Last update: 2025-23-10
           {%- endif -%}
         {% endif %}
 
-        {%- if wind_speed >= wind_warning_threshold -%}
+        {%- if wind_speed | float(0) >= wind_warning_threshold -%}
           Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
-        {%- elif wind_speed >= wind_joke_threshold -%}
+        {%- elif wind_speed | float(0) >= wind_joke_threshold -%}
           Pass auf, dass dir dein Regenschirm nicht davonfliegt!
         {% endif %}
       wind_phrases:

@@ -6,11 +6,15 @@
 
 Using this blueprint you can create an automation to request the weather forecast. The automation runs totally local, no LLM is required to use this automation.
 
+## Requirements
+
+* Home Assistant 2024.10 or newer
+
 ## Limitations of this automation
 
 * The sentences used to trigger the automation are rather strict
-* For full days you can only ask forecasts up to one weak ahead and for a period of one full day. For partial days only `night`, `morning`, `afternoon` and `evening` are possible, no other (subset of) hours.
-* The response is predefined, and therefor will follow the same format every time you request the weather. 
+* For full days you can only ask forecasts up to one week ahead and for a period of one full day. For partial days only `night`, `morning`, `afternoon` and `evening` are possible (optionally combined with a day, like `tomorrow morning` or `saturday evening`), no other (subset of) hours.
+* The response is predefined, and therefore will follow the same format every time you request the weather. 
 * In case you want to use it in another language as English, you need to provide translations for a large number of settings. You can also find translations in the `translations` folder in this directory.
 
 ## How to use the blueprint
@@ -55,6 +59,10 @@ These settings can be use to set which terms can be used to request a forecast. 
 When checking for the terms which are part of the day, they will also be checked against the values set for `Tomorrow`. If there is a match for one of the terms for `Tomorrow`, a day will be added.
 So `What is the weather for this morning` will give the weather for the morning of today, and `What is the weather for tomorrow morning` will give the forecast for the morning of the next day.
 
+A term for a part of the day can also be combined with any of the terms for a day. `saturday afternoon` will give the forecast for the afternoon of next Saturday, and `day after tomorrow evening` for the evening of the day after tomorrow. This needs a weather entity with an hourly forecast which goes far enough ahead.
+
+When you ask for a part of the day which has already passed (for example `morning` in the afternoon), the forecast for that part of the next day is given.
+
 ### Settings for the responses
 
 First part of this section set how the state of the weather entity will be used in the response. So for example the state `windy-cloudy` will be `windy and cloudy`.
@@ -68,6 +76,8 @@ First part of this section set how the state of the weather entity will be used 
 
 These variables can be used in the response. For all numeric values, the `Value round` setting in the blueprint is used (defaults to 0 digits).
 
+Not every weather provider provides all values. In the forecast for a full day, values which are not provided are `none`, so make sure your own response template can handle that (for example by using `uv_index | float(-1) > 3` instead of `uv_index > 3`, or `rain_expected` instead of comparing `precipitation_probability`). Otherwise the response will fail with an error.
+
 | Variable | Type | Description |
 | :--- | :--- | :--- |
 | `apparent_temperature` | number | The (highest) apparent temperature |
@@ -78,14 +88,15 @@ These variables can be used in the response. For all numeric values, the `Value 
 | `humidity` | number | The (highest) humidity |
 | `pressure` | number | The (highest) pressure |
 | `temperature` | number | The (highest) temperature |
-| `templow` | number | The low temperature for the day forecast (not provided in day part forecast) |
+| `templow` | number | The low temperature for the day forecast. For a part of a day, this is the lowest temperature in that part |
 | `precipitation` | number | The (total) precipitation |
 | `precipitation_probability` | number | The (highest) probability for rain |
+| `rain_expected` | boolean | `true` when the precipitation probability is above the `Rain warning threshold`. When the weather provider doesn't provide a precipitation probability, `true` when any precipitation is expected |
 | `rain_warning_threshold` | number | Set in the blueprint settings, can be used to not respond about rain when the probability is low |
 | `wind_speed` | number | The (highest) wind speed |
 | `wind_direction` | text | The cardinal wind direction |
 | `wind_phrase` | text | Term to describe the wind as set in the blueprint settings |
-| `wind_gust_speed` | number | The wind gust speed (not provided in day part forecast) |
+| `wind_gust_speed` | number | The (highest) wind gust speed |
 | `wind_threshold` | number | Set in the blueprint settings, can be used to not respond about wind when the speed is low |
 | `wind_joke_threshold` | number | Set in the blueprint, it is used in the default response template to issue a small joke about the wind |
 | `wind_warning_threshold` | number | Set in the blueprint, can be used to issue a warning about the wind |

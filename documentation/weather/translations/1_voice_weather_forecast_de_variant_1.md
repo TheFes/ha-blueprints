@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forecast_local.yaml)
 Translation by: @danielrheinbay
-Last update: 2025-27-01
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -74,7 +74,7 @@ Last update: 2025-27-01
       exceptional: mit außergewöhnlichem Wetter
       response_invalid_phrase: Ich kann keine Wettervorhersage für {{ phrase }} abrufen
       response_no_data: Keine Wettervorhersage verfügbar für {{ phrase }}
-      response_forecast: Es wird {{ temperature }} Grad {{ condition_translated }}. {% if temperature != apparent_temperature %}Es fühlt sich an wie {{ apparent_temperature }} Grad.{% endif %} {% if precipitation_probability > rain_warning_threshold %}Es besteht ein {{ precipitation_probability }}-prozentiges Risiko für {{ precipitation }} Millimeter regen, also nimm einen Regenschirm mit, wenn du rausgehst.{% endif %} {% if uv_index > 3 and condition in ['clear', 'partlycloudy'] %}Die Sonne scheint stark heute, also trage Sonnenschutz auf, wenn du nach draußen gehst.{% endif %} {% if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }}.{% endif %} {% if wind_speed >= wind_warning_threshold %}Also, wenn du nicht unbedingt raus musst, bleib lieber drinnen.{% elif wind_speed >= wind_joke_threshold %}Also pass auf, dass dir {% if precipitation_probability > 10 %}dein Regenschirm {% else %}'s{% endif %} nicht wegfliegt!{% endif %}
+      response_forecast: Es wird {{ temperature }} Grad {{ condition_translated }}. {% if temperature != apparent_temperature %}Es fühlt sich an wie {{ apparent_temperature }} Grad.{% endif %} {% if rain_expected %}Es besteht ein {{ precipitation_probability }}-prozentiges Risiko für {{ precipitation }} Millimeter regen, also nimm einen Regenschirm mit, wenn du rausgehst.{% endif %} {% if uv_index | float(-1) > 3 and condition in ['sunny', 'partlycloudy', 'clear'] %}Die Sonne scheint stark heute, also trage Sonnenschutz auf, wenn du nach draußen gehst.{% endif %} {% if wind_speed | float(0) >= wind_threshold %} Der Wind wird {{ wind_phrase }}.{% endif %} {% if wind_speed | float(0) >= wind_warning_threshold %}Also, wenn du nicht unbedingt raus musst, bleib lieber drinnen.{% elif wind_speed | float(0) >= wind_joke_threshold %}Also pass auf, dass dir {% if rain_expected %}dein Regenschirm {% else %}'s{% endif %} nicht wegfliegt!{% endif %}
       wind_phrases:
         windstill: 0
         schwach: 1
