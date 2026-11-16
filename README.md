@@ -73,6 +73,17 @@ Using these blueprints you can ask for the calendar entries from one or more cal
 |[3: Full LLM v2 (AI Task)](/documentation/calendar/3_voice_calendar_entries_full_llm_v2.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_calendar_entries_full_llm_v2.yaml)|
 
 
+### 📆 Add calendar event
+
+Using these blueprints you can add events to your calendars, with a start and end time, or as an all-day event.
+
+|Option|Import Button|
+|---|---|
+|[1: Local](/documentation/calendar/1_voice_add_calendar_event_local.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F1_voice_add_calendar_event_local.yaml)|
+|[2: LLM Enhanced](/documentation/calendar/2_voice_add_calendar_event_llm_enhanced.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F2_voice_add_calendar_event_llm_enhanced.yaml)|
+|[3: Full LLM](/documentation/calendar/3_voice_add_calendar_event_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_add_calendar_event_full_llm.yaml)|
+
+
 ### ✅ ToDo
 
 Using these blueprints you can ask for the todo list items from the todo entities in your system.
