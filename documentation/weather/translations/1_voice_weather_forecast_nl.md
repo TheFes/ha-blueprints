@@ -107,7 +107,7 @@ Last update: 2026-11-16
         Het {{ 'is' if current else 'wordt' }} {{ temperature }} graden {{ condition_translated }}. 
         {% if temperature != apparent_temperature %}Het voelt als {{ apparent_temperature }} graden.
         {% endif %} {% if rain_expected %}Er is {{ precipitation_probability }}% 
-        kans op {{ precipitation }} milimeter regen, dus neem een paraplu mee als je naar
+        kans op {% if precipitation | float(0) > 0 %}{{ precipitation }} millimeter {% endif %}regen, dus neem een paraplu mee als je naar
         buiten gaat.{% endif %} {% if uv_index | float(-1) > 3 and condition in ['sunny', 'partlycloudy', 'clear'] %}
         De zon schijnt fel vandaag, dus doe zonnebrand op als je naar buiten gaat.{% endif %} 
         {% if wind_speed | float(0) >= wind_threshold %} De wind wordt {{ wind_phrase }}{% if wind_direction is not none %} 
@@ -121,7 +121,7 @@ Last update: 2026-11-16
         graden zijn. {% if current_temperature != current_apparent_temperature %}
         Het voelt nu als {{ current_apparent_temperature }} graden.{% endif %} 
         {% if rain_expected %}
-        Er is {{ precipitation_probability }}% kans op {{ precipitation }} mm regen, 
+        Er is {{ precipitation_probability }}% kans op {% if precipitation | float(0) > 0 %}{{ precipitation }} mm {% endif %}regen, 
         dus neem een paraplu mee naar buiten.{% endif %} {% if current_uv_index | float(-1) 
         > 3 and current_condition in ['sunny', 'partlycloudy', 'clear'] %}De zon schijnt fel vandaag, 
         dus doe zonnebrand op als je naar buiten gaat.{% endif %} {%- if current_wind_speed 
