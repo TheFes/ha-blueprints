@@ -6,6 +6,9 @@
 
 Using this blueprint you can create a script to request the weather forecast. It allows you to ask any weather related question, so not only the weather forecast, but also if an umbrella is required if you go outside. You can ask for full days, periods of a day (e.g. morning) or specific hour ranges.
 
+> [!TIP]
+> There is also a [version 2](3_voice_weather_forecast_full_llm_v2.md) of this script, with a single `query` field and an AI Task to determine the period.
+
 ## Limitations of this script
 
 * You need to have an LLM integration set up and use it in your voice pipeline
