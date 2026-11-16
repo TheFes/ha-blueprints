@@ -11,7 +11,7 @@ blueprint:
 
     ### Prerequisites
 
-    * Createa a ToDo entity to store the reminders in. You can use the button below to start the config flow
+    * Create a ToDo entity to store the reminders in. You can use the button below to start the config flow
     
     [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=todo)
 
@@ -25,8 +25,6 @@ blueprint:
 
     * Change the prompt settings for the LLM
 
-    * Change or translate the settings for the response given by Assist
-
     #### Note:
 
     * Give the script a clear description. This will be used by the LLM to understand
@@ -37,9 +35,8 @@ blueprint:
     #### Example for script description:
 
 
-    `Tool to set reminders based on voice commands. In case not recipient is provided ask for it, 
-    in case no clear date and time is provided ask for it, in case no recipient is provided ask 
-    for it`
+    `Tool to set reminders based on voice commands. In case no recipient is provided ask for it, 
+    in case no clear date and time is provided ask for it`
 
     ### Usage
 
@@ -84,7 +81,7 @@ blueprint:
       input:
         recipient_prompt:
           name: Recipient prompt
-          description: The prompt which will be used to the LLM can provide the recipients for the reminder
+          description: The prompt used by the LLM to provide the recipients for the reminder
           selector:
             text:
               multiline: true
@@ -92,7 +89,7 @@ blueprint:
           default: "The recipients of the reminder based on the command given"
         reminder_text_prompt:
           name: Reminder text prompt
-          description: The prompt which will be used to the LLM can provide the text for the reminder
+          description: The prompt used by the LLM to provide the text for the reminder
           selector:
             text:
               multiline: true
@@ -100,7 +97,7 @@ blueprint:
           default: The text for the reminder which will be sent
         date_prompt:
           name: Date prompt
-          description: The prompt which will be used to the LLM can provide de right recipient names for the reminder
+          description: The prompt used by the LLM to provide the date for the reminder
           selector:
             text:
               multiline: true
@@ -110,14 +107,14 @@ blueprint:
             what!
 
             Provide the date on which the reminder should be sent. In case only a time
-            is provided by the user, take the next occurance of that time. So if the request
+            is provided by the user, take the next occurrence of that time. So if the request
             is for a reminder at 6 o clock in the evening, and it's already 8 o clock in the evening
             set the reminder for tomorrow.
-            The date needs be in the format YYYY-MM-DD. Always provide a date, and only provide a date, do
+            The date needs to be in the format YYYY-MM-DD. Always provide a date, and only provide a date, do
             not include a time"
         time_prompt:
           name: Time prompt
-          description: The prompt which will be used to the LLM can provide the time for the reminder
+          description: The prompt used by the LLM to provide the time for the reminder
           selector:
             text:
               multiline: true
@@ -126,7 +123,7 @@ blueprint:
             "This argument is mandatory and must always be provided no matter
             what!
 
-            Provide the time on which the requested period starts. This time should
+            Provide the time on which the reminder should be sent. This time should
             be in the format HH:MM:SS in 24 hour format (for example 17:00:00). Always
             provide a time. In case only a day is provided, use 00:00:00."
 
@@ -159,7 +156,7 @@ fields:
     required: true
 sequence:
   - variables:
-      version: 20250327
+      version: 20261116
       date: "{{ (date | as_datetime(default=now())).date() }}"
       time: "{{ time | default('00:00:00') | as_timedelta | default('00:00:00', true) }}"
       datetime: "{{ as_datetime(date) + as_timedelta(time) }}"

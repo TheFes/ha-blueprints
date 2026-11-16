@@ -2,7 +2,7 @@
 
 # Set reminders
 
-# 🚨 ONLY WORKS ON 2025.4.0 which is in beta now
+Requires Home Assistant 2025.4.0 or newer
 
 ### Important
 
@@ -20,8 +20,6 @@
 
 * Change the prompt settings for the LLM
 
-* Change or translate the settings for the response given by Assist
-
 #### Note:
 
 * Give the script a clear description. This will be used by the LLM to understand
@@ -32,9 +30,8 @@ it should use this script for the todo list items.
 #### Example for script description:
 
 
-`Tool to set reminders based on voice commands. In case not recipient is provided ask for it, 
-in case no clear date and time is provided ask for it, in case no recipient is provided ask 
-for it`
+`Tool to set reminders based on voice commands. In case no recipient is provided ask for it, 
+in case no clear date and time is provided ask for it`
 
 ### Usage
 
@@ -61,20 +58,20 @@ Make sure I do not forget to buy a gift for Mothers day
 The notifier should be an action to send the notification, it can be any action you want, which supports
 the `message` field in the data. So a persistent notification, tts message, notify message, etc.
 
-You can add addtional action data as normal, for example a `title`.
+You can add additional action data as normal, for example a `title`.
 
 It is also possible to use a jinja template as `condition` to determine if the reminder should be sent, 
 however, if all notifiers have a condition, and it returns `false` for all, the reminder will not be removed 
 from the list. Only when at least one action is performed, the item will be removed.
 
-Lastly it is possible to add a `prefix` for the message, so for example you can prefix the a TTS announcement 
+Lastly it is possible to add a `prefix` for the message, so for example you can prefix a TTS announcement 
 with `This is a reminder for: `
 
 Here is an example with comments to explain it in more detail. Make sure to adjust this to your own system.
 
 ```yaml
 - name: Richard # the name of the recipient
-  description: Father of the house, also called Dick # decription of the recipient which will be used by the LLM
+  description: Father of the house, also called Dick # description of the recipient which will be used by the LLM
   notifiers:
     # first notifier action
     - action: notify.mobile_app_dick
@@ -93,7 +90,7 @@ Here is an example with comments to explain it in more detail. Make sure to adju
         media_player_entity_id: media_player.office_dick
       # prefix which will be added to the description of the reminder
       prefix: "This is a reminder for:"
-      # condtion to determine if the reminder will be sent
+      # condition to determine if the reminder will be sent
       condition: "{{ is_state('person.richard', 'home') }}"
 ```
 

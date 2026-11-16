@@ -23,7 +23,7 @@ blueprint:
     you want, which supports the `message` field in the data. So a persistent notification,
     tts message, notify message, etc.
 
-    You can add addtional action data as normal, for example a `title`.
+    You can add additional action data as normal, for example a `title`.
 
     It is also possible to use a jinja template as `condition` to determine if the
     reminder should be sent, however, if all notifiers have a condition, and it returns
@@ -31,7 +31,7 @@ blueprint:
     least one action is performed, the item will be removed.
 
     Lastly it is possible to add a `prefix` for the message, so for example you can
-    prefix the a TTS announcement with `This is a reminder for: `
+    prefix a TTS announcement with `This is a reminder for: `
 
     The default setting in this selector acts as an example, make sure to adjust it
     to your own system.
@@ -57,10 +57,10 @@ blueprint:
     general_settings:
       name: General settings
       icon: mdi:cog
-      description: General settings for the script
+      description: General settings for the automation
       input:
         llm_agent:
-          name: LLM converation agent
+          name: LLM conversation agent
           description: The LLM agent you want to use to process the query
           selector:
             entity:
@@ -70,7 +70,7 @@ blueprint:
               multiple: false
         todo_entity:
           name: ToDo entity
-          description: Select the calendar entity to use for the reminders.
+          description: Select the ToDo entity which is used to store the reminders.
           selector:
             entity:
               multiple: false
@@ -138,7 +138,7 @@ blueprint:
         recipient_prompt:
           name: LLM Prompt
           description: The prompt which will be used to the LLM can provide the recipient
-            names based on the calendar entries
+            names based on the todo items
           selector:
             text:
               multiline: true
@@ -160,7 +160,7 @@ blueprint:
             this is used for further processing in actions. '
 triggers: !input triggers
 variables:
-  version: 2025.6.3
+  version: 2026.11.0
   todo_entity: !input todo_entity
   after_notification: !input after_notification
   recipients: !input recipients
@@ -175,9 +175,19 @@ actions:
   response_variable: todo_data
 - alias: Set new variable
   variables:
-    items: '{{ todo_data[todo_entity][''items''] | selectattr(''status'', ''eq'',
-      ''needs_action'') | selectattr(''due'', ''<'', (now()+timedelta(seconds=30)).isoformat())
-      | list }}'
+    items: >
+      {% set ns = namespace(items=[]) %}
+      {% set limit = now() + timedelta(seconds=30) %}
+      {% for i in todo_data[todo_entity]['items'] | selectattr('status', 'eq', 'needs_action') | selectattr('due', 'defined') %}
+        {% set due = as_datetime(i.due, none) %}
+        {% if due is not none %}
+          {% set due = due | as_local if due.tzinfo else as_datetime(i.due ~ 'T00:00:00' if i.due | length == 10 else i.due) | as_local %}
+          {% if due <= limit %}
+            {% set ns.items = ns.items + [i] %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {{ ns.items }}
 - alias: Repeat sending the notifications for each event
   repeat:
     for_each: '{{ items }}'
@@ -196,7 +206,7 @@ actions:
     - variables:
         recipients_raw: '{{ recipient_llm_raw.response.speech.plain.speech }}'
         recipients_llm: "{% set r = recipients_raw %} {% if r is list %}\n  {{ r }}\n{%
-          elif r is string and r is search('\\[*\\]') %}\n  {{ r[r.index('['):r.index(']')+1]
+          elif r is string and r is search('\\[.*\\]') %}\n  {{ r[r.index('['):r.index(']')+1]
           }}\n{% elif r is string %}\n  {{ r.split(',') | map('trim') | list }}\n{%
           endif %}\n"
     - alias: Repeat sending the notification for each recipient
@@ -232,7 +242,7 @@ actions:
           target:
             entity_id: !input todo_entity
           data:
-            item: '{{ text }}'
+            item: '{{ item.uid | default(text, true) }}'
         else:
         - alias: mark item as completed
           action: todo.update_item
@@ -240,4 +250,4 @@ actions:
             entity_id: !input todo_entity
           data:
             status: completed
-            item: '{{ text }}'
+            item: '{{ item.uid | default(text, true) }}'
