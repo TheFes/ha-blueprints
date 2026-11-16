@@ -110,11 +110,15 @@ response_translations:
   January: januari
   February: februari
   March: maart
+  April: april
   May: mei
   June: juni
   July: juli
   August: augustus
+  September: september
   October: oktober
+  November: november
+  December: december
 response_added: "{item} staat op {list_name}, voor {due}"
 response_no_due_support: "{item} staat op {list_name}, maar deze lijst ondersteunt geen datum"
 response_invalid_list: "Ik kan geen lijst met de naam {list_name} vinden"
