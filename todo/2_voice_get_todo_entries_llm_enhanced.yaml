@@ -86,7 +86,7 @@ blueprint:
           description: >-
             Instructions for the AI to determine the requested lists and status. The output format
             is enforced by the structure, so this only needs to explain how to interpret the request.
-            You can use `{{ trigger.sentence }}`.
+            You can use `{{ trigger.sentence }}` and `{{ default_list_name }}`.
           default: >-
             You interpret a question about todo lists, like a shopping list or a list with tasks.
             The user asked: "{{ trigger.sentence }}"
@@ -99,8 +99,9 @@ blueprint:
 
             - lists: the list or lists the question is about. Match what the user says with the
             names in the field description (also when the user uses another word, like "groceries"
-            for a shopping list) and return the matching ids. When no list is mentioned, use the
-            default list from the field description, or all lists when there is no default list.
+            for a shopping list) and return the matching ids. When no list is mentioned (for example
+            "do we need milk" or "what do I need to buy"), use the default list:
+            {{ default_list_name or 'all lists' }}.
 
             - status: needs_action for items which still need to be done (also when the user asks
             what is on a list), completed only when the user asks for items which are done, all
@@ -167,7 +168,6 @@ actions:
     variables:
       version: 20261116
       ai_task_entity: !input ai_task_entity
-      llm_instructions: !input llm_instructions
       todo_entities: !input todo_entities
       default_list: !input default_list
   - alias: Collect the todo lists
@@ -182,8 +182,12 @@ actions:
       list_desc: >-
         {% for o in lists %}{{ o.label }} = {{ o.value }}{{ '; ' if not loop.last }}{% endfor %}
         {%- if default_list in lists | map(attribute='value') | list %}. Default list: {{ default_list }}{% endif %}
-  - alias: Create the structure for the AI Task
+  - alias: Create the structure and instructions for the AI Task
     variables:
+      default_list_name: >-
+        {{ (lists | selectattr('value', 'eq', default_list) | map(attribute='label') | list | first) ~ ' (' ~ default_list ~ ')'
+           if default_list in lists | map(attribute='value') | list else '' }}
+      llm_instructions: !input llm_instructions
       structure:
         lists:
           description: "Lists the question is about. Match on the name, return the id. Available (name = id): {{ list_desc }}"
