@@ -1,5 +1,5 @@
 ![Version](https://img.shields.io/github/v/release/TheFes/ha-blueprints)
-[![Buy me a coffe](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/TheFes)
+[![Buy me a coffee](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/TheFes)
 [![Paypal](https://img.shields.io/badge/PayPal-00457C?&color=00457c&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/thefes)
 
 # thefes.casa Home Assistant blueprints
@@ -10,13 +10,14 @@
 </picture>
 
 
-## Under construction
-
-This Repository is still under contstruction. The contents in general, but also the blueprints might change quite frequently. I'll try not to introduce any backwards incompatible changes.
+> [!NOTE]
+> The recent additions and changes (the LLM Enhanced automations, the Full LLM v2 scripts using AI Tasks, reminders version 2 and the blueprints to add todo items and calendar events) were written together with Claude, the AI assistant by Anthropic. I reviewed them and they were tested on my own instance.
 
 ## About this repository
 
-On this respository I will put my blueprints which are created to help issuing advanced (voice) commands using Assist. 
+I use Assist on my Voice PE units, but out of the box Assist can't answer questions about the weather forecast or your calendar, and it can't set reminders or add calendar events. To fill these gaps I created blueprints for voice commands.
+
+On this repository I put my blueprints which are created to help issuing advanced (voice) commands using Assist. 
 There are basically 5 ways to configure a voice pipeline in Home Assistant:
 
 |#|LLM|Home Control (Assist) enabled|Local preference enabled|Description|
@@ -27,7 +28,7 @@ There are basically 5 ways to configure a voice pipeline in Home Assistant:
 |4|✅|✅|❌|LLM as voice agent, with home control, no local preference|
 |5|✅|✅|✅|LLM as voice agent, with home control, with local preference|
 
-On this repository different blueprints will be placed with the same goal. The will differ in which op the above mentioned configurations are supported. Based on that, also other aspects will differ.
+On this repository different blueprints will be placed with the same goal. They differ in which of the above mentioned configurations are supported. Based on that, also other aspects will differ.
 
 ## Blueprint options
 
@@ -131,7 +132,7 @@ The first version of the full LLM script, with its own automation to send the re
 For completeness I also mention these blueprints here. They are located on the Music Assistant Voice support [repository](<https://github.com/music-assistant/voice-support>).
 I'm also a maintainer of that repository and did a lot of work on those blueprints together with some other guys.
 
-Using these bleuprints you can issue voice commands to play media on your Music Assistant media players.
+Using these blueprints you can issue voice commands to play media on your Music Assistant media players.
 
 |Option|Import Button|
 |---|---|
@@ -141,16 +142,13 @@ Using these bleuprints you can issue voice commands to play media on your Music 
 
 ## Planned
 
-1. ~~Add missing options for weather and calendar~~
-2. ~~Add blueprints to create reminders~~
-3. ~~Add blueprints to add and list todo items, including due dates/times~~
-4. ...
+* Nothing at the moment, all planned blueprints are available. Feel free to suggest new ones by opening an [issue](https://github.com/TheFes/ha-blueprints/issues)!
 
 ## Questions/issues/bugs/feature requests?
 
 In case you have a question, you found a bug, or have a feature request open an [issue](https://github.com/TheFes/ha-blueprints/issues) on this GitHub repository. 
 
-In case something isn't working or you found a bug, a trace of the script will be needed in most cases to determine the cause. The trace can be downloaded as a json file. To do this follow the steps below:
+In case something isn't working or you found a bug, a trace of the script or automation will be needed in most cases to determine the cause. The trace can be downloaded as a json file. To do this follow the steps below:
 
 1. Depending on the blueprint type go to [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/scripts.svg)](https://my.home-assistant.io/redirect/scripts/) or [![Open your Home Assistant instance and show your scripts.](https://my.home-assistant.io/badges/automations.svg)](https://my.home-assistant.io/redirect/automations/)
 2. Find the relevant script or automation in the list.
@@ -164,7 +162,7 @@ In case you create the issue on GitHub you can upload the json files, in case yo
 
 ## ☕ Coffee
 
-If you think I deserve a coffe, please feel free to buy me one (I might spend it on another beverage though).
+If you think I deserve a coffee, please feel free to buy me one (I might spend it on another beverage though).
 In case you decide to do so, thanks a lot!
 
 <a href="https://www.buymeacoffee.com/thefes" target="_blank">![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)</a>
