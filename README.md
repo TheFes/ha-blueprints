@@ -97,17 +97,23 @@ The built-in intent to add an item to a todo list doesn't support a due date or 
 
 ### 📋 Reminder
 
-#### 🚨 Requires at least Home Assistant 2025.4.0
+Using these blueprints you can set reminders for one or more people. The reminders are stored in a todo list, and an automation sends them at the right moment to the notify entities of the recipients, and announces them on their Assist satellites when they are home.
 
-Using these blueprints you can set reminders.
-
-Note: the setup for these bluprints require you to create a todo entity first to store the reminders in. It also relies on an automation to send the reminders. Make sure to read the documentation
+Note: these blueprints require a todo list which supports due dates with a time and descriptions (for example [Local To-do](https://www.home-assistant.io/integrations/local_todo/)), and an automation to send the reminders. Make sure to read the documentation.
 
 |Option|Import Button|
 |---|---|
-|1: Local|To be created|
-|2: LLM Enhanced|To be created|
+|[1: Local](/documentation/reminder/1_voice_reminder_local.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F1_voice_reminder_local.yaml)|
+|[2: LLM Enhanced](/documentation/reminder/2_voice_reminder_llm_enhanced.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F2_voice_reminder_llm_enhanced.yaml)|
+|[3: Full LLM v2 (AI Task)](/documentation/reminder/3_voice_reminder_full_llm_v2.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F3_voice_reminder_full_llm_v2.yaml)|
+|[Send reminders (version 2)](/documentation/reminder/0_voice_send_reminder_v2.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F0_voice_send_reminder_v2.yaml)|
+
+The first version of the full LLM script, with its own automation to send the reminders, is still available for existing users:
+
+|Option|Import Button|
+|---|---|
 |[3: Full LLM](/documentation/reminder/3_voice_reminder_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F3_voice_reminder_full_llm.yaml)|
+|Send reminders (version 1)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Freminder%2F0_voice_send_reminder.yaml)|
 
 ### 🎶 Music Assistant
 
