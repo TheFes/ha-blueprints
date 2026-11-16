@@ -4,7 +4,10 @@
 
 [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Fcalendar%2F3_voice_calendar_entries_full_llm.yaml)
 
-Using this blueprint you can create an script to request for calendar entries. It allows you to ask any calendar related question, so not only directly for a day of period, but also if when the next doctor's meeting will be.
+Using this blueprint you can create a script to request calendar entries. It allows you to ask any calendar related question, so not only for a day or period, but also when the next doctor's appointment is.
+
+> [!TIP]
+> There is also a [version 2](3_voice_calendar_entries_full_llm_v2.md) of this script, with a single `query` field and an AI Task to determine the period.
 
 ## Limitations of this script
 
@@ -14,9 +17,9 @@ Using this blueprint you can create an script to request for calendar entries. I
 ## How to use the blueprint
 
 1. Import the blueprint using the button above
-2. Create an script using the blueprint
-3. Select one or more calendar entries
-4. (optionally) adjust the prompts which will are used to instruct the LLM how to use the script fields
+2. Create a script using the blueprint
+3. Select one or more calendar entities
+4. (optionally) adjust the prompts which are used to instruct the LLM how to use the script fields
 5. Make sure to provide a clear description for the script (example below)
 6. Save the script, and expose it to Assist
 
@@ -26,7 +29,7 @@ Using this blueprint you can create an script to request for calendar entries. I
 
 ## Usage
 
-You can request for the calendar entries in any way yuou can think of, using any language. Unless set otherwise in the LLM
+You can request the calendar entries in any way you can think of, using any language. Unless set otherwise in the LLM
 configuration, the response will be in the same language as the command.
 
 You can refer to a single day, multiple days (e.g. next weekend) a part of the day (e.g. next morning) or one or more hours
