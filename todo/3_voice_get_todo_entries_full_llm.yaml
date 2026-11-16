@@ -72,8 +72,7 @@ blueprint:
             the items on the list should be fetched. Use the entity_id of the todo list
             (preferred) or its name.
 
-            Ignore items which are marked as completed, unless the user specifically requests
-            completed items."
+            Completed items are only returned when the include_completed field is set to true."
 mode: parallel
 max_exceeded: silent
 fields:
@@ -86,6 +85,13 @@ fields:
     name: ToDo entities
     required: true
     description: !input todo_entities_prompt
+  include_completed:
+    name: Include completed items
+    description: >-
+      Set to true only when the user explicitly asks for items which are completed (done).
+      By default only the items which still need to be done are returned.
+    selector:
+      boolean: {}
 sequence:
   - alias: Match the requested lists with the todo entities
     variables:
@@ -131,6 +137,8 @@ sequence:
     continue_on_error: true
     target:
       entity_id: "{{ todo }}"
+    data:
+      status: "{{ ['needs_action', 'completed'] if include_completed | default(false) | bool(false) else ['needs_action'] }}"
     response_variable: response
   - if:
       - condition: template
