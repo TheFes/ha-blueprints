@@ -4,7 +4,7 @@ Translation for: [1_voice_weather_forecast_local](/weather/1_voice_weather_forec
 
 Translation by: @PocketMiner82
 
-Last update: 2026-03-06
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -174,11 +174,11 @@ Last update: 2026-03-06
       {%- endif %}
 
       {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Heute besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
-        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+        {%- if rain_expected %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
         {%- endif %}
       {%- endif %}
 
-      {%- if current_uv_index | float(-1) > 3 and current_condition in ['clear', 'partlycloudy'] %} Die Sonne scheint stark.
+      {%- if current_uv_index | float(-1) > 3 and current_condition in ['sunny', 'partlycloudy', 'clear'] %} Die Sonne scheint stark.
       {%- endif %}
 
       {%- if current_wind_speed is not none -%}
@@ -190,26 +190,26 @@ Last update: 2026-03-06
         {%- endif %}
       {%- endif %}
     response_forecast: >-
-      Es {{ condition_translated }}. Die Temperatur wird {{ phrase }} bei{% if templow is defined %} minimal {{ templow }} und{% endif %} maximal {{ temperature }} Grad liegen.
+      Es {{ condition_translated }}. Die Temperatur wird {{ phrase }} bei{% if templow is not none %} minimal {{ templow }} und{% endif %} maximal {{ temperature }} Grad liegen.
       Die Luftfeuchtigkeit wird etwa {{ humidity }} Prozent betragen.
 
       {%- if temperature != apparent_temperature %} Es wird sich aber anfühlen wie {{ apparent_temperature }} Grad.
       {%- endif %}
 
       {%- if precipitation_probability is not none and precipitation | float(-1) > 0 %} Es besteht eine {{ precipitation_probability }} prozentige Wahrscheinlichkeit für {{ precipitation }} Liter Regen pro Quadratmeter.
-        {%- if precipitation_probability > rain_warning_threshold %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
+        {%- if rain_expected %} Nimm also besser einen Regenschirm mit, wenn du rausgehst.
         {%- endif %}
       {%- endif %}
 
-      {%- if uv_index | float(-1) > 3 and condition in ['clear', 'partlycloudy'] %} Die Sonne wird stark scheinen.
+      {%- if uv_index | float(-1) > 3 and condition in ['sunny', 'partlycloudy', 'clear'] %} Die Sonne wird stark scheinen.
       {%- endif %}
 
       {%- if wind_speed is not none -%}
-        {%- if wind_speed >= wind_threshold %} Der Wind wird {{ wind_phrase }}{% if wind_direction is not none %} aus {{ wind_direction }} Richtung wehen{% endif %}.
+        {%- if wind_speed | float(0) >= wind_threshold %} Der Wind wird {{ wind_phrase }}{% if wind_direction is not none %} aus {{ wind_direction }} Richtung wehen{% endif %}.
         {%- endif %}
 
-        {%- if wind_speed >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
-        {%- elif wind_speed >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
+        {%- if wind_speed | float(0) >= wind_warning_threshold %} Wenn du also nicht unbedingt raus musst, bleib besser drinnen.
+        {%- elif wind_speed | float(0) >= wind_joke_threshold %} Pass auf, dass dir dein Regenschirm nicht davonfliegt!
         {%- endif %}
       {%- endif %}
     wind_phrases:

@@ -1,0 +1,441 @@
+blueprint:
+  domain: automation
+  name: Voice - Weather Forecast - LLM Enhanced Blueprint
+  author: TheFes
+  source_url: https://github.com/TheFes/ha-blueprints/blob/main/weather/2_voice_weather_forecast_llm_enhanced.yaml
+  homeassistant:
+    min_version: 2025.8.0
+  description: |
+    ![Image](https://github.com/TheFes/ha-blueprints/blob/main/images/header.png?raw=true)
+
+    More detailed information can be found [here](https://github.com/TheFes/ha-blueprints/blob/main/documentation/weather/2_voice_weather_forecast_llm_enhanced.md)
+
+    # Request the weather forecast with local Assist, enhanced by an AI Task
+
+    The request is caught by local trigger sentences, so you don't need an LLM as conversation agent,
+    and the LLM doesn't need access to your house. An AI Task (`ai_task.generate_data`) is used twice:
+
+    1. To determine the requested period from your question (with structured output, so it can only
+       return a valid period)
+    2. To answer your question in natural language, based on the forecast data for that period
+
+    The forecast data is collected and summarized by Home Assistant itself, so the AI only receives
+    the data it needs.
+
+    ### Blueprint setup
+
+    #### Required
+    * Set a weather entity to use for the forecasts
+    * An AI Task entity (or set a preferred AI Task entity in Home Assistant)
+
+    #### Optional
+    * Add triggers or change the existing ones (for example to translate them)
+    * Change the instructions for the AI
+    * Translate the error responses
+
+    ### Usage
+
+    The sentence needs to match one of the trigger sentences, but within those sentences you can
+    ask anything. By default the following sentences are configured:
+
+    - (what's|what is|how's|how is) the weather [forecast] [like] [{query}]
+    - what('ll| will) the weather [forecast] be [like] [{query}]
+    - what('s| is) the [weather] forecast [{query}]
+    - (will|is) it [going to] (rain|snow|freeze|be (sunny|cold|warm|hot|windy|dry|nice)) [{query}]
+    - (do|should) I (need|take|bring|wear|use) [a|an|my] (umbrella|sunscreen|coat|jacket) [{query}]
+
+    #### Examples
+    * What's the weather like tomorrow afternoon
+    * What will the weather be this weekend
+    * Will it rain at 9 this evening
+    * Do I need an umbrella when I go out between 3 and 5
+    * Is it going to be cold on Saturday morning
+  input:
+    weather_settings:
+      name: Weather settings
+      icon: mdi:weather-lightning-rainy
+      input:
+        weather_entity:
+          name: Weather entity
+          description: >-
+            The weather entity to use for the forecasts. For the best results it should provide an
+            hourly and a daily forecast.
+          selector:
+            entity:
+              filter:
+                - domain: weather
+        include_details:
+          name: Include the forecast per hour or day
+          description: >-
+            Besides a summary of the requested period, also send the forecast for each hour or day
+            (up to 24 items) to the AI. This allows answers like "it will start raining around 4",
+            but uses more tokens.
+          default: true
+          selector:
+            boolean: {}
+    ai_settings:
+      name: AI settings
+      icon: mdi:robot
+      collapsed: true
+      input:
+        ai_task_entity:
+          name: AI Task entity
+          description: >-
+            The AI Task entity used to interpret the request and create the response. Leave empty
+            to use the preferred AI Task entity set in Home Assistant.
+          default:
+          selector:
+            entity:
+              filter:
+                - domain: ai_task
+        llm_instructions:
+          name: Instructions to determine the period
+          description: >-
+            Instructions for the AI to determine the requested period. The output format is
+            enforced by the structure, so this only needs to explain how to interpret the request.
+            You can use `{{ trigger.sentence }}`.
+          default: >-
+            You interpret a voice request about the weather. The user said: "{{ trigger.sentence }}"
+
+
+            The current date and time is {{ now().strftime('%A %Y-%m-%d %H:%M') }}.
+
+
+            Fill in the fields as follows:
+
+            - time_period_type: daily when the request is about one or more full days (today,
+            tomorrow, next Thursday, the weekend). hourly when the request is about a part of a
+            day, specific hours, the coming hours or the current weather (this evening, tomorrow
+            morning, at 9, from 3 to 5, right now). Also use hourly when the user asks when
+            something happens during a day ("when will it start raining tomorrow"), then use the
+            full day (start at 00:00:00, or the current hour for today) as the period. When no
+            period is mentioned, use hourly for the coming 3 hours.
+
+            - start_date: the date on which the requested period starts, in the format YYYY-MM-DD.
+            Use today's date when no day is mentioned. A weekday means the next occurrence of that
+            day, today included. The weekend is Saturday and Sunday. For the night, use the next
+            day, unless the current time is before 06:00.
+
+            - start_time: the time on which the requested period starts, in the 24 hour format
+            HH:MM:SS. Use 00:00:00 for full days. Night starts at 00:00:00, morning at 06:00:00,
+            afternoon at 12:00:00 and evening at 18:00:00. For the current weather or the coming
+            hours, use the start of the current hour.
+
+            - time_period_length: the number of days (daily) or hours (hourly) of the period.
+            Night, morning, afternoon and evening are 6 hours, a single moment ("at 9") is 1 hour
+            and the weekend is 2 days.
+
+            - period_description: a short description of the requested period, in the language
+            of the request (for example "tomorrow morning").
+          selector:
+            text:
+              multiline: true
+        response_instructions:
+          name: Instructions for the response
+          description: >-
+            Instructions for the AI to create the response. The question, the requested period
+            and the forecast data are added automatically. You can use `{{ trigger.sentence }}`
+            and `{{ period_description }}`.
+          default: >-
+            You are a voice assistant answering a question about the weather. Answer in the same
+            language as the question. Keep it short and natural, one to three sentences. The answer
+            will be read aloud by a text-to-speech engine, so don't use markdown, lists or emoji,
+            write units in words (degrees, millimeters, kilometers per hour) and round the numbers.
+            When the user asks about something specific (rain, an umbrella, sunscreen, a coat),
+            answer that first. Only mention the wind when it is strong, and only mention the UV
+            index when it is above 3. Only use the data below, don't make anything up.
+          selector:
+            text:
+              multiline: true
+    trigger_settings:
+      name: Trigger and responses
+      icon: mdi:chat
+      collapsed: true
+      description: >-
+        The trigger sentences and the response used when something went wrong. Translate these to
+        use the blueprint in another language. The response of the AI is always in the language of
+        the question, also when there is no forecast for the requested period.
+      input:
+        trigger:
+          name: Conversation trigger sentences
+          description: >-
+            The sentences which will trigger the automation. {query} is a wildcard which can hold
+            the period, but the full sentence is always sent to the AI.
+          default:
+            - "(what's|what is|how's|how is) the weather [forecast] [like] [{query}]"
+            - "what('ll| will) the weather [forecast] be [like] [{query}]"
+            - "what('s| is) the [weather] forecast [{query}]"
+            - "(will|is) it [going to] (rain|snow|freeze|be (sunny|cold|warm|hot|windy|dry|nice)) [{query}]"
+            - "(do|should) I (need|take|bring|wear|use) [a|an|my] (umbrella|sunscreen|coat|jacket) [{query}]"
+          selector:
+            text:
+              multiple: true
+        error_response:
+          name: Error response
+          description: Used when the AI Task fails, or the weather data could not be retrieved.
+          default: Sorry, something went wrong while getting the weather forecast
+          selector:
+            text:
+              multiline: true
+
+mode: parallel
+max: 10
+
+triggers:
+  - alias: Voice request for the weather
+    trigger: conversation
+    command: !input trigger
+
+actions:
+  - alias: Set the input variables
+    variables:
+      version: 20261116
+      weather_entity: !input weather_entity
+      include_details: !input include_details
+      ai_task_entity: !input ai_task_entity
+      llm_instructions: !input llm_instructions
+  - alias: Determine the supported forecast types
+    variables:
+      supported: >
+        {% set sf = state_attr(weather_entity, 'supported_features') | int(0) %}
+        {% set d = ['daily'] if sf | bitwise_and(1) else [] %}
+        {% set h = ['hourly'] if sf | bitwise_and(2) else [] %}
+        {% set td = ['twice_daily'] if sf | bitwise_and(4) else [] %}
+        {{ d + h + td }}
+      structure:
+        time_period_type:
+          description: daily for one or more full days, hourly for a part of a day or specific hours
+          required: true
+          selector:
+            select:
+              options:
+                - daily
+                - hourly
+        start_date:
+          description: The date on which the period starts (YYYY-MM-DD)
+          required: true
+          selector:
+            date: {}
+        start_time:
+          description: The time on which the period starts (HH:MM:SS, 24 hour format)
+          required: true
+          selector:
+            time: {}
+        time_period_length:
+          description: Number of days (daily) or hours (hourly) of the period
+          required: true
+          selector:
+            number:
+              min: 1
+              max: 48
+        period_description:
+          description: Short description of the requested period, in the language of the request
+          required: true
+          selector:
+            text: {}
+
+  - alias: Ask the AI Task to determine the requested period
+    action: ai_task.generate_data
+    continue_on_error: true
+    data: >-
+      {% set d = {'task_name': 'Weather voice request', 'instructions': llm_instructions, 'structure': structure} %}
+      {{ dict(d, entity_id=ai_task_entity) if ai_task_entity else d }}
+    response_variable: ai_period
+
+  - alias: Stop with error response when the AI Task failed
+    if:
+      - condition: template
+        value_template: "{{ ai_period is not defined or ai_period.data is not defined or ai_period.data is string or not supported }}"
+    then:
+      - set_conversation_response: !input error_response
+      - stop: AI Task failed, or the weather entity doesn't support forecasts
+
+  - alias: Read the period from the AI result
+    variables:
+      llm: "{{ ai_period.data }}"
+      period_description: "{{ llm.get('period_description') or trigger.sentence }}"
+      requested_type: "{{ llm.get('time_period_type') if llm.get('time_period_type') in ['daily', 'hourly'] else 'daily' }}"
+  - alias: Check the forecast type
+    variables:
+      time_period_type: >
+        {% if requested_type == 'hourly' and 'hourly' not in supported %}
+          {{ 'daily' if 'daily' in supported else 'twice_daily' }}
+        {% elif requested_type == 'daily' and 'daily' not in supported %}
+          {{ 'twice_daily' if 'twice_daily' in supported else 'hourly' }}
+        {% else %}
+          {{ requested_type }}
+        {% endif %}
+  - alias: Validate the date and time provided by the AI
+    variables:
+      start_date: >
+        {% set d = llm.get('start_date') | default('', true) | string | trim %}
+        {{ d[:10] if d is match('\d{4}-\d{2}-\d{2}') else now().date() | string }}
+      start_time: >
+        {% set t = llm.get('start_time') | default('00:00:00', true) | string | trim %}
+        {% set t = t ~ ':00' if t is match('^\d{1,2}:\d{2}$') else t %}
+        {{ t if as_timedelta(t) is not none else '00:00:00' }}
+      length: "{{ [llm.get('time_period_length') | default(1) | int(1), 1] | max }}"
+  - alias: Determine the start of the period
+    variables:
+      start: >
+        {% set s = as_datetime(start_date) | as_local %}
+        {{ (s + as_timedelta(start_time) if requested_type == 'hourly' and time_period_type == 'hourly' else s).isoformat() }}
+  - alias: Determine the end of the period
+    variables:
+      end: >
+        {% set s = as_datetime(start) %}
+        {% if requested_type == 'hourly' and time_period_type == 'hourly' %}
+          {{ (s + timedelta(hours=length)).isoformat() }}
+        {% elif requested_type == 'hourly' %}
+          {# no hourly forecast available, use the full days which contain the requested hours #}
+          {% set e = s + as_timedelta(start_time) + timedelta(hours=length) %}
+          {% set m = as_datetime(e.date() | string) | as_local %}
+          {{ (m if e == m else m + timedelta(days=1)).isoformat() }}
+        {% else %}
+          {{ (s + timedelta(days=length)).isoformat() }}
+        {% endif %}
+
+  - alias: Get the forecast data
+    action: weather.get_forecasts
+    continue_on_error: true
+    target:
+      entity_id: !input weather_entity
+    data:
+      type: "{{ time_period_type }}"
+    response_variable: weather_response
+  - alias: Select the forecast data for the requested period
+    variables:
+      all_forecast: >
+        {{ weather_response[weather_entity].forecast | default([])
+           if weather_response is defined and weather_entity in weather_response else [] }}
+      selected: >
+        {% set ns = namespace(forecast=[]) %}
+        {% for item in all_forecast %}
+          {% set dt = item.datetime | as_datetime | as_local %}
+          {% if start | as_datetime <= dt < end | as_datetime %}
+            {% set ns.forecast = ns.forecast + [dict(item, datetime=dt.isoformat())] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.forecast }}
+
+  - alias: Stop when the weather provider returned no forecast data
+    if:
+      - condition: template
+        value_template: "{{ all_forecast | count == 0 }}"
+    then:
+      - set_conversation_response: !input error_response
+      - stop: No forecast data received from the weather provider
+
+  - alias: Collect the units
+    variables:
+      units:
+        temperature: "{{ state_attr(weather_entity, 'temperature_unit') }}"
+        precipitation: "{{ state_attr(weather_entity, 'precipitation_unit') }}"
+        wind_speed: "{{ state_attr(weather_entity, 'wind_speed_unit') }}"
+        pressure: "{{ state_attr(weather_entity, 'pressure_unit') }}"
+        visibility: "{{ state_attr(weather_entity, 'visibility_unit') }}"
+        wind_bearing: degrees
+  - alias: Collect current conditions
+    variables:
+      current_conditions: >
+        {% if start | as_datetime <= now() < end | as_datetime %}
+          {% set a = states[weather_entity].attributes %}
+          {% set keys = ['temperature', 'apparent_temperature', 'humidity', 'cloud_coverage', 'uv_index',
+                         'wind_speed', 'wind_gust_speed', 'wind_bearing', 'precipitation', 'visibility'] %}
+          {% set ns = namespace(d={'condition': states(weather_entity)}) %}
+          {% for k in keys if a.get(k) is not none %}
+            {% set ns.d = dict(ns.d, **{k: a.get(k)}) %}
+          {% endfor %}
+          {{ ns.d }}
+        {% else %}
+          {{ none }}
+        {% endif %}
+  - alias: Summarize the forecast data
+    variables:
+      summary: >
+        {% set items = selected %}
+        {% set keys = items | map('list') | sum(start=[]) | unique | reject('in', ['datetime', 'is_daytime']) | list %}
+        {% set ns = namespace(d={}) %}
+        {% for k in keys %}
+          {% set v = items | selectattr(k, 'defined') | map(attribute=k) | reject('none') | list %}
+          {% if v %}
+            {% if v[0] is string %}
+              {% set ns.d = dict(ns.d, **{k ~ '_most_frequent': v | statistical_mode}) %}
+              {% if k == 'condition' %}
+                {% set ns.d = dict(ns.d, conditions_in_period=v | unique | list) %}
+              {% endif %}
+            {% elif k == 'wind_bearing' %}
+              {% set n = v | select('is_number') | list %}
+              {% if n %}
+                {% set t = namespace(s=0, c=0) %}
+                {% for b in n %}
+                  {% set t.s = t.s + sin(b * pi / 180) %}
+                  {% set t.c = t.c + cos(b * pi / 180) %}
+                {% endfor %}
+                {% set ns.d = dict(ns.d, wind_bearing_average=((atan2(t.s, t.c) * 180 / pi) % 360) | round(0)) %}
+              {% endif %}
+            {% elif k in ['temperature', 'apparent_temperature', 'dew_point'] %}
+              {% set ns.d = dict(ns.d, **{k: {'min': v | min | round(1), 'max': v | max | round(1)} if v | count > 1 else v[0] | round(1)}) %}
+            {% elif k == 'templow' %}
+              {% set ns.d = dict(ns.d, templow_min=v | min | round(1)) %}
+            {% elif k == 'precipitation' %}
+              {% set ns.d = dict(ns.d, precipitation_total=v | sum | round(1)) %}
+            {% elif k in ['precipitation_probability', 'wind_speed', 'wind_gust_speed', 'uv_index'] %}
+              {% set ns.d = dict(ns.d, **{k ~ '_max': v | max | round(1)}) %}
+            {% else %}
+              {% set ns.d = dict(ns.d, **{k ~ '_average': v | average | round(0)}) %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.d }}
+  - alias: Combine the weather data
+    variables:
+      weather_data: >
+        {% set r = {
+          'requested_period': period_description,
+          'start_of_period': start,
+          'end_of_period': end,
+          'forecast_type': time_period_type,
+          'units': units,
+          'summary_for_period': summary
+        } %}
+        {% set r = dict(r, note='The weather provider has no hourly forecast, so the forecast for the full day is provided') if requested_type == 'hourly' and time_period_type != 'hourly' else r %}
+        {% set r = dict(r, current_conditions=current_conditions) if current_conditions else r %}
+        {% if selected | count == 0 %}
+          {% set r = dict(r, error='There is no forecast data for the requested period, tell the user for which period the forecast is available',
+                          forecast_available_from=((all_forecast | first).datetime | as_datetime | as_local).isoformat(),
+                          forecast_available_until=((all_forecast | last).datetime | as_datetime | as_local).isoformat(),
+                          forecast_type=time_period_type) %}
+          {{ dict(r.items() | rejectattr('0', 'eq', 'summary_for_period')) }}
+        {% else %}
+          {{ dict(r, forecast=selected[:24]) if include_details and selected | count > 1 else r }}
+        {% endif %}
+      response_instructions: !input response_instructions
+  - alias: Create the instructions for the response
+    variables:
+      answer_instructions: |-
+        {{ response_instructions }}
+
+        The current date and time is {{ now().strftime('%A %Y-%m-%d %H:%M') }}.
+
+        The question of the user: "{{ trigger.sentence }}"
+
+        Weather data for {{ period_description }}:
+        {{ weather_data | to_json }}
+
+  - alias: Ask the AI Task to answer the question
+    action: ai_task.generate_data
+    continue_on_error: true
+    data: >-
+      {% set d = {'task_name': 'Weather voice response', 'instructions': answer_instructions} %}
+      {{ dict(d, entity_id=ai_task_entity) if ai_task_entity else d }}
+    response_variable: ai_answer
+
+  - alias: Send back the response
+    if:
+      - condition: template
+        value_template: "{{ ai_answer is defined and ai_answer.data is string and ai_answer.data | trim | length > 0 }}"
+    then:
+      - set_conversation_response: "{{ ai_answer.data | trim }}"
+    else:
+      - set_conversation_response: !input error_response
