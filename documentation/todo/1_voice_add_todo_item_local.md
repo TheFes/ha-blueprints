@@ -13,13 +13,25 @@ Home Assistant has a built-in intent to add an item to a todo list, but it doesn
 ## Limitations of this automation
 
 * The sentences used to trigger the automation are rather strict
+* The list needs to be one of your todo lists (or one of the `Default list names`), otherwise the `List not found` response is given
 * The due moment can contain a day (today, tomorrow, the day after tomorrow or a weekday), a time and a part of the day. Dates like "December 3rd", "next week" or "in two hours" are not supported, and numbers need to be digits (`5`, not `five`)
 * One item per sentence
 * In case you want to use it in another language as English, you need to translate the trigger, the phrases and the responses. A Dutch translation is available below
 
 ## How the default sentence works
 
-By default the sentence is `(add|put) {item} (on|to) [the|my] {list_name} list {due}`. Because the `{due}` part is required, a sentence without a due moment ("add milk to the shopping list") doesn't match, and is still handled by the built-in intent.
+The default sentences are:
+
+* `(add|put) {item} (on|to) [the|my] {list} (for|on|at|due|before|by) {due}`
+* `(add|put) {item} (on|to) [the|my] {list} (today|tonight|tomorrow|this|next) [{due}]`
+
+The word after `{list}` is required, so a sentence without a due moment ("add milk to the shopping list") and other sentences like "add 5 minutes to the timer" don't match, and are still handled by the built-in intents.
+
+Sentence matching can't reliably split the wildcards itself (in "add go to the gym to my chores for friday" the item would be "go"), so the blueprint determines the item, the list and the due moment from the complete sentence:
+
+1. It looks for the `Words between the item and the list` ("to the", "on my", ...) and checks if the text after them starts with the name of one of your todo lists or one of the `Default list names`. The longest matching name wins.
+2. A list name is also recognized with one of the `Words for list` after it ("chores list", or "boodschappenlijst" for the list "Boodschappen"), and without it when the list name itself ends with it (the list "Homeassistant list" is found with both "homeassistant list" and "homeassistant").
+3. Everything after the list name is the due moment.
 
 ## How to use the blueprint
 
@@ -35,7 +47,9 @@ By default the sentence is `(add|put) {item} (on|to) [the|my] {list_name} list {
 |Setting|Description|
 |---|---|
 |Default todo list|Used when the spoken list name is one of the `Default list names`|
-|Default list names|For example `shopping` or `todo`. Other names are matched with the names of your todo lists (not case sensitive, first the complete name, then a part of the name)|
+|Default list names|For example `shopping` or `todo`. Other names are matched with the names of your todo lists (not case sensitive)|
+|Words for list|Words for "list", see [How the default sentence works](#how-the-default-sentence-works)|
+|Words between the item and the list|The words between `{item}` and `{list}` in your sentences, longer variants first (`to the` before `to`)|
 
 ### Settings for the due moment
 
@@ -72,8 +86,19 @@ default_list_names:
   - to do
   - todo
 trigger:
-  - "(zet|doe) {item} op [de|mijn] {list_name}[ ]lijst {due}"
-  - "voeg {item} toe aan [de|mijn] {list_name}[ ]lijst {due}"
+  - "(zet|doe) {item} op [de|mijn] {list} (voor|op|om|tegen|deze|volgende|komende) {due}"
+  - "(zet|doe) {item} op [de|mijn] {list} (vandaag|vanavond|vannacht|morgen|overmorgen|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag) [{due}]"
+  - "voeg {item} toe aan [de|mijn] {list} (voor|op|om|tegen|deze|volgende|komende) {due}"
+  - "voeg {item} toe aan [de|mijn] {list} (vandaag|vanavond|vannacht|morgen|overmorgen|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag) [{due}]"
+list_words:
+  - lijst
+list_separators:
+  - toe aan de
+  - toe aan mijn
+  - toe aan
+  - op de
+  - op mijn
+  - op
 day_phrases:
   vandaag: 0
   vanavond: 0
