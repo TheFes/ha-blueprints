@@ -85,6 +85,16 @@ Using these blueprints you can ask for the todo list items from the todo entitie
 |[3: Full LLM v2 (AI Task)](/documentation/todo/3_voice_get_todo_entries_full_llm_v2.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F3_voice_get_todo_entries_full_llm_v2.yaml)|
 
 
+### ➕ Add ToDo item with due date
+
+The built-in intent to add an item to a todo list doesn't support a due date or time. Using these blueprints you can add items with a due date and time.
+
+|Option|Import Button|
+|---|---|
+|[1: Local](/documentation/todo/1_voice_add_todo_item_local.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F1_voice_add_todo_item_local.yaml)|
+|[2: LLM Enhanced](/documentation/todo/2_voice_add_todo_item_llm_enhanced.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F2_voice_add_todo_item_llm_enhanced.yaml)|
+|[3: Full LLM](/documentation/todo/3_voice_add_todo_item_full_llm.md)|[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FTheFes%2Fha-blueprints%2Fblob%2Fmain%2Ftodo%2F3_voice_add_todo_item_full_llm.yaml)|
+
 ### 📋 Reminder
 
 #### 🚨 Requires at least Home Assistant 2025.4.0
@@ -116,7 +126,7 @@ Using these bleuprints you can issue voice commands to play media on your Music 
 
 1. ~~Add missing options for weather and calendar~~
 2. ~~Add blueprints to create reminders~~
-3. Add blueprints to add and list todo items, including due dates/times
+3. ~~Add blueprints to add and list todo items, including due dates/times~~
 4. ...
 
 ## Questions/issues/bugs/feature requests?
