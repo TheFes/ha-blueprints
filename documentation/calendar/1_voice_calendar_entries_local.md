@@ -6,11 +6,15 @@
 
 Using this blueprint you can create an automation to request the calendar entries. The automation runs totally local, no LLM is required to use this automation.
 
+## Requirements
+
+* Home Assistant 2024.10 or newer
+
 ## Limitations of this automation
 
 * The sentences used to trigger the automation are rather strict
-* For full days you can only ask calendar entries up to one weak ahead and for a period of one full day, or for the rest of the current week (`this week`, from today until Sunday). For partial days only `night`, `morning`, `afternoon` and `evening` are possible, no other (subset of) hours.
-* The response is predefined, and therefor will follow the same format every time you request the calendar entries. 
+* For full days you can ask calendar entries for one day up to one week ahead, for the rest of the current week (`this week`, from today until Sunday), the coming weekend (`this weekend`) or next week (`next week`, Monday until Sunday). For partial days only `night`, `morning`, `afternoon` and `evening` are possible (optionally combined with a day, like `tomorrow evening`), no other (subset of) hours.
+* The response is predefined, and therefore will follow the same format every time you request the calendar entries. 
 * In case you want to use it in another language as English, you need to provide translations for a large number of settings.
 
 ## How to use the blueprint
@@ -48,13 +52,29 @@ Capitalization is ignored when checking a (voice) command with a trigger sentenc
 
 ### Settings for the daily calendar entries / Settings for the calendar entries of a part of a day
 
-These settings can be use to set which terms can be used to request a calendar entries. Multiple terms can be entered for a single parameter.
+These settings can be used to set which terms can be used to request a calendar entries. Multiple terms can be entered for a single parameter.
 
 #### Note on the terms for part of a day
 
 When checking for the terms which are part of the day, they will also be checked against the values set for `Tomorrow`. If there is a match for one of the terms for `Tomorrow`, a day will be added.
-So `What is the weather for this morning` will give the weather for the morning of today, and `What is the weather for tomorrow morning` will give the calendar entries for the morning of the next day.
+So `What's on the calendar for this morning` will give the calendar entries for the morning of today, and `What's on the calendar for tomorrow morning` will give the calendar entries for the morning of the next day.
+
+A term for a part of the day can also be combined with any of the terms for a day, for example `saturday evening` or `day after tomorrow afternoon`.
+
+When no period is mentioned (for example `What's on the calendar`), the entries for today are given. When the period is not recognized, the `Period not recognized` response is given.
 
 ### Settings for the responses
 
 You can change how Assist responds to the voice command here.
+
+|Setting|Description|
+|---|---|
+|Phrases used in the response for the weekdays and months|Mapping to translate the English weekday and month names in the date|
+|Date format / Time format|Format for the date and time, see https://strftime.org|
+|Singular event / Multiple events|Words used for one or more events|
+|Combine word|Word used to combine multiple full day events|
+|No events for selected period|Response when there are no events|
+|Period not recognized|Response when the requested period is not recognized. `{{ phrase }}` contains the period as spoken|
+|Day introduction|First line for each day. `{date}`, `{event_count}` and `{events}` are replaced|
+|Full day|Line for the full day events of a day. `{event_list}` is replaced|
+|Part of a day|Line for each other event. `{start}`, `{end}` and `{event_summary}` are replaced|

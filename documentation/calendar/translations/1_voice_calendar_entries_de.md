@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_calendar_entries_local](/calendar/1_voice_calendar_entries_local.yaml)
 Translation by: @nilsreiter and @felixschndr
-Last update: 2025-23-10
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -29,6 +29,7 @@ Last update: 2025-23-10
     event_singular: Termin
     event_plural: Termine
     no_events: In diesem Zeitraum gibt es keine Termine.
+    response_invalid_phrase: Ich weiß nicht, welchen Zeitraum du mit {{ phrase }} meinst.
     event_count: "Am {date} gibt es {event_count} {events}:"
     day_event: Ganztägig steht {event_list} im Kalender.
     day_after_tomorrow:
@@ -49,6 +50,12 @@ Last update: 2025-23-10
       - sonntag
     this_week:
       - diese woche
+    weekend:
+      - wochenende
+      - dieses wochenende
+      - am wochenende
+    next_week:
+      - nächste woche
     night:
       - nacht
       - nachts

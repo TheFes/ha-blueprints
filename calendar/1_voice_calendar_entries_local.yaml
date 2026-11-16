@@ -481,7 +481,12 @@ actions:
     response_variable: calendar
     continue_on_error: true
   - variables:
-      events: "{{ merge_response(calendar) | sort(attribute='start') | list if calendar is defined else [] }}"
+      events: >
+        {%- set ns = namespace(events=[]) %}
+        {%- for e in (merge_response(calendar) if calendar is defined else []) | sort(attribute='start') %}
+          {%- set ns.events = ns.events + [dict(e, summary=(e.summary | default('') | string | regex_replace('\\s+', ' ') | trim))] %}
+        {%- endfor %}
+        {{ ns.events }}
   - if:
       - condition: template
         value_template: "{{ iif(events) }}"

@@ -2,7 +2,7 @@
 
 Translation for: [1_voice_calendar_entries_local](/calendar/1_voice_calendar_entries_local.yaml)
 Translation by: @TheFes
-Last update: 2025-29-01
+Last update: 2026-11-16
 
 # How to use this translation
 
@@ -40,6 +40,12 @@ Last update: 2025-29-01
       - zondag
       this_week:
       - deze week
+      weekend:
+      - weekend
+      - dit weekend
+      - het weekend
+      next_week:
+      - volgende week
       night:
       - vannacht
       - morgennacht
@@ -80,10 +86,12 @@ Last update: 2025-29-01
       event_plural: afspraken
       combine_word: en
       no_events: Er zijn geen afspraken voor deze periode
+      response_invalid_phrase: Ik weet niet welke periode je bedoelt met {{ phrase }}
       event_count: Op {date} heb je {event_count} {events}.
       day_event: Voor de hele dag staat er {event_list}.
       part_day_event: Van {start} tot {end} heb je {event_summary}.
       trigger:
       - wat staat er [voor|op] {phrase} op de (agenda|kalender|planning)
       - staat er [voor|op] {phrase} iets op de (agenda|kalender|planning)
+      - wat staat er [vandaag] op de (agenda|kalender|planning)
 ```
